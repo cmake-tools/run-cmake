@@ -26147,6 +26147,124 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 6315:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const { isexe, sync: isexeSync } = __nccwpck_require__(2524)
+const { join, delimiter, sep, posix } = __nccwpck_require__(1017)
+
+const isWindows = process.platform === 'win32'
+
+// used to check for slashed in commands passed in. always checks for the posix
+// seperator on all platforms, and checks for the current separator when not on
+// a posix platform. don't use the isWindows check for this since that is mocked
+// in tests but we still need the code to actually work when called. that is also
+// why it is ignored from coverage.
+/* istanbul ignore next */
+const rSlash = new RegExp(`[${posix.sep}${sep === posix.sep ? '' : sep}]`.replace(/(\\)/g, '\\$1'))
+const rRel = new RegExp(`^\\.${rSlash.source}`)
+
+const getNotFoundError = (cmd) =>
+  Object.assign(new Error(`not found: ${cmd}`), { code: 'ENOENT' })
+
+const getPathInfo = (cmd, {
+  path: optPath = process.env.PATH,
+  pathExt: optPathExt = process.env.PATHEXT,
+  delimiter: optDelimiter = delimiter,
+}) => {
+  // If it has a slash, then we don't bother searching the pathenv.
+  // just check the file itself, and that's it.
+  const pathEnv = cmd.match(rSlash) ? [''] : [
+    // windows always checks the cwd first
+    ...(isWindows ? [process.cwd()] : []),
+    ...(optPath || /* istanbul ignore next: very unusual */ '').split(optDelimiter),
+  ]
+
+  if (isWindows) {
+    const pathExtExe = optPathExt ||
+      ['.EXE', '.CMD', '.BAT', '.COM'].join(optDelimiter)
+    const pathExt = pathExtExe.split(optDelimiter).flatMap((item) => [item, item.toLowerCase()])
+    if (cmd.includes('.') && pathExt[0] !== '') {
+      pathExt.unshift('')
+    }
+    return { pathEnv, pathExt, pathExtExe }
+  }
+
+  return { pathEnv, pathExt: [''] }
+}
+
+const getPathPart = (raw, cmd) => {
+  const pathPart = /^".*"$/.test(raw) ? raw.slice(1, -1) : raw
+  const prefix = !pathPart && rRel.test(cmd) ? cmd.slice(0, 2) : ''
+  return prefix + join(pathPart, cmd)
+}
+
+const which = async (cmd, opt = {}) => {
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
+
+  for (const envPart of pathEnv) {
+    const p = getPathPart(envPart, cmd)
+
+    for (const ext of pathExt) {
+      const withExt = p + ext
+      const is = await isexe(withExt, { pathExt: pathExtExe, ignoreErrors: true })
+      if (is) {
+        if (!opt.all) {
+          return withExt
+        }
+        found.push(withExt)
+      }
+    }
+  }
+
+  if (opt.all && found.length) {
+    return found
+  }
+
+  if (opt.nothrow) {
+    return null
+  }
+
+  throw getNotFoundError(cmd)
+}
+
+const whichSync = (cmd, opt = {}) => {
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
+
+  for (const pathEnvPart of pathEnv) {
+    const p = getPathPart(pathEnvPart, cmd)
+
+    for (const ext of pathExt) {
+      const withExt = p + ext
+      const is = isexeSync(withExt, { pathExt: pathExtExe, ignoreErrors: true })
+      if (is) {
+        if (!opt.all) {
+          return withExt
+        }
+        found.push(withExt)
+      }
+    }
+  }
+
+  if (opt.all && found.length) {
+    return found
+  }
+
+  if (opt.nothrow) {
+    return null
+  }
+
+  throw getNotFoundError(cmd)
+}
+
+module.exports = which
+which.sync = whichSync
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -26216,6 +26334,14 @@ module.exports = require("events");
 
 "use strict";
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 3292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
 
 /***/ }),
 
@@ -28010,6 +28136,212 @@ function parseParams (str) {
 module.exports = parseParams
 
 
+/***/ }),
+
+/***/ 2524:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sync = exports.isexe = exports.posix = exports.win32 = void 0;
+const posix = __importStar(__nccwpck_require__(1410));
+exports.posix = posix;
+const win32 = __importStar(__nccwpck_require__(5389));
+exports.win32 = win32;
+__exportStar(__nccwpck_require__(2657), exports);
+const platform = process.env._ISEXE_TEST_PLATFORM_ || process.platform;
+const impl = platform === 'win32' ? win32 : posix;
+/**
+ * Determine whether a path is executable on the current platform.
+ */
+exports.isexe = impl.isexe;
+/**
+ * Synchronously determine whether a path is executable on the
+ * current platform.
+ */
+exports.sync = impl.sync;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 2657:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//# sourceMappingURL=options.js.map
+
+/***/ }),
+
+/***/ 1410:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+/**
+ * This is the Posix implementation of isexe, which uses the file
+ * mode and uid/gid values.
+ *
+ * @module
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sync = exports.isexe = void 0;
+const fs_1 = __nccwpck_require__(7147);
+const promises_1 = __nccwpck_require__(3292);
+/**
+ * Determine whether a path is executable according to the mode and
+ * current (or specified) user and group IDs.
+ */
+const isexe = async (path, options = {}) => {
+    const { ignoreErrors = false } = options;
+    try {
+        return checkStat(await (0, promises_1.stat)(path), options);
+    }
+    catch (e) {
+        const er = e;
+        if (ignoreErrors || er.code === 'EACCES')
+            return false;
+        throw er;
+    }
+};
+exports.isexe = isexe;
+/**
+ * Synchronously determine whether a path is executable according to
+ * the mode and current (or specified) user and group IDs.
+ */
+const sync = (path, options = {}) => {
+    const { ignoreErrors = false } = options;
+    try {
+        return checkStat((0, fs_1.statSync)(path), options);
+    }
+    catch (e) {
+        const er = e;
+        if (ignoreErrors || er.code === 'EACCES')
+            return false;
+        throw er;
+    }
+};
+exports.sync = sync;
+const checkStat = (stat, options) => stat.isFile() && checkMode(stat, options);
+const checkMode = (stat, options) => {
+    const myUid = options.uid ?? process.getuid?.();
+    const myGroups = options.groups ?? process.getgroups?.() ?? [];
+    const myGid = options.gid ?? process.getgid?.() ?? myGroups[0];
+    if (myUid === undefined || myGid === undefined) {
+        throw new Error('cannot get uid or gid');
+    }
+    const groups = new Set([myGid, ...myGroups]);
+    const mod = stat.mode;
+    const uid = stat.uid;
+    const gid = stat.gid;
+    const u = parseInt('100', 8);
+    const g = parseInt('010', 8);
+    const o = parseInt('001', 8);
+    const ug = u | g;
+    return !!(mod & o ||
+        (mod & g && groups.has(gid)) ||
+        (mod & u && uid === myUid) ||
+        (mod & ug && myUid === 0));
+};
+//# sourceMappingURL=posix.js.map
+
+/***/ }),
+
+/***/ 5389:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+/**
+ * This is the Windows implementation of isexe, which uses the file
+ * extension and PATHEXT setting.
+ *
+ * @module
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sync = exports.isexe = void 0;
+const fs_1 = __nccwpck_require__(7147);
+const promises_1 = __nccwpck_require__(3292);
+/**
+ * Determine whether a path is executable based on the file extension
+ * and PATHEXT environment variable (or specified pathExt option)
+ */
+const isexe = async (path, options = {}) => {
+    const { ignoreErrors = false } = options;
+    try {
+        return checkStat(await (0, promises_1.stat)(path), path, options);
+    }
+    catch (e) {
+        const er = e;
+        if (ignoreErrors || er.code === 'EACCES')
+            return false;
+        throw er;
+    }
+};
+exports.isexe = isexe;
+/**
+ * Synchronously determine whether a path is executable based on the file
+ * extension and PATHEXT environment variable (or specified pathExt option)
+ */
+const sync = (path, options = {}) => {
+    const { ignoreErrors = false } = options;
+    try {
+        return checkStat((0, fs_1.statSync)(path), path, options);
+    }
+    catch (e) {
+        const er = e;
+        if (ignoreErrors || er.code === 'EACCES')
+            return false;
+        throw er;
+    }
+};
+exports.sync = sync;
+const checkPathExt = (path, options) => {
+    const { pathExt = process.env.PATHEXT || '' } = options;
+    const peSplit = pathExt.split(';');
+    if (peSplit.indexOf('') !== -1) {
+        return true;
+    }
+    for (let i = 0; i < peSplit.length; i++) {
+        const p = peSplit[i].toLowerCase();
+        const ext = path.substring(path.length - p.length).toLowerCase();
+        if (p && ext === p) {
+            return true;
+        }
+    }
+    return false;
+};
+const checkStat = (stat, path, options) => stat.isFile() && checkPathExt(path, options);
+//# sourceMappingURL=win32.js.map
+
 /***/ })
 
 /******/ 	});
@@ -28055,13 +28387,23 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(6519);
 const exec = __nccwpck_require__(1372);
+const which = __nccwpck_require__(6315)
 
 try
 {
-  exec.exec('cmake','--version');
+  let found_cmake = which.sync('cmake', { nothrow: true })
+  if (variable === null)
+  {
+    throw new Error('CMake program not found.')
+  }
+  else
+  {
+    exec.exec('cmake','--version');
+  }
 }
 catch (error)
 {
+  core.error(error.message)
   core.setFailed(error.message);
 }
 
