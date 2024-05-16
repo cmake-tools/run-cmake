@@ -28391,8 +28391,8 @@ const which = __nccwpck_require__(6315)
 
 try
 {
-  let found_cmake = which.sync('cmake', { nothrow: true })
-  if (variable === null)
+  let found_cmake = which.sync('cmake333', { nothrow: true })
+  if (found_cmake === null)
   {
     throw new Error('CMake program not found.')
   }
