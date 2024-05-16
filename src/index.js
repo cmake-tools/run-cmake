@@ -3,7 +3,7 @@ const exec = require('@actions/exec');
 
 try
 {
-  exec.exec('ln',['-s', '/usr/lib/x86_64-linux-gnu/libidn.so.12.x','/usr/lib/x86_64-linux-gnu/libidn.so.11')
+  exec.exec('sudo',['apt-get', 'install','--no-install-recommends', '-y','libidn11-dev')
   exec.exec('cmake','--version');
 }
 catch (error)
