@@ -4,10 +4,10 @@ const which = require('which')
 
 try
 {
-  let found_cmake = which.sync('cmake333', { nothrow: true })
+  let found_cmake = which.sync('cmake', { nothrow: true })
   if (found_cmake === null)
   {
-    throw new String('CMake program not found.')
+    throw String('CMake program not found.')
   }
   else
   {
