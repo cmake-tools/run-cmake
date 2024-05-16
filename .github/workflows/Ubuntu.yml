@@ -1,13 +1,26 @@
 on:
   push:
 
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     name: test run-cmake
+    strategy:
+      fail-fast: false
+      matrix:
+        cmake_version: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: ⬇️ Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ^3
+          ninjaVersion: ^1.11.1
       - name: run-cmake
         uses: ./
         id: hello
