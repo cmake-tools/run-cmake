@@ -28404,7 +28404,6 @@ try
 catch (error)
 {
   core.error(error.message)
-  core.setFailed(-1);
 }
 
 })();
