@@ -1,0 +1,14 @@
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: test run-cmake
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: run-cmake
+        uses: ./
+        id: hello
+        with:

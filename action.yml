@@ -1,0 +1,11 @@
+name: run-cmake
+description: 'GitHub action to run CMake'
+author: flagarde
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'settings'
+  color: 'green'
