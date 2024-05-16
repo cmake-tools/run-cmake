@@ -11,4 +11,3 @@ jobs:
       - name: run-cmake
         uses: ./
         id: hello
-        with:
