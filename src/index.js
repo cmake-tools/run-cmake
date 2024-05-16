@@ -7,7 +7,7 @@ try
   let found_cmake = which.sync('cmake333', { nothrow: true })
   if (found_cmake === null)
   {
-    throw new Error('CMake program not found.')
+    throw new String('CMake program not found.')
   }
   else
   {
