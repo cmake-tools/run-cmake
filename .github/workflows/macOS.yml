@@ -8,7 +8,7 @@ concurrency:
 jobs:
   test:
     runs-on: macos-latest
-    name: test run-cmake
+    name: CMake v3.${{ matrix.cmake_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -19,8 +19,8 @@ jobs:
       - name: ⬇️ Setup CMake
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: ^3
-          ninjaVersion: ^1.11.1
+          cmakeVersion: ~3.${{ matrix.cmake_version }}
+          ninjaVersion: ^1
       - name: run-cmake
         uses: ./
         id: hello
