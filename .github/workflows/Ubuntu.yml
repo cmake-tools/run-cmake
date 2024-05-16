@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install libidn11
+        run: apt-get install --no-install-recommends -y libidn11
       - name: ⬇️ Setup CMake
         uses: lukka/get-cmake@latest
         with:

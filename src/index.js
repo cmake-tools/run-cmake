@@ -3,7 +3,6 @@ const exec = require('@actions/exec');
 
 try
 {
-  exec.exec('sudo',['apt-get', 'install','--no-install-recommends', '-y','libidn11')
   exec.exec('cmake','--version');
 }
 catch (error)
