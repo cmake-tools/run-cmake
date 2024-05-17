@@ -27,15 +27,22 @@ async function getCMakeVersion()
   else return version_number[0]
 }
 
+
+function CMakeVersionGreaterEqual(version)
+{
+  //let cmake_version= await getCMakeVersion()
+  return compare_version.compare(global.cmake_version, version, '>=')
+}
+
 class commandLineMaker
 {
   constructor(version)
   {
-    if(compare_version.compare(version, '3.13.0', '>=') ) this.old_style=false
+    if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
+    this.#generator()
     this.#fullSourceDir()
     this.#fullBinaryDir()
-    this.#generator()
   }
   isOldStyle() { return this.old_style }
   buildArray() 
@@ -43,11 +50,18 @@ class commandLineMaker
     let options=[]
     let absolute=path.resolve('./')
     console.log(absolute)
-    let name=absolute+'/toto.dot'
-    options.push('-G',this.generator)
-    options.push('--graphviz='+name)
+
+
+    //let name=absolute+'/toto.dot'
+    //options.push('-G',this.generator)
+    //options.push('--graphviz='+name)
+
+    this.toolset = core.getInput('toolset', { required: false })
+    if(this.toolset!='') options.push('-T',this.toolset)
+    options=options.concat(this.#install_prefix())
     if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
     else options.push(this.source_dir)
+    console.log(options)
     return options
   }
   buildPath() { return this.binary_dir}
@@ -77,7 +91,20 @@ class commandLineMaker
     {
       if(process.platform === "win32") this.generator="NMake Makefiles"
       else this.generator="Unix Makefiles"
+      return ['']
     }
+  }
+  #install_prefix()
+  {
+    delete process.env.CMAKE_INSTALL_PREFIX;
+    this.install_prefix = core.getInput('install_prefix', { required: false });
+    if(this.install_prefix!='')
+    {
+      this.install_prefix=path.resolve(this.install_prefix)
+      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
+      else return Array('-DCMAKE_INSTALL_PREFIX:STRING='+this.install_prefix)
+    }
+    return []
   }
 }
 
@@ -91,8 +118,8 @@ try{
   }
   else
   {
-    let version= await getCMakeVersion()
-    const command_line_maker = new commandLineMaker(version)
+    global.cmake_version= await getCMakeVersion()
+    const command_line_maker = new commandLineMaker()
     let cout ='';
     let cerr='';
     const options = {};
@@ -115,27 +142,27 @@ try{
     let png_file=absolute+'/png.png'
     console.log('lllll'+dot_name)
     await exec.exec('cmake',command_line_maker.buildArray(), options)
-    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
-    else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
-    else await exec.exec('brew', ['install', 'graphviz'])
-    await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
+    //if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
+    //else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
+    //else await exec.exec('brew', ['install', 'graphviz'])
+    //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
     //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
     //core.summary.write()
 
-    const artifact = new DefaultArtifactClient()
-    const {id, size} = await artifact.uploadArtifact(
+    //const artifact = new DefaultArtifactClient()
+    //const {id, size} = await artifact.uploadArtifact(
       // name of the artifact
-      'toto.dot',
+    //  'toto.dot',
       // files to include (supports absolute and relative paths)
-      ['./png.png'],absolute,
-      {
+    //  ['./png.png'],absolute,
+    //  {
         // optional: how long to retain the artifact
         // if unspecified, defaults to repository/org retention settings (the limit of this value)
         retentionDays: 1
-      }
-    )
-    console.log(id)
+    //  }
+   // )
+    //console.log(id)
     //${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}
 
 }

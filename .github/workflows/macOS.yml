@@ -29,4 +29,6 @@ jobs:
       - name: run-cmake with arguments
         uses: ./
         id: cmake
+        with:
+          install_prefix:'./MyInstallPrefix'
         

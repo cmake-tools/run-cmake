@@ -15,6 +15,14 @@ inputs:
     description: 'Generator to use (Unix Makefiles on Linux and macOS, NMake Makefiles in Windows)'
     required: false
     default: ''
+  toolset:
+    description: 'Toolset specification for the generator, if supported.'
+    required: false
+    default: ''
+  install_prefix:
+    description: 'Specify the installation directory, used by the CMAKE_INSTALL_PREFIX variable'
+    required: false
+    default: ''
 
 runs:
   using: 'node20'
