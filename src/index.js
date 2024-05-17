@@ -110,7 +110,7 @@ try{
     await exec.exec('cmake',command_line_maker.buildArray(), options)
 
     core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
-
+    core.summary.write()
 }
 
 }
