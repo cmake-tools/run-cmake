@@ -4,6 +4,8 @@ const which = require('which')
 const compare_version = require('compare-versions')
 const io = require('@actions/io');
 const path = require('path')
+const {DefaultArtifactClient} = require('@actions/artifact')
+const github = require('@actions/github');
 
 async function getCMakeVersion()
 {
@@ -40,6 +42,7 @@ class commandLineMaker
   {
     let options=[]
     options.push('-G',this.generator)
+    options.push('--graphviz=./toto.dot')
     if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
     else options.push(this.source_dir)
     return options
@@ -75,7 +78,6 @@ class commandLineMaker
   }
 }
 
-
 async function main()
 {
 try{
@@ -106,7 +108,11 @@ try{
       options.cwd = command_line_maker.buildPath();
     }
     await exec.exec('cmake',command_line_maker.buildArray(), options)
-  }
+
+    core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
+
+}
+
 }
 catch (error)
 {
