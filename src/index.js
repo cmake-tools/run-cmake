@@ -39,9 +39,9 @@ class commandLineMaker
   buildArray() 
   {
     let options=[]
-    if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
-    else return options.push(this.source_dir)
     options.push('-G',this.generator)
+    if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
+    else options.push(this.source_dir)
     return options
   }
   buildPath() { return this.binary_dir}
