@@ -33,12 +33,16 @@ class commandLineMaker
     else this.old_style=true
     this.#fullSourceDir()
     this.#fullBinaryDir()
+    this.#generator()
   }
   isOldStyle() { return this.old_style }
   buildArray() 
   {
-    if(this.old_style==false) return ['-S',this.source_dir,'-B',this.binary_dir]
-    else return [this.source_dir]
+    let options=[]
+    if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
+    else return options.push(this.source_dir)
+    options.push('-G',this.generator)
+    return options
   }
   buildPath() { return this.binary_dir}
   #fullSourceDir()
@@ -59,6 +63,15 @@ class commandLineMaker
       this.binary_dir="./build"
     }
     this.binary_dir=path.resolve(this.binary_dir)
+  }
+  #generator()
+  {
+    this.generator = core.getInput('generator', { required: false });
+    if(this.generator=='')
+    {
+      if(process.platform === "win32") this.generator="Ninja"
+      else this.generator="Ninja"
+    }
   }
 }
 

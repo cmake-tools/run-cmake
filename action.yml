@@ -11,6 +11,10 @@ inputs:
     description: 'Build tree.'
     required: false
     default: './build'
+  generator:
+    description: 'Generator to use (Unix Makefiles on Linux and macOS, NMake Makefiles in Windows)'
+    required: false
+    default: ''
 
 runs:
   using: 'node20'
