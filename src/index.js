@@ -115,9 +115,9 @@ try{
     let png_file=absolute+'/png.png'
     console.log('lllll'+dot_name)
     await exec.exec('cmake',command_line_maker.buildArray(), options)
-    if(process.platform === "win32") await exec.exec('choco','install', 'graphviz')
-    else if(process.platform === "linux") await exec.exec('sudo','apt-get','install', 'graphviz')
-    else await exec.exec('brew', 'install', 'graphviz')
+    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
+    else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
+    else await exec.exec('brew', ['install', 'graphviz'])
     await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
     //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
