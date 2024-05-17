@@ -29,7 +29,7 @@ class commandLineMaker
 {
   constructor(version)
   {
-    if(compare_version.compare(version, '3.7.0', '>=') ) this.old_style=false
+    if(compare_version.compare(version, '3.13.0', '>=') ) this.old_style=false
     else this.old_style=true
     this.#fullSourceDir()
     this.#fullBinaryDir()
