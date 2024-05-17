@@ -69,8 +69,8 @@ class commandLineMaker
     this.generator = core.getInput('generator', { required: false });
     if(this.generator=='')
     {
-      if(process.platform === "win32") this.generator="Ninja"
-      else this.generator="Ninja"
+      if(process.platform === "win32") this.generator="NMake Makefiles"
+      else this.generator="Unix Makefiles"
     }
   }
 }
