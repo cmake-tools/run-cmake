@@ -41,8 +41,11 @@ class commandLineMaker
   buildArray() 
   {
     let options=[]
+    let absolute=path.resolve('./')
+    console.log(absolute)
+    let name=absolute+'/toto.dot'
     options.push('-G',this.generator)
-    options.push('--graphviz=./toto.dot')
+    options.push('--graphviz='+name)
     if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
     else options.push(this.source_dir)
     return options
@@ -107,10 +110,31 @@ try{
       await io.mkdirP(command_line_maker.buildPath());
       options.cwd = command_line_maker.buildPath();
     }
+    let absolute=path.resolve('./')
+    let dot_name=absolute+'/toto.dot'
+    let png_file=absolute+'/png.png'
+    console.log('lllll'+dot_name)
     await exec.exec('cmake',command_line_maker.buildArray(), options)
+    await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
-    core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
-    core.summary.write()
+    //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
+    //core.summary.write()
+
+    const artifact = new DefaultArtifactClient()
+    const {id, size} = await artifact.uploadArtifact(
+      // name of the artifact
+      'toto.dot',
+      // files to include (supports absolute and relative paths)
+      ['./png.png'],absolute,
+      {
+        // optional: how long to retain the artifact
+        // if unspecified, defaults to repository/org retention settings (the limit of this value)
+        retentionDays: 1
+      }
+    )
+    console.log(id)
+    //${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}
+
 }
 
 }
