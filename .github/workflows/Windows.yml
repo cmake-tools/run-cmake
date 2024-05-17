@@ -24,6 +24,8 @@ jobs:
           ninjaVersion: ^1
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
+      - name: CMake --help
+        run: cmake --help
       - name: run-cmake
         uses: ./
         id: cmake

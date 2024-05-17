@@ -24,6 +24,8 @@ jobs:
         with:
           cmakeVersion: ~3.${{ matrix.cmake_version }}
           ninjaVersion: ^1
+      - name: CMake --help
+        run: cmake --help
       - name: run-cmake
         uses: ./
         id: cmake
