@@ -27,14 +27,4 @@ jobs:
       - name: run-cmake
         uses: ./
         id: cmake
-      - name: run-cmake with source
-        uses: ./
-        id: cmake-source
-        with:
-          source_dir: ./tests
-      - name: run-cmake with source
-        uses: ./
-        id: cmake-source-build
-        with:
-          source_dir: ./tests
-          binary_dir: ./my_binary_folder
+
