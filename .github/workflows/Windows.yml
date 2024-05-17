@@ -34,4 +34,4 @@ jobs:
         uses: ./
         id: cmake
         with:
-          install_prefix:'./MyInstallPrefix'
+          install_prefix: './MyInstallPrefix'
