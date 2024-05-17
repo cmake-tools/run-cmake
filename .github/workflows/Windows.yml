@@ -23,4 +23,4 @@ jobs:
           ninjaVersion: ^1
       - name: run-cmake
         uses: ./
-        id: hello
+        id: cmake
