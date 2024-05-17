@@ -40,7 +40,6 @@ class commandLineMaker
   {
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
-    this.#generator()
     this.#fullSourceDir()
     this.#fullBinaryDir()
   }
@@ -59,6 +58,7 @@ class commandLineMaker
     this.toolset = core.getInput('toolset', { required: false })
     if(this.toolset!='') options.push('-T',this.toolset)
     options=options.concat(this.#install_prefix())
+    options=options.concat(this.#generator())
     if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
     else options.push(this.source_dir)
     console.log(options)
@@ -91,8 +91,8 @@ class commandLineMaker
     {
       if(process.platform === "win32") this.generator="NMake Makefiles"
       else this.generator="Unix Makefiles"
-      return ['']
     }
+    return Array('-G',this.generator)
   }
   #install_prefix()
   {
@@ -140,7 +140,6 @@ try{
     let absolute=path.resolve('./')
     let dot_name=absolute+'/toto.dot'
     let png_file=absolute+'/png.png'
-    console.log('lllll'+dot_name)
     await exec.exec('cmake',command_line_maker.buildArray(), options)
     //if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
     //else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
