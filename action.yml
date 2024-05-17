@@ -2,6 +2,16 @@ name: run-cmake
 description: 'GitHub action to run CMake'
 author: flagarde
 
+inputs:
+  source_dir:
+    description: 'Source tree.'
+    required: false
+    default: ''
+  binary_dir:
+    description: 'Build tree.'
+    required: false
+    default: './build'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
