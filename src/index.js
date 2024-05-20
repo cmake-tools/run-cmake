@@ -27,11 +27,16 @@ async function getCMakeVersion()
   else return version_number[0]
 }
 
-
 function CMakeVersionGreaterEqual(version)
 {
-  //let cmake_version= await getCMakeVersion()
   return compare_version.compare(global.cmake_version, version, '>=')
+}
+
+async function installGraphviz()
+{
+  if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
+  else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
+  else await exec.exec('brew', ['install', 'graphviz'])
 }
 
 class commandLineMaker
@@ -40,32 +45,9 @@ class commandLineMaker
   {
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
-    this.#fullSourceDir()
-    this.#fullBinaryDir()
   }
-  isOldStyle() { return this.old_style }
-  buildArray() 
-  {
-    let options=[]
-    let absolute=path.resolve('./')
-    console.log(absolute)
 
-
-    //let name=absolute+'/toto.dot'
-    //options.push('-G',this.generator)
-    //options.push('--graphviz='+name)
-
-    this.toolset = core.getInput('toolset', { required: false })
-    if(this.toolset!='') options.push('-T',this.toolset)
-    options=options.concat(this.#install_prefix())
-    options=options.concat(this.#generator())
-    if(this.old_style==false) options.push('-S',this.source_dir,'-B',this.binary_dir)
-    else options.push(this.source_dir)
-    console.log(options)
-    return options
-  }
-  buildPath() { return this.binary_dir}
-  #fullSourceDir()
+  #source_dir()
   {
     this.source_dir = core.getInput('source_dir', { required: false });
     if(this.source_dir=='')
@@ -74,16 +56,70 @@ class commandLineMaker
       if(this.source_dir === undefined) this.source_dir="./"
     }
     this.source_dir=path.resolve(this.source_dir)
+    if(this.old_style==false) return Array('-S',this.source_dir)
+    else return Array(this.source_dir)
   }
-  #fullBinaryDir()
+
+  #binary_dir()
   {
     this.binary_dir = core.getInput('binary_dir', { required: false });
-    if(this.binary_dir=='')
-    {
-      this.binary_dir="./build"
-    }
+    if(this.binary_dir=='') this.binary_dir="./build"
     this.binary_dir=path.resolve(this.binary_dir)
+    if(this.old_style==false) return Array('-B',this.binary_dir)
+    else
+    {
+      io.mkdirP(this.binary_dir);
+      return Array()
+    }
   }
+
+  #variables_before_initial_cache()
+  {
+    this.variables_before_initial_cache = core.getInput('variables_before_initial_cache', { required: false })
+    if(this.variables_before_initial_cache.length ==0 || this.variables_before_initial_cache.length=='') return Array()
+    let ret=Array()
+    for(const variable in this.variables_before_initial_cache)
+    {
+      ret=ret.concat('-D'+this.variables_before_initial_cache[variable])
+    }
+    return ret;
+  }
+
+  #initial_cache()
+  {
+    this.initial_cache = core.getInput('initial_cache', { required: false })
+    if(this.initial_cache!='') return Array('-C',this.initial_cache)
+    else return Array()
+  }
+
+
+
+
+
+  buildArray() 
+  {
+    let options=[]
+    this.pwd=path.resolve('./')
+
+    options=options.concat(this.#binary_dir())
+    options=options.concat(this.#variables_before_initial_cache())
+    options=options.concat(this.#initial_cache())
+
+    options=options.concat(this.#install_prefix())
+    options=options.concat(this.#generator())
+    options=options.concat(this.#toolset())
+
+    options=options.concat(this.#source_dir()) // Need to be the last
+    console.log(options)
+    return options
+  }
+  workingDirectory()
+  {
+    if(this.old_style==false) return this.binary_dir
+    else return this.pwd()
+  }
+
+
   #generator()
   {
     this.generator = core.getInput('generator', { required: false });
@@ -94,6 +130,16 @@ class commandLineMaker
     }
     return Array('-G',this.generator)
   }
+
+  #toolset()
+  {
+    this.toolset = core.getInput('toolset', { required: false })
+    if(this.toolset!='') return Array('-T',this.toolset)
+    else return Array()
+  }
+
+
+
   #install_prefix()
   {
     delete process.env.CMAKE_INSTALL_PREFIX;
@@ -132,18 +178,9 @@ try{
       }
     }
     options.silent = false
-    if(command_line_maker.buildPath() !='')
-    {
-      await io.mkdirP(command_line_maker.buildPath());
-      options.cwd = command_line_maker.buildPath();
-    }
-    let absolute=path.resolve('./')
-    let dot_name=absolute+'/toto.dot'
-    let png_file=absolute+'/png.png'
+    options.cwd = command_line_maker.workingDirectory()
     await exec.exec('cmake',command_line_maker.buildArray(), options)
-    //if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
-    //else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
-    //else await exec.exec('brew', ['install', 'graphviz'])
+
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
     //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})

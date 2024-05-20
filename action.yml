@@ -4,13 +4,23 @@ author: flagarde
 
 inputs:
   source_dir:
-    description: 'Source tree.'
+    description: 'Path to root directory of the CMake project to build.'
     required: false
     default: ''
   binary_dir:
-    description: 'Build tree.'
+    description: 'Path to directory which CMake will use as the root of build directory.'
     required: false
     default: './build'
+  initial_cache:
+    description: 'Pre-load a script to populate the cache.'
+    required: false
+    default: './build'
+  variables_before_initial_cache:
+    description: 'Variable to set before loading the cache provided by "initial_cache"'
+    required: false
+    default: './build'
+
+
   generator:
     description: 'Generator to use (Unix Makefiles on Linux and macOS, NMake Makefiles in Windows)'
     required: false
