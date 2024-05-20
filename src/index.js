@@ -45,7 +45,7 @@ class commandLineMaker
   {
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
-    this.pwd=path.resolve('./')
+    this.actual_path=path.resolve('./')
   }
 
   #source_dir()
@@ -116,7 +116,7 @@ class commandLineMaker
   workingDirectory()
   {
     if(this.old_style==false) return this.binary_dir
-    else return this.pwd
+    else return this.actual_path
   }
 
 
