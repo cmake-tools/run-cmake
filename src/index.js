@@ -77,13 +77,8 @@ class commandLineMaker
   #variables_before_initial_cache()
   {
     this.variables_before_initial_cache = core.getInput('variables_before_initial_cache', { required: false })
-    if(this.variables_before_initial_cache.length ==0 || this.variables_before_initial_cache.length=='') return Array()
-    let ret=Array()
-    for(const variable in this.variables_before_initial_cache)
-    {
-      ret=ret.concat('-D'+this.variables_before_initial_cache[variable])
-    }
-    return ret;
+    if(this.variables_before_initial_cache =='') return Array()
+    else return Array(this.variables_before_initial_cache)
   }
 
   #initial_cache()
