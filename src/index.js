@@ -41,10 +41,11 @@ async function installGraphviz()
 
 class commandLineMaker
 {
-  constructor(version)
+  constructor()
   {
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
+    this.pwd=path.resolve('./')
   }
 
   #source_dir()
@@ -99,7 +100,6 @@ class commandLineMaker
   buildArray() 
   {
     let options=[]
-    this.pwd=path.resolve('./')
 
     options=options.concat(this.#binary_dir())
     options=options.concat(this.#variables_before_initial_cache())
