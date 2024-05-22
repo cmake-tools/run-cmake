@@ -9,6 +9,9 @@ message(STATUS "\t- binary_dir : ${CMAKE_BINARY_DIR}")
 message(STATUS "\t- generator : ${CMAKE_GENERATOR}")
 message(STATUS "\t- install_prefix : ${CMAKE_INSTALL_PREFIX}")
 
-message(STATUS "\t- MY_VARIABLE : ${MY_VARIABLE}")
-message(STATUS "\t- MY_VARIABLE2 : ${MY_VARIABLE2}")
+message(STATUS "\t- BEFORE_CACHE_BOOL : ${BEFORE_CACHE_BOOL}")
+message(STATUS "\t- BEFORE_CACHE_STRING : ${BEFORE_CACHE_STRING}")
+
+message(STATUS "\t- AFTER_CACHE_BOOL : ${AFTER_CACHE_BOOL}")
+message(STATUS "\t- AFTER_CACHE_STRING : ${AFTER_CACHE_STRING}")
 add_executable(Main src/main.cpp)

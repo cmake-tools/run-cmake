@@ -36,5 +36,8 @@ jobs:
         with:
           install_prefix: './MyInstallPrefix'
           variables_before_initial_cache: |
-            MY_VARIABLE=TRUE
-            MY_VARIABLE2="Toto"
+            BEFORE_CACHE_BOOL:BOOL=TRUE
+            BEFORE_CACHE_STRING:STRING="MyString"
+          variables: |
+            AFTER_CACHE_BOOL:BOOL=TRUE
+            AFTER_CACHE_STRING:STRING="MyString"

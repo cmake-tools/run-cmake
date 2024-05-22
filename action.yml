@@ -19,6 +19,10 @@ inputs:
     description: 'Variable to set before loading the cache provided by "initial_cache"'
     required: false
     default: ''
+  variables:
+    description: 'Variable to set'
+    required: false
+    default: ''
 
 
   generator:
