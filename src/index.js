@@ -6,6 +6,7 @@ const io = require('@actions/io');
 const path = require('path')
 const {DefaultArtifactClient} = require('@actions/artifact')
 const github = require('@actions/github');
+const parser = require('action-input-parser')
 
 async function getCMakeVersion()
 {
@@ -76,9 +77,9 @@ class commandLineMaker
 
   #variables_before_initial_cache()
   {
-    this.variables_before_initial_cache = core.getInput('variables_before_initial_cache', { required: false })
-    if(this.variables_before_initial_cache =='') return Array()
-    else return Array(this.variables_before_initial_cache)
+    const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
+    console.log(value);
+    return value;
   }
 
   #initial_cache()

@@ -33,5 +33,7 @@ jobs:
         id: cmake
         with:
           install_prefix: './MyInstallPrefix'
-          variables_before_initial_cache: '-DMY_VARIABLE=TRUE -DMY_VARIABLE2="Toto"'
+          variables_before_initial_cache: |
+            MY_VARIABLE=TRUE
+            MY_VARIABLE2="Toto"
 
