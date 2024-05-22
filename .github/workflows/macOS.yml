@@ -38,4 +38,6 @@ jobs:
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
+          remove_variables: |
+            TOTO*
         

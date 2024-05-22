@@ -23,14 +23,24 @@ inputs:
     description: 'Variable to set'
     required: false
     default: ''
-
-
+  remove_variables:
+    description: 'Remove matching entries from CMake CACHE.'
+    required: false
+    default: ''
   generator:
     description: 'Generator to use (Unix Makefiles on Linux and macOS, NMake Makefiles in Windows)'
     required: false
     default: ''
   toolset:
     description: 'Toolset specification for the generator, if supported.'
+    required: false
+    default: ''
+  platform:
+    description: 'Specify platform name if supported by generator.'
+    required: false
+    default: ''
+  toolchain:
+    description: 'Specify the cross compiling toolchain file.'
     required: false
     default: ''
   install_prefix:

@@ -28,6 +28,29 @@ async function getCMakeVersion()
   else return version_number[0]
 }
 
+async function getCapabilities()
+{
+  if(CMakeVersionGreaterEqual('3.7'))
+  {
+    let cout ='';
+    let cerr='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout = data.toString();
+      },
+      stderr: (data) => {
+        cerr = data.toString();
+      }
+    }
+    options.silent = true
+    await exec.exec('cmake',['-E','capabilities'], options)
+    return JSON.parse(cout);
+  }
+  else return '{}'
+}
+
+
 function CMakeVersionGreaterEqual(version)
 {
   return compare_version.compare(global.cmake_version, version, '>=')
@@ -104,7 +127,16 @@ class commandLineMaker
     return ret;
   }
 
-
+  #remove_variables()
+  {
+    const value = parser.getInput('remove_variables', {type: 'array',default:[]})
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-U',value[i])
+    }
+    return ret;
+  }
 
 
   buildArray() 
@@ -119,11 +151,13 @@ class commandLineMaker
       options=options.concat(this.#variables_before_initial_cache())
       options=options.concat(initial_cache)
     }
+    options=options.concat(this.#remove_variables())
     options=options.concat(this.#variables())
-
-    options=options.concat(this.#install_prefix())
     options=options.concat(this.#generator())
     options=options.concat(this.#toolset())
+    options=options.concat(this.#platform())
+    options=options.concat(this.#toolchain())
+    options=options.concat(this.#install_prefix())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
@@ -154,7 +188,19 @@ class commandLineMaker
     else return Array()
   }
 
+  #platform()
+  {
+    this.platform = core.getInput('platform', { required: false })
+    if(this.platform!='') return Array('-A',this.platform)
+    else return Array()
+  }
 
+  #toolchain()
+  {
+    this.toolchain = core.getInput('toolchain', { required: false })
+    if(this.toolchain!='') return Array('--toolchain',this.toolchain)
+    else return Array()
+  }
 
   #install_prefix()
   {
@@ -168,6 +214,9 @@ class commandLineMaker
     }
     return []
   }
+
+
+
 }
 
 async function main()
@@ -181,6 +230,7 @@ try{
   else
   {
     global.cmake_version= await getCMakeVersion()
+    global.capabilities = await getCapabilities()
     const command_line_maker = new commandLineMaker()
     let cout ='';
     let cerr='';
