@@ -78,8 +78,12 @@ class commandLineMaker
   #variables_before_initial_cache()
   {
     const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
-    console.log(value);
-    return value;
+    let ret=[]
+    for(var i in value)
+    {
+      ret=ret.concat('-D',i)
+    }
+    return ret;
   }
 
   #initial_cache()
