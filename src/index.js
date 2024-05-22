@@ -79,9 +79,9 @@ class commandLineMaker
   {
     const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
     let ret=[]
-    for(var i in value)
+    for(const i in value)
     {
-      ret=ret.concat('-D',i)
+      ret=ret.concat('-D',value[i])
     }
     return ret;
   }
