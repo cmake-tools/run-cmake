@@ -78,14 +78,10 @@ class commandLineMaker
   #variables_before_initial_cache()
   {
     let ret=[]
-    const has_cache_file = parser.getInput('initial_cache', {type: 'string',default:''})
-    if(has_cache_file!='')
+    const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
+    for(const i in value)
     {
-      const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
-      for(const i in value)
-      {
-        ret=ret.concat('-D',value[i])
-      }
+      ret=ret.concat('-D',value[i])
     }
     return ret;
   }
@@ -116,10 +112,15 @@ class commandLineMaker
     let options=[]
 
     options=options.concat(this.#binary_dir())
-    options=options.concat(this.#variables_before_initial_cache())
-    options=options.concat(this.#initial_cache())
+    // First check is initial_cache file exist
+    const initial_cache = this.#initial_cache()
+    if(Array.isArray(initial_cache) && initial_cache.length !== 0)
+    {
+      options=options.concat(this.#variables_before_initial_cache())
+      options=options.concat(initial_cache)
+    }
     options=options.concat(this.#variables())
-    
+
     options=options.concat(this.#install_prefix())
     options=options.concat(this.#generator())
     options=options.concat(this.#toolset())
