@@ -165,7 +165,7 @@ class commandLineMaker
   }
   workingDirectory()
   {
-    if(this.old_style==false) return this.binary_dir
+    if(this.old_style==true) return this.binary_dir
     else return this.actual_path
   }
 
