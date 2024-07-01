@@ -15,10 +15,6 @@ inputs:
     description: 'Pre-load a script to populate the cache.'
     required: false
     default: ''
-  variables_before_initial_cache:
-    description: 'Variable to set before loading the cache provided by "initial_cache"'
-    required: false
-    default: ''
   variables:
     description: 'Variable to set'
     required: false

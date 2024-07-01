@@ -99,17 +99,6 @@ class commandLineMaker
     }
   }
 
-  #variables_before_initial_cache()
-  {
-    let ret=[]
-    const value = parser.getInput('variables_before_initial_cache', {type: 'array',default:[]})
-    for(const i in value)
-    {
-      ret=ret.concat('-D',value[i])
-    }
-    return ret;
-  }
-
   #initial_cache()
   {
     this.initial_cache = core.getInput('initial_cache', { required: false })
@@ -149,7 +138,6 @@ class commandLineMaker
     const initial_cache = this.#initial_cache()
     if(Array.isArray(initial_cache) && initial_cache.length !== 0)
     {
-      options=options.concat(this.#variables_before_initial_cache())
       options=options.concat(initial_cache)
     }
     options=options.concat(this.#remove_variables())
