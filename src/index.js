@@ -70,6 +70,7 @@ class commandLineMaker
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
     this.actual_path=path.resolve('./')
+    this.#binary_dir()
   }
 
   #source_dir()
