@@ -18,6 +18,7 @@
     "action-input-parser": "^1.2.38",
     "compare-versions": "^6.1.0",
     "path": "^0.12.7",
+    "semver": "^7.6.2",
     "which": "^4.0.0"
   }
 }

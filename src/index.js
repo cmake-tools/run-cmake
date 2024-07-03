@@ -7,6 +7,7 @@ const path = require('path')
 const {DefaultArtifactClient} = require('@actions/artifact')
 const github = require('@actions/github');
 const parser = require('action-input-parser')
+const semver = require('semver')
 
 async function getCMakeVersion()
 {
@@ -251,7 +252,8 @@ class commandLineMaker
         ['3.29', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
         ['3.30', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
       ]);
-      return myMap.get(global.cmake_version);
+      version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      return myMap.get(version.toString());
     }
     else if(process.platform === "linux")
     {
@@ -288,7 +290,8 @@ class commandLineMaker
         ['3.29', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
         ['3.30', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
       ]);
-      return myMap.get(global.cmake_version);
+      version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      return myMap.get(version.toString());
     }
     else
     {
@@ -325,7 +328,8 @@ class commandLineMaker
         ['3.29', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
         ['3.30', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
       ]);
-      return myMap.get(global.cmake_version);
+      version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      return myMap.get(version.toString());
     }
   }
 
