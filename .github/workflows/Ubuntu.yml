@@ -32,6 +32,7 @@ jobs:
         uses: ./
         id: cmake
         with:
+          mode: toto
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE

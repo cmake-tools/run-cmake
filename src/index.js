@@ -364,22 +364,33 @@ try{
   {
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
-    const command_line_maker = new commandLineMaker()
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
+    let mode = getMode()
+    if(mode==='configure' || mode ==='all')
+    {
+      const command_line_maker = new commandLineMaker()
+      let cout ='';
+      let cerr='';
+      const options = {};
+      options.listeners = {
+        stdout: (data) => {
+          cout = data.toString();
+        },
+        stderr: (data) => {
+          cerr = data.toString();
+        } 
       }
+      options.silent = false
+      options.cwd = command_line_maker.workingDirectory()
+      await exec.exec('cmake',command_line_maker.buildArray(), options)
     }
-    options.silent = false
-    options.cwd = command_line_maker.workingDirectory()
-    await exec.exec('cmake',command_line_maker.buildArray(), options)
+    if(mode==='build' || mode==='all')
+    {
 
+    }
+    if(mode=='install' || mode==='all')
+    {
+      
+    }
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
     //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
