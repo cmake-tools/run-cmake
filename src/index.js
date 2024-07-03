@@ -78,10 +78,10 @@ class commandLineMaker
     this.source_dir = core.getInput('source_dir', { required: false });
     if(this.source_dir=='')
     {
-      this.source_dir = process.env.GITHUB_WORKSPACE;
-      if(this.source_dir === undefined) this.source_dir="./"
+      this.source_dir = path.resolve(process.env.GITHUB_WORKSPACE);
+      if(this.source_dir === undefined) this.source_dir=path.resolve('./')
     }
-    this.source_dir=path.posix.resolve(this.source_dir)
+    this.source_dir=path.resolve(this.source_dir)
     if(this.old_style==false) return Array('-S',this.source_dir)
     else return Array(this.source_dir)
   }
