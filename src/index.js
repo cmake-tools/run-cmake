@@ -345,10 +345,7 @@ class commandLineMaker
 function getMode()
 {
   const mode = parser.getInput('mode', {type: 'string',default:'configure'})
-  if(mode!='configure' && mode!='build' && mode!='install' && mode!='all')
-  {
-    core.error('mode should be configure, build, install or all')
-  }
+  if(mode!='configure' && mode!='build' && mode!='install' && mode!='all') throw String('mode should be configure, build, install or all')
   return mode;
 }
 
@@ -389,7 +386,7 @@ try{
     }
     if(mode=='install' || mode==='all')
     {
-      
+
     }
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
@@ -416,7 +413,8 @@ try{
 }
 catch (error)
 {
-  core.setFailed(error);
+  core.error('${error}')
+  core.setFailed('${error}');
 }
 }
 
