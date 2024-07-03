@@ -28,13 +28,26 @@ jobs:
           ninjaVersion: ^1
       - name: CMake --help
         run: cmake --help
-      - name: run-cmake
+
+      - name: run-cmake (configure)
         uses: ./
-        id: cmake
+        id: configure
         with:
-          mode: toto
+          mode: configure
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
+
+      - name: run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+
+      - name: run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
 
