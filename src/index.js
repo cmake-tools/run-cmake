@@ -382,7 +382,8 @@ async function main()
 {
   try
   {
-    which.sync('cmakee', { nothrow: false })
+    let found = which.sync('cmakee', { nothrow: true })
+    if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
     let mode = getMode()
