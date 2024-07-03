@@ -413,8 +413,7 @@ try{
 }
 catch (error)
 {
-  core.error('${error}')
-  core.setFailed('${error}');
+  core.error(error)
 }
 }
 
