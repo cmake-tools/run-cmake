@@ -378,13 +378,10 @@ async function install()
 
 }
 
-async function isCMakeInstalled()
+function isCMakeInstalled()
 {
-  let found_cmake = which.sync('cmakeeee', { nothrow: true })
-  if(found_cmake === null)
-  {
-    throw String('CMake program not found.')
-  }
+  let found_cmake = which.sync('cmakee', { nothrow: true })
+  if(found_cmake === null) throw String('CMake program not found.')
 } 
 
 async function main()
