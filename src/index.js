@@ -349,44 +349,67 @@ function getMode()
   return mode;
 }
 
-async function main()
+async function configure()
 {
-try{
-  let found_cmake = which.sync('cmake', { nothrow: true })
-  if (found_cmake === null)
+  const command_line_maker = new commandLineMaker()
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    } 
+  }
+  options.silent = false
+  options.cwd = command_line_maker.workingDirectory()
+  await exec.exec('cmake',command_line_maker.buildArray(), options)
+}
+
+async function build()
+{
+
+}
+
+async function install()
+{
+
+}
+
+async function isCMakeInstalled()
+{
+  let found_cmake = which.sync('cmakeeee', { nothrow: true })
+  if(found_cmake === null)
   {
     throw String('CMake program not found.')
   }
-  else
+} 
+
+async function main()
+{
+  try
   {
+    isCMakeInstalled()
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
     let mode = getMode()
-    if(mode==='configure' || mode ==='all')
+    if(mode==='configure')
     {
-      const command_line_maker = new commandLineMaker()
-      let cout ='';
-      let cerr='';
-      const options = {};
-      options.listeners = {
-        stdout: (data) => {
-          cout = data.toString();
-        },
-        stderr: (data) => {
-          cerr = data.toString();
-        } 
-      }
-      options.silent = false
-      options.cwd = command_line_maker.workingDirectory()
-      await exec.exec('cmake',command_line_maker.buildArray(), options)
+      configure()
     }
-    if(mode==='build' || mode==='all')
+    else if(mode==='build')
     {
 
     }
-    if(mode=='install' || mode==='all')
+    else if(mode==='install')
     {
 
+    }
+    else if(mode==='all')
+    {
+      configure()
     }
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
@@ -395,26 +418,23 @@ try{
 
     //const artifact = new DefaultArtifactClient()
     //const {id, size} = await artifact.uploadArtifact(
-      // name of the artifact
+    // name of the artifact
     //  'toto.dot',
-      // files to include (supports absolute and relative paths)
+    // files to include (supports absolute and relative paths)
     //  ['./png.png'],absolute,
     //  {
-        // optional: how long to retain the artifact
-        // if unspecified, defaults to repository/org retention settings (the limit of this value)
-        retentionDays: 1
+    // optional: how long to retain the artifact
+    // if unspecified, defaults to repository/org retention settings (the limit of this value)
+    //retentionDays: 1
     //  }
-   // )
+    // )
     //console.log(id)
     //${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}
-
-}
-
-}
-catch (error)
-{
-  core.setFailed(error)
-}
+    }
+  catch (error)
+  {
+    core.setFailed(error)
+  }
 }
 
 main()
