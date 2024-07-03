@@ -3,6 +3,10 @@ description: 'GitHub action to run CMake'
 author: flagarde
 
 inputs:
+  mode:
+    description: 'Mode in which CMake is running : configure, build, install, all'
+    required: false
+    default: 'configure'
   source_dir:
     description: 'Path to root directory of the CMake project to build.'
     required: false
@@ -43,6 +47,12 @@ inputs:
     description: 'Specify the installation directory, used by the CMAKE_INSTALL_PREFIX variable'
     required: false
     default: ''
+  
+  build:
+    description: 'Project binary directory to be built'
+    required: false
+    default: ''
+
 
 runs:
   using: 'node20'

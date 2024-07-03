@@ -335,6 +335,23 @@ class commandLineMaker
 
 }
 
+/* Detect which mode the user wants :
+   - configure: CMake configure the project only.
+   - build: CMake build the project only.
+   - install: CMake install the project.
+   - all: CMake configure, build and install in a row.
+   By default CMake is in configure mode.
+*/ 
+function getMode()
+{
+  const mode = parser.getInput('mode', {type: 'string',default:'configure'})
+  if(mode!='configure' && mode!='build' && mode!='install' && mode!='all')
+  {
+    core.error('mode should be configure, build, install or all')
+  }
+  return mode;
+}
+
 async function main()
 {
 try{
