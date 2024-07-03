@@ -30,7 +30,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: CMake --help
         run: cmake --help
-      - name: run-cmake (configure)
+      - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
         with:
@@ -40,13 +40,13 @@ jobs:
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
 
-      - name: run-cmake (build)
+      - name: 🛠️ run-cmake (build)
         uses: ./
         id: build
         with:
           mode: build
 
-      - name: run-cmake (install)
+      - name: 📥 run-cmake (install)
         uses: ./
         id: install
         with:
