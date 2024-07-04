@@ -13,7 +13,7 @@ inputs:
   source_dir:
     description: 'Path to root directory of the CMake project to build.'
     required: false
-    default: './'
+    default: ''
   binary_dir:
     description: 'Path to directory which CMake will use as the root of build directory.'
     required: false

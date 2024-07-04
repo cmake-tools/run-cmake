@@ -75,17 +75,19 @@ class CommandLineMaker
     this.#binary_dir()
   }
 
+  /* Configure */
+
   #source_dir()
   {
-    this.source_dir = core.getInput('source_dir', { required: false });
-    if(this.source_dir=='')
+    let source_dir = core.getInput('source_dir', { required: false, default: '' });
+    if(source_dir=='')
     {
-      this.source_dir = process.env.GITHUB_WORKSPACE;
-      if(this.source_dir === undefined) this.source_dir='./'
+      source_dir = process.env.GITHUB_WORKSPACE;
+      if(source_dir === undefined) source_dir='./'
     }
-    this.source_dir=path.resolve(this.source_dir)
-    if(this.old_style==false) return Array('-S',this.source_dir)
-    else return Array(this.source_dir)
+    source_dir=path.resolve(source_dir)
+    if(!this.old_style) return Array('-S',source_dir)
+    else return Array(source_dir)
   }
 
   #binary_dir()
@@ -93,7 +95,7 @@ class CommandLineMaker
     this.binary_dir = core.getInput('binary_dir', { required: false, default: "../build" });
     this.binary_dir=path.posix.resolve(this.binary_dir)
     core.exportVariable('binary_dir',this.binary_dir)
-    if(this.old_style==false) return Array('-B',this.binary_dir)
+    if(!this.old_style) return Array('-B',this.binary_dir)
     else
     {
       io.mkdirP(this.binary_dir);
@@ -108,11 +110,11 @@ class CommandLineMaker
 
   #initial_cache()
   {
-    this.initial_cache = core.getInput('initial_cache', { required: false })
-    if(this.initial_cache!='')
+    let initial_cache = core.getInput('initial_cache', { required: false })
+    if(initial_cache!='')
     {
-      this.initial_cache=path.posix.resolve(this.initial_cache)
-      return Array('-C',this.initial_cache)
+      initial_cache=path.posix.resolve(initial_cache)
+      return Array('-C',initial_cache)
     }
     else return Array()
   }
