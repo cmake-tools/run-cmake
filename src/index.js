@@ -57,11 +57,6 @@ function CMakeVersionGreaterEqual(version)
   return compare_version.compare(global.cmake_version, version, '>=')
 }
 
-function CMakeVersionEqual(version)
-{
-  return compare_version.compare(global.cmake_version, version, '==')
-}
-
 async function installGraphviz()
 {
   if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
@@ -69,7 +64,7 @@ async function installGraphviz()
   else await exec.exec('brew', ['install', 'graphviz'])
 }
 
-class commandLineMaker
+class CommandLineMaker
 {
   constructor()
   {
@@ -97,12 +92,18 @@ class commandLineMaker
     this.binary_dir = core.getInput('binary_dir', { required: false });
     if(this.binary_dir=='') this.binary_dir="./build"
     this.binary_dir=path.posix.resolve(this.binary_dir)
+    core.exportVariable(binary_dir,this.binary_dir)
     if(this.old_style==false) return Array('-B',this.binary_dir)
     else
     {
       io.mkdirP(this.binary_dir);
       return Array()
     }
+  }
+
+  #binary_build_dir()
+  {
+    return Array(process.env.binary_dir)
   }
 
   #initial_cache()
@@ -139,7 +140,7 @@ class commandLineMaker
   }
 
 
-  buildArray() 
+  configureCommandParameters() 
   {
     let options=[]
 
@@ -162,6 +163,14 @@ class commandLineMaker
     console.log(options)
     return options
   }
+
+  buildCommandParameters()
+  {
+    let parameters=[]
+    parameters=parameters.concat('--build')
+    parameters=parameters.concat(this.#binary_build_dir())
+  }
+
   workingDirectory()
   {
     if(this.old_style==true) return this.binary_dir
@@ -360,9 +369,8 @@ function getMode()
   return mode;
 }
 
-function configure()
+function configure(command_line_maker)
 {
-  const command_line_maker = new commandLineMaker()
   let cout ='';
   let cerr='';
   const options = {};
@@ -376,15 +384,27 @@ function configure()
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  exec.exec('cmake',command_line_maker.buildArray(), options)
+  exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
 }
 
-async function build()
+function build(command_line_maker)
 {
-
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    } 
+  }
+  options.silent = false
+  exec.exec('cmake',command_line_maker.buildCommandParameters(), options)
 }
 
-async function install()
+async function install(command_line_maker)
 {
 
 }
@@ -397,24 +417,25 @@ async function main()
     if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
+    const command_line_maker = new CommandLineMaker()
     let mode = getMode()
     if(mode==='configure')
     {
-      configure()
+      configure(command_line_maker)
     }
     else if(mode==='build')
     {
-      build()
+      build(command_line_maker)
     }
     else if(mode==='install')
     {
-      install()
+      install(command_line_maker)
     }
     else if(mode==='all')
     {
-      configure()
-      build()
-      install()
+      configure(command_line_maker)
+      build(command_line_maker)
+      install(command_line_maker)
     }
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
