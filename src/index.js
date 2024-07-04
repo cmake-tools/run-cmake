@@ -146,7 +146,7 @@ class CommandLineMaker
     let value = parser.getInput('parallel')
     if(value==='') value= os.cpus().length
     const int = parseInt(value, 10)
-    if(isNaN(int)||value<=0) throw String('parallel should be a number >=1')
+    if(isNaN(int)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
     return Array('--parallel',String(int))
   }
 
