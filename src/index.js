@@ -268,7 +268,7 @@ class CommandLineMaker
 
   #strip()
   {
-    this.strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
+    const strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
     if(strip) return Array('--strip')
     else return Array()
   }
