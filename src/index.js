@@ -8,6 +8,7 @@ const {DefaultArtifactClient} = require('@actions/artifact')
 const github = require('@actions/github');
 const parser = require('action-input-parser')
 const semver = require('semver')
+const os = require("node:os");
 
 async function getCMakeVersion()
 {
@@ -139,6 +140,15 @@ class CommandLineMaker
     return ret;
   }
 
+  #parallel()
+  {
+    if(!CMakeVersionGreaterEqual('3.12.0')) return Array()
+    const value = parser.getInput('parallel')
+    if(value==='') value= os.cpus().length
+    const int = parseInt(value, 10)
+    if(isNaN(int)||value<=0) throw String('parallel should be a number >=1')
+    return Array('--parallel',String(int))
+  }
 
   configureCommandParameters() 
   {
@@ -169,6 +179,7 @@ class CommandLineMaker
     let parameters=[]
     parameters=parameters.concat('--build') // Need to be the first
     parameters=parameters.concat(this.#binary_build_dir())
+    parameters=parameters.concat(this.#parallel())
     console.log(parameters)
     return parameters
   }

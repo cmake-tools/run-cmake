@@ -48,6 +48,12 @@ inputs:
     required: false
     default: ''
   
+  # Build mode options:
+  parallel:
+    description: "The maximum number of concurrent processes to use when building. If omitted the number of core available is used. (CMake 3.12+)"
+    required: false
+    default: ''
+
   # Install mode options:
   strip:
     description: 'Strip before installing'
