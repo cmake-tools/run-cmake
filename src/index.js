@@ -167,8 +167,10 @@ class CommandLineMaker
   buildCommandParameters()
   {
     let parameters=[]
-    parameters=parameters.concat('--build')
+    parameters=parameters.concat('--build') // Need to be the first
     parameters=parameters.concat(this.#binary_build_dir())
+    console.log(parameters)
+    return parameters
   }
 
   workingDirectory()
