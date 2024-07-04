@@ -92,7 +92,7 @@ class CommandLineMaker
     this.binary_dir = core.getInput('binary_dir', { required: false });
     if(this.binary_dir=='') this.binary_dir="./build"
     this.binary_dir=path.posix.resolve(this.binary_dir)
-    core.exportVariable(binary_dir,this.binary_dir)
+    core.exportVariable('binary_dir',this.binary_dir)
     if(this.old_style==false) return Array('-B',this.binary_dir)
     else
     {
