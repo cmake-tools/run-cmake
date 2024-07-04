@@ -183,7 +183,7 @@ class commandLineMaker
       if(!generators.includes(this.generator))
       {
         let gen = String('Generators are :\n')
-        for(const i in rooms) { gen+='* '+rooms[i]+'\n' }
+        for(const i in generators) { gen+='* '+generators[i]+'\n' }
         core.setFailed('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'\n'+gen)
       }
     }
