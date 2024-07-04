@@ -182,9 +182,11 @@ class commandLineMaker
       let generators = this.#getGeneratorList()
       if(!generators.includes(this.generator))
       {
-        let gen = String('Generators are :\n')
-        for(const i in generators) { gen+='* '+generators[i]+'\n' }
-        core.setFailed('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'\n'+gen)
+        let gen = String('[')
+        for(const i in generators) { gen+=generators[i]+',' }
+        gen = str.substring(0, gen.length - 1);
+        gen+=']'
+        throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
       }
     }
     return Array('-G',this.generator)
@@ -358,7 +360,7 @@ function getMode()
   return mode;
 }
 
-async function configure()
+function configure()
 {
   const command_line_maker = new commandLineMaker()
   let cout ='';
@@ -374,7 +376,7 @@ async function configure()
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  await exec.exec('cmake',command_line_maker.buildArray(), options)
+  exec.exec('cmake',command_line_maker.buildArray(), options)
 }
 
 async function build()
