@@ -184,7 +184,7 @@ class commandLineMaker
       {
         let gen = String('[')
         for(const i in generators) { gen+=generators[i]+',' }
-        gen = str.substring(0, gen.length - 1);
+        gen = gen.substring(0, gen.length - 1);
         gen+=']'
         throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
       }
