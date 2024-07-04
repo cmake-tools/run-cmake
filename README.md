@@ -5,15 +5,23 @@ GitHub action to run CMake
 
 CMake command options and corresponding action parameters :
 
-|  CMake option      |  Action parameter  |  Descritpion                                                            |  Type  |  Default |
-|:------------------:|:------------------:|:-----------------------------------------------------------------------:|:------:|:--------:|
-|  -S                |  source_dir        |  Path to root directory of the CMake project to build                   |        |          |
-|  -B                |  binary_dir        |  Path to directory which CMake will use as the root of build directory  |        |          |
-|  -C                |  initial_cache     |  Pre-load a script to populate the cache                                |        |          |
-|  -D                |  variables         |  Create or update a CMake **CACHE** entry                               |        |          |
-|  -U                |  remove_variables  |  Remove matching entries from CMake **CACHE**                           |        |          |
-|  -G                |  generator         |  Specify a build system generator                                       |        |          |
-|  -T                |  toolset           |  Toolset specification for the generator, if supported                  |        |          |
-|  -A                |  platform          |  Specify platform name if supported by generator                        |        |          |
-|  --toolchain       |  toolchain         |  Specify the cross compiling toolchain file                             |        |          |
-|  --install-prefix  |  install_prefix    |  Specify the installation directory                                     |        |          |
+|  CMake option      |  Action parameter  |  Descritpion                                                            |  Type    |  Default                         | Available  |
+|:------------------:|:------------------:|:-----------------------------------------------------------------------:|:--------:|:--------------------------------:|:----------:|
+|  -S                |  source_dir        |  Path to root directory of the CMake project to build                   |  path    |  "./"                            |  ✔️         |
+|  -B                |  binary_dir        |  Path to directory which CMake will use as the root of build directory  |  path    |  "../build"                      |  ✔️         |
+|  -C                |  initial_cache     |  Pre-load a script to populate the cache                                |  file    |  ""                              |  ✔️         |
+|  -D                |  variables         |  Create or update a CMake **CACHE** entry                               |  array   |  []                              |  ✔️         |
+|  -U                |  remove_variables  |  Remove matching entries from CMake **CACHE**                           |  array   |  []                              |  ✔️         |
+|  -G                |  generator         |  Specify a build system generator                                       |  string  |  NMake Makefiles/Unix Makefiles  |  ✔️         |
+|  -T                |  toolset           |  Toolset specification for the generator, if supported                  |  string  |  ""                              |  ✔️         |
+|  -A                |  platform          |  Specify platform name if supported by generator                        |  string  |  ""                              |            |
+|  --toolchain       |  toolchain         |  Specify the cross compiling toolchain file                             |  file    |  ""                              |            |
+|  --install-prefix  |  install_prefix    |  Specify the installation directory                                     |          |  ""                              |            |
+
+## Build a Build a Project
+
+CMake command options and corresponding action parameters :
+
+|  CMake option      |  Action parameter  |  Descritpion                                                                                                       |  Type  |  Default  | Available  |
+|:------------------:|:------------------:|:------------------------------------------------------------------------------------------------------------------:|:------:|:---------:|:----------:|
+|  --parallel        |  parallel          |  The maximum number of concurrent processes to use when building. If omitted the number of core available is used  |        |           |  3.12+     |

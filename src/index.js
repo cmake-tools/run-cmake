@@ -90,8 +90,7 @@ class CommandLineMaker
 
   #binary_dir()
   {
-    this.binary_dir = core.getInput('binary_dir', { required: false });
-    if(this.binary_dir=='') this.binary_dir="./build"
+    this.binary_dir = core.getInput('binary_dir', { required: false, default: "../build" });
     this.binary_dir=path.posix.resolve(this.binary_dir)
     core.exportVariable('binary_dir',this.binary_dir)
     if(this.old_style==false) return Array('-B',this.binary_dir)
@@ -256,7 +255,7 @@ class CommandLineMaker
   #install_prefix()
   {
     delete process.env.CMAKE_INSTALL_PREFIX;
-    this.install_prefix = core.getInput('install_prefix', { required: false });
+    this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
     if(this.install_prefix!='')
     {
       this.install_prefix=path.resolve(this.install_prefix)

@@ -3,18 +3,21 @@ description: 'GitHub action to run CMake'
 author: flagarde
 
 inputs:
+  # General options:
   mode:
     description: 'Mode in which CMake is running : configure, build, install, all'
     required: false
     default: 'configure'
+  
+  # Configure mode options:
   source_dir:
     description: 'Path to root directory of the CMake project to build.'
     required: false
-    default: ''
+    default: './'
   binary_dir:
     description: 'Path to directory which CMake will use as the root of build directory.'
     required: false
-    default: './build'
+    default: '../binary'
   initial_cache:
     description: 'Pre-load a script to populate the cache.'
     required: false
@@ -46,7 +49,7 @@ inputs:
   install_prefix:
     description: 'Specify the installation directory, used by the CMAKE_INSTALL_PREFIX variable'
     required: false
-    default: ''
+    default: '../install'
   
   # Build mode options:
   parallel:
