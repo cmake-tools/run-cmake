@@ -145,9 +145,9 @@ class CommandLineMaker
     if(!CMakeVersionGreaterEqual('3.12.0')) return Array()
     let value = parser.getInput('parallel')
     if(value==='') value= os.cpus().length
-    const int = parseInt(value, 10)
-    if(isNaN(int)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
-    return Array('--parallel',String(int))
+    else value = parseInt(value, 10)
+    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
+    return Array('--parallel',String(value))
   }
 
   configureCommandParameters() 
