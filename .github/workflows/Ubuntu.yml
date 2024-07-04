@@ -51,4 +51,5 @@ jobs:
         id: install
         with:
           mode: install
+          strip: true
 

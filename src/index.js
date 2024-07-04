@@ -180,6 +180,7 @@ class CommandLineMaker
     {
       parameters=parameters.concat('--install')
       parameters=parameters.concat(process.env.binary_dir)
+      parameters=parameters.concat(this.#strip())
     }
     else
     {
@@ -252,6 +253,13 @@ class CommandLineMaker
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
     }
     return []
+  }
+
+  #strip()
+  {
+    this.strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
+    if(strip) return Array('--strip')
+    else return Array()
   }
 
   #getGeneratorList()
