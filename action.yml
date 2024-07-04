@@ -17,7 +17,7 @@ inputs:
   binary_dir:
     description: 'Path to directory which CMake will use as the root of build directory.'
     required: false
-    default: '../binary'
+    default: '../build'
   initial_cache:
     description: 'Pre-load a script to populate the cache.'
     required: false
