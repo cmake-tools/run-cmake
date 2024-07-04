@@ -180,7 +180,7 @@ class commandLineMaker
     else
     {
       let generators = this.#getGeneratorList()
-      if(!generators.includes(this.generator)) throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version)
+      if(!generators.includes(this.generator)) core.setFailed('Generator '+this.generator+' is not supported by CMake '+global.cmake_version)
     }
     return Array('-G',this.generator)
   }
