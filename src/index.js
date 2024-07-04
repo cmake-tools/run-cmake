@@ -143,9 +143,9 @@ class CommandLineMaker
   #parallel()
   {
     if(!CMakeVersionGreaterEqual('3.12.0')) return Array()
-    let value = parser.getInput('parallel')
-    if(value==='') value= os.cpus().length
-    else value = parseInt(value, 10)
+    let nbrCores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
+    let value = parser.getInput('parallel',{default:nbrCores})
+    value = parseInt(value, 10)
     if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
     return Array('--parallel',String(value))
   }
