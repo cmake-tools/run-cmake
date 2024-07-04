@@ -34,6 +34,7 @@ jobs:
         id: configure
         with:
           mode: configure
+          generator: toto
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE

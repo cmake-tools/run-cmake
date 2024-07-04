@@ -77,7 +77,6 @@ class commandLineMaker
     else this.old_style=true
     this.actual_path=path.resolve('./')
     this.#binary_dir()
-    console.log(this.#getGeneratorList())
   }
 
   #source_dir()
@@ -177,6 +176,11 @@ class commandLineMaker
     {
       if(process.platform === "win32") this.generator="NMake Makefiles"
       else this.generator="Unix Makefiles"
+    }
+    else
+    {
+      let generators = this.#getGeneratorList()
+      if(!generators.includes(this.generator)) throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version)
     }
     return Array('-G',this.generator)
   }
@@ -393,15 +397,17 @@ async function main()
     }
     else if(mode==='build')
     {
-
+      build()
     }
     else if(mode==='install')
     {
-
+      install()
     }
     else if(mode==='all')
     {
       configure()
+      build()
+      install()
     }
     //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
 
