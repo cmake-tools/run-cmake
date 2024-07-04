@@ -34,7 +34,7 @@ jobs:
         id: configure
         with:
           mode: configure
-          generator: toto
+          generator: Ninja
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
