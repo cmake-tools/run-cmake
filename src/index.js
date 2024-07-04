@@ -173,6 +173,23 @@ class CommandLineMaker
     return parameters
   }
 
+  installCommandParameters()
+  {
+    let parameters=[]
+    if(CMakeVersionGreaterEqual('3.15.0'))
+    {
+      parameters=parameters.concat('--install')
+      parameters=parameters.concat(process.env.binary_dir)
+    }
+    else
+    {
+      parameters=parameters.concat('-P')
+      parameters=parameters.concat(process.env.binary_dir+'/cmake_install.cmake')
+    }
+    console.log(parameters)
+    return parameters
+  }
+
   workingDirectory()
   {
     if(this.old_style==true) return this.binary_dir
@@ -408,7 +425,19 @@ function build(command_line_maker)
 
 async function install(command_line_maker)
 {
-
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    } 
+  }
+  options.silent = false
+  exec.exec('cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
