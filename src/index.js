@@ -159,7 +159,7 @@ class CommandLineMaker
     if(!CMakeVersionGreaterEqual('3.1.0'))
     {
       this.#platform() /** TODO fix this mess dude */
-      this.generator=this.generator+' '+this.platform
+      if(this.platform!='')this.generator=this.generator+' '+this.platform
     }
     return Array('-G',this.generator)
   }
