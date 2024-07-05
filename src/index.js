@@ -103,11 +103,6 @@ class CommandLineMaker
     }
   }
 
-  #binary_build_dir()
-  {
-    return Array(process.env.binary_dir)
-  }
-
   #initial_cache()
   {
     let initial_cache = core.getInput('initial_cache', { required: false })
@@ -139,6 +134,82 @@ class CommandLineMaker
       ret=ret.concat('-U',value[i])
     }
     return ret;
+  }
+
+  #generator()
+  {
+    this.generator = core.getInput('generator', { required: false });
+    if(this.generator=='')
+    {
+      if(process.platform === "win32") this.generator="NMake Makefiles"
+      else this.generator="Unix Makefiles"
+    }
+    else
+    {
+      let generators = this.#getGeneratorList()
+      if(!generators.includes(this.generator))
+      {
+        let gen = String('[')
+        for(const i in generators) { gen+=generators[i]+',' }
+        gen = gen.substring(0, gen.length - 1);
+        gen+=']'
+        throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
+      }
+    }
+    if(!CMakeVersionGreaterEqual('3.1.0'))
+    {
+      this.#toolset() /** TODO fix this mess dude */
+      this.generator=this.generator+' '+this.platform
+      return Array()
+    }
+    else return Array('-G',this.generator)
+  }
+
+  #toolset()
+  {
+    this.toolset = core.getInput('toolset', { required: false })
+    if(this.toolset!='' && CMakeVersionGreaterEqual('3.1.0')) return Array('-T',this.toolset)
+    else return Array()
+  }
+
+  /* Must be called before generator to allow to add the toolset to the generator string !!!*/
+  #platform()
+  {
+    this.platform = core.getInput('platform', { required: false })
+    /* CMake 3.0 only allow platform to be addind to the generator string */
+    if(!CMakeVersionGreaterEqual('3.1.0')) return Array()
+    if(this.platform!='') return Array('-A',this.platform)
+    else return Array()
+  }
+
+  #toolchain()
+  {
+    this.toolchain = core.getInput('toolchain', { required: false })
+    if(this.toolchain!='') return Array('--toolchain',this.toolchain)
+    else return Array()
+  }
+
+  #install_prefix()
+  {
+    delete process.env.CMAKE_INSTALL_PREFIX;
+    this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
+    if(this.install_prefix!='')
+    {
+      this.install_prefix=path.resolve(this.install_prefix)
+      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
+      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
+    }
+    return []
+  }
+
+  
+
+
+
+
+  #binary_build_dir()
+  {
+    return Array(process.env.binary_dir)
   }
 
   #parallel()
@@ -207,64 +278,6 @@ class CommandLineMaker
   {
     if(this.old_style==true) return this.binary_dir
     else return this.actual_path
-  }
-
-
-  #generator()
-  {
-    this.generator = core.getInput('generator', { required: false });
-    if(this.generator=='')
-    {
-      if(process.platform === "win32") this.generator="NMake Makefiles"
-      else this.generator="Unix Makefiles"
-    }
-    else
-    {
-      let generators = this.#getGeneratorList()
-      if(!generators.includes(this.generator))
-      {
-        let gen = String('[')
-        for(const i in generators) { gen+=generators[i]+',' }
-        gen = gen.substring(0, gen.length - 1);
-        gen+=']'
-        throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
-      }
-    }
-    return Array('-G',this.generator)
-  }
-
-  #toolset()
-  {
-    this.toolset = core.getInput('toolset', { required: false })
-    if(this.toolset!='') return Array('-T',this.toolset)
-    else return Array()
-  }
-
-  #platform()
-  {
-    this.platform = core.getInput('platform', { required: false })
-    if(this.platform!='') return Array('-A',this.platform)
-    else return Array()
-  }
-
-  #toolchain()
-  {
-    this.toolchain = core.getInput('toolchain', { required: false })
-    if(this.toolchain!='') return Array('--toolchain',this.toolchain)
-    else return Array()
-  }
-
-  #install_prefix()
-  {
-    delete process.env.CMAKE_INSTALL_PREFIX;
-    this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
-    if(this.install_prefix!='')
-    {
-      this.install_prefix=path.resolve(this.install_prefix)
-      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
-      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
-    }
-    return []
   }
 
   #strip()
