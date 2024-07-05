@@ -160,9 +160,8 @@ class CommandLineMaker
     {
       this.#toolset() /** TODO fix this mess dude */
       this.generator=this.generator+' '+this.platform
-      return Array()
     }
-    else return Array('-G',this.generator)
+    return Array('-G',this.generator)
   }
 
   #toolset()
