@@ -35,7 +35,6 @@ jobs:
         id: configure
         with:
           mode: configure
-          generator: 'Visual Studio 9 2008'
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
