@@ -73,6 +73,7 @@ class CommandLineMaker
     else this.old_style=true
     this.actual_path=path.resolve('./')
     this.#binary_dir()
+    this.need_to_install_graphviz=this.#graphviz()
   }
 
   /* Configure */
@@ -276,10 +277,14 @@ class CommandLineMaker
   #graphviz()
   {
     let graphviz = core.getInput('graphviz', { required: false, default:'none' });
-    if(graphviz=='') return []
+    if(graphviz=='')
+    {
+      this.install_graphviz=false;
+      return []
+    }
     else
     {
-      installGraphviz().then()
+      this.install_graphviz=true;
       graphviz=path.resolve(graphviz)
       return Array('--graphviz='+graphviz)
     }
@@ -489,6 +494,10 @@ class CommandLineMaker
     }
   }
 
+  InstallGraphvizNeeded()
+  {
+    return this.need_to_install_graphviz
+  }
 }
 
 /* Detect which mode the user wants :
@@ -566,6 +575,7 @@ async function main()
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
+    if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
     let mode = getMode()
     if(mode==='configure')
     {
