@@ -53,7 +53,7 @@ inputs:
   configure_warnings:
     description: 'Enable warnings. Choice is : none (default), deprecated, warning, developer'
     required: false
-    default: 'none'
+    default: ''
   
   # Build mode options:
   parallel:
