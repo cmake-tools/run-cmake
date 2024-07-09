@@ -294,7 +294,7 @@ class CommandLineMaker
     options=options.concat(this.#configure_warnings())
     options=options.concat(this.#configure_warnings_as_errors())
     options=options.concat(this.#fresh())
-    options=options.conacat(this.#list_cache_variables())
+    options=options.concat(this.#list_cache_variables())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
