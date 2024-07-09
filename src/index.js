@@ -208,7 +208,7 @@ class CommandLineMaker
 
   #configure_warnings()
   {
-    configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
+    let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
     if(configure_warnings=='' || configure_warnings=='none')
     {
       return Array('-Wno-dev')
