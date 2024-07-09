@@ -40,7 +40,7 @@ jobs:
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
           configure_warnings: warning
-          configure_warnings_as_errors: deprecated
+          configure_warnings_as_errors: ''
 
       - name: 🛠️ run-cmake (build)
         uses: ./
