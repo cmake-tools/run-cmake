@@ -60,13 +60,14 @@ function CMakeVersionGreaterEqual(version)
 
 async function installGraphviz()
 {
+  let found_graphviz = false
   if(process.platform === "win32")
   {
-    let found_graphviz = which.sync('dot.exe', { nothrow: true })
+    found_graphviz = which.sync('dot.exe', { nothrow: true })
   }
   else
   {
-    let found_graphviz = which.sync('dot', { nothrow: true })
+    found_graphviz = which.sync('dot', { nothrow: true })
   }
   if(found_graphviz)
   {
