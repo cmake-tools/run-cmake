@@ -60,9 +60,20 @@ function CMakeVersionGreaterEqual(version)
 
 async function installGraphviz()
 {
-  if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
-  else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
-  else await exec.exec('brew', ['install', 'graphviz'])
+  if(process.platform === "win32")
+  {
+    let found_graphviz = which.sync('dot.exe', { nothrow: true })
+  }
+  else
+  {
+    let found_graphviz = which.sync('dot', { nothrow: true })
+  }
+  if(found_graphviz)
+  {
+    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
+    else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
+    else await exec.exec('brew', ['install', 'graphviz'])
+  }
 }
 
 class CommandLineMaker
