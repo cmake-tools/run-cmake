@@ -5,21 +5,23 @@ GitHub action to run CMake
 
 CMake command options and corresponding action parameters :
 
-|  CMake option                                                  |  Action parameter    |  Descritpion                                                            |  Type    |  Default                         | Available  |
-|:--------------------------------------------------------------:|:--------------------:|:-----------------------------------------------------------------------:|:--------:|:--------------------------------:|:----------:|
-|  -S                                                            |  source_dir          |  Path to root directory of the CMake project to build                   |  path    |  "./"                            |  ✔️         |
-|  -B                                                            |  binary_dir          |  Path to directory which CMake will use as the root of build directory  |  path    |  "../build"                      |  ✔️         |
-|  -C                                                            |  initial_cache       |  Pre-load a script to populate the cache                                |  file    |  ""                              |  ✔️         |
-|  -D                                                            |  variables           |  Create or update a CMake **CACHE** entry                               |  array   |  []                              |  ✔️         |
-|  -U                                                            |  remove_variables    |  Remove matching entries from CMake **CACHE**                           |  array   |  []                              |  ✔️         |
-|  -G                                                            |  generator           |  Specify a build system generator                                       |  string  |  NMake Makefiles/Unix Makefiles  |  ✔️         |
-|  -T                                                            |  toolset             |  Toolset specification for the generator, if supported                  |  string  |  ""                              |  ✔️         |
-|  -A                                                            |  platform            |  Specify platform name if supported by generator                        |  string  |  ""                              |  ✔️         |
-|  --toolchain                                                   |  toolchain           |  Specify the cross compiling toolchain file                             |  file    |  ""                              |  ✔️         |
-|  --install-prefix                                              |  install_prefix      |  Specify the installation directory                                     |  path    |  ""                              |  ✔️         |
-|  -Wno-dev/-Wdev -Wdeprecated/-Wno-deprecated (CMake3.5+)       |  configure_warnings  |  Specify the warnings to print (none, deprecated, warning, developer)   |  string  |  ""                              |  ✔️         |
-|  -Werror=dev/deprecated -Wno-error=dev/deprecated (CMake3.5+)  |  configure_warnings  |  The warnings to throw error (none, deprecated, warning, developer)     |  string  |  ""                              |  ✔️         |
-|  --fresh                                                       |  fresh               |  Perform a fresh configuration of the build tree                        |          |                                  |  ❌        |
+|  CMake option                                                  |  Action parameter      |  Descritpion                                                            |  Type    |  Default                         | Available  |
+|:--------------------------------------------------------------:|:----------------------:|:-----------------------------------------------------------------------:|:--------:|:--------------------------------:|:----------:|
+|  -S                                                            |  source_dir            |  Path to root directory of the CMake project to build                   |  path    |  "./"                            |  ✔️         |
+|  -B                                                            |  binary_dir            |  Path to directory which CMake will use as the root of build directory  |  path    |  "../build"                      |  ✔️         |
+|  -C                                                            |  initial_cache         |  Pre-load a script to populate the cache                                |  file    |  ""                              |  ✔️         |
+|  -D                                                            |  variables             |  Create or update a CMake **CACHE** entry                               |  array   |  []                              |  ✔️         |
+|  -U                                                            |  remove_variables      |  Remove matching entries from CMake **CACHE**                           |  array   |  []                              |  ✔️         |
+|  -G                                                            |  generator             |  Specify a build system generator                                       |  string  |  NMake Makefiles/Unix Makefiles  |  ✔️         |
+|  -T                                                            |  toolset               |  Toolset specification for the generator, if supported                  |  string  |  ""                              |  ✔️         |
+|  -A                                                            |  platform              |  Specify platform name if supported by generator                        |  string  |  ""                              |  ✔️         |
+|  --toolchain                                                   |  toolchain             |  Specify the cross compiling toolchain file                             |  file    |  ""                              |  ✔️         |
+|  --install-prefix                                              |  install_prefix        |  Specify the installation directory                                     |  path    |  ""                              |  ✔️         |
+|  -Wno-dev/-Wdev -Wdeprecated/-Wno-deprecated (CMake3.5+)       |  configure_warnings    |  Specify the warnings to print (none, deprecated, warning, developer)   |  string  |  ""                              |  ✔️         |
+|  -Werror=dev/deprecated -Wno-error=dev/deprecated (CMake3.5+)  |  configure_warnings    |  The warnings to throw error (none, deprecated, warning, developer)     |  string  |  ""                              |  ✔️         |
+|  --fresh                                                       |  fresh                 |  Perform a fresh configuration of the build tree                        |          |                                  |  ❌        |
+|  -L[A][H]                                                      |  list_cache_variables  |  List cached variables                                                  |  string  |  "none"                          |  ✔️         |
+|  --graphviz                                                    |  graphviz              |  Generate graphviz of dependencies                                      |  file    |  ""                              |  ✔️         |
 
 ## Build a Build a Project
 

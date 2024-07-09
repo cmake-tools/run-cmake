@@ -62,7 +62,12 @@ inputs:
     description: 'List cached variables. Choice is : none, cache, cache_help, advanced, advanced_help'
     required: false
     default: 'none'
-  
+  graphviz:
+    description: 'Generate graphviz of dependencies, see CMakeGraphVizOptions for more'
+    required: false
+    default: ''
+
+
   # Build mode options:
   parallel:
     description: "The maximum number of concurrent processes to use when building. If omitted the number of core available is used. (CMake 3.12+)"

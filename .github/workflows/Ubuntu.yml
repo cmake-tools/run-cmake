@@ -42,6 +42,7 @@ jobs:
           configure_warnings: developer
           configure_warnings_as_errors: ''
           list_cache_variables: 'advanced_help'
+          graphviz: './graph.dot'
 
       - name: 🛠️ run-cmake (build)
         uses: ./

@@ -273,6 +273,18 @@ class CommandLineMaker
     else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables) 
   }
 
+  #graphviz()
+  {
+    let graphviz = core.getInput('graphviz', { required: false, default:'none' });
+    if(graphviz=='') return []
+    else
+    {
+      installGraphviz()
+      graphviz=path.resolve(graphviz)
+      return Array('--graphviz='+graphviz)
+    }
+  }
+
   configureCommandParameters() 
   {
     let options=[]
@@ -295,6 +307,7 @@ class CommandLineMaker
     options=options.concat(this.#configure_warnings_as_errors())
     options=options.concat(this.#fresh())
     options=options.concat(this.#list_cache_variables())
+    options=options.concat(this.#graphviz())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
