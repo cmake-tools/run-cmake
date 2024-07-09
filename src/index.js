@@ -279,7 +279,7 @@ class CommandLineMaker
     if(graphviz=='') return []
     else
     {
-      installGraphviz()
+      installGraphviz().then()
       graphviz=path.resolve(graphviz)
       return Array('--graphviz='+graphviz)
     }
