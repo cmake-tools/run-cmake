@@ -254,7 +254,7 @@ class CommandLineMaker
     {
       return Array('-Werror=dev')
     }
-    else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
+    else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
   }
 
 
