@@ -582,6 +582,7 @@ async function main()
 {
   try
   {
+    console.log(`::add-matcher::./dist/cmake.json`);
     let found = which.sync('cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
