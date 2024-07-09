@@ -257,24 +257,20 @@ class CommandLineMaker
     else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
   }
 
-
-
-
-
-
-  #binary_build_dir()
+  #fresh()
   {
-    return Array(process.env.binary_dir)
+    return []
   }
 
-  #parallel()
+  #list_cache_variables()
   {
-    if(!CMakeVersionGreaterEqual('3.12.0')) return Array()
-    let nbrCores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
-    let value = parser.getInput('parallel',{default:nbrCores})
-    value = parseInt(value, 10)
-    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
-    return Array('--parallel',String(value))
+    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'none' });
+    if(list_cache_variables=='') return []
+    else if(list_cache_variables=='cache') return Array('-L')
+    else if(list_cache_variables=='cache_help') return Array('-LH')
+    else if(list_cache_variables=='advanced') return Array('-LA')
+    else if(list_cache_variables=='advanced_help') return Array('-LAH')
+    else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables) 
   }
 
   configureCommandParameters() 
@@ -297,10 +293,28 @@ class CommandLineMaker
     options=options.concat(this.#install_prefix())
     options=options.concat(this.#configure_warnings())
     options=options.concat(this.#configure_warnings_as_errors())
+    options=options.concat(this.#fresh())
+    options=options.conacat(this.#list_cache_variables())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
     return options
+  }
+
+
+  #binary_build_dir()
+  {
+    return Array(process.env.binary_dir)
+  }
+
+  #parallel()
+  {
+    if(!CMakeVersionGreaterEqual('3.12.0')) return Array()
+    let nbrCores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
+    let value = parser.getInput('parallel',{default:nbrCores})
+    value = parseInt(value, 10)
+    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
+    return Array('--parallel',String(value))
   }
 
   buildCommandParameters()

@@ -51,13 +51,17 @@ inputs:
     required: false
     default: '../install'
   configure_warnings:
-    description: 'Enable warnings. Choice is : none (default), deprecated, warning, developer'
+    description: 'Enable warnings. Choice is : none, deprecated, warning, developer'
     required: false
     default: ''
   configure_warnings_as_errors:
-    description: 'Enable warnings as errors. Choice is : none (default), deprecated, warning, developer'
+    description: 'Enable warnings as errors. Choice is : none, deprecated, warning, developer'
     required: false
     default: ''
+  list_cache_variables:
+    description: 'List cached variables. Choice is : none, cache, cache_help, advanced, advanced_help'
+    required: false
+    default: 'none'
   
   # Build mode options:
   parallel:

@@ -38,6 +38,7 @@ jobs:
             AFTER_CACHE_STRING:STRING="MyString"
           configure_warnings: deprecated
           configure_warnings_as_errors: ''
+          list_cache_variables: 'advanced_help'
 
       - name: 🛠️ run-cmake (build)
         uses: ./
