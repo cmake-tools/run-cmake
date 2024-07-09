@@ -183,9 +183,14 @@ class CommandLineMaker
 
   #toolchain()
   {
-    this.toolchain = core.getInput('toolchain', { required: false })
-    if(this.toolchain!='') return Array('--toolchain',this.toolchain)
-    else return Array()
+    delete process.env.CMAKE_TOOLCHAIN_FILE;
+    let toolchain = core.getInput('toolchain', { required: false })
+    if(toolchain!='')
+    {
+      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--toolchain',toolchain)
+      else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+install_prefix)
+    }
+    return []
   }
 
   #install_prefix()
@@ -201,7 +206,33 @@ class CommandLineMaker
     return []
   }
 
+  #configure_warnings()
+  {
+    configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
+    if(configure_warnings=='' || configure_warnings=='none')
+    {
+      return Array('-Wno-dev')
+    }
+    else if(configure_warnings=='deprecated')
+    {
+      if(!CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      else return Array('-Wdeprecated')
+    }
+    else if(configure_warnings=='warning')
+    {
+      if(!CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      else return Array('-Wdev','-Wno-deprecated')
+    }
+    else if(configure_warnings=='developer')
+    {
+      return Array('-Wdev')
+    }
+    else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings)
+  }
+
   
+
+
 
 
 
@@ -239,6 +270,7 @@ class CommandLineMaker
     options=options.concat(this.#platform())
     options=options.concat(this.#toolchain())
     options=options.concat(this.#install_prefix())
+    options=options.concat(this.#configure_warnings())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)

@@ -14,4 +14,7 @@ message(STATUS "\t- BEFORE_CACHE_STRING : ${BEFORE_CACHE_STRING}")
 
 message(STATUS "\t- AFTER_CACHE_BOOL : ${AFTER_CACHE_BOOL}")
 message(STATUS "\t- AFTER_CACHE_STRING : ${AFTER_CACHE_STRING}")
+
+message(AUTHOR_WARNING "I'm a warning")
+message(DEPRECATION "I'm a deprecation")
 add_executable(Main src/main.cpp)

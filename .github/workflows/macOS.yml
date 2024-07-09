@@ -36,6 +36,7 @@ jobs:
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
+          configure_warnings: deprecated
 
       - name: 🛠️ run-cmake (build)
         uses: ./

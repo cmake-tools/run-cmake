@@ -35,12 +35,12 @@ jobs:
         id: configure
         with:
           mode: configure
-          platform: 'Win32'
           generator: 'Visual Studio 9 2008'
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
             AFTER_CACHE_STRING:STRING="MyString"
+          configure_warnings: warning
 
       - name: 🛠️ run-cmake (build)
         uses: ./
