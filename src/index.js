@@ -216,7 +216,7 @@ class CommandLineMaker
     else if(configure_warnings=='deprecated')
     {
       if(!CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
-      else return Array('-Wdeprecated')
+      else return Array('-Wno-dev','-Wdeprecated')
     }
     else if(configure_warnings=='warning')
     {
