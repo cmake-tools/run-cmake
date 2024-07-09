@@ -231,7 +231,31 @@ class CommandLineMaker
     else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings)
   }
 
-  
+  #configure_warnings_as_errors()
+  {
+    let configure_warnings_as_errors = core.getInput('configure_warnings_as_errors', { required: false, default:'none' });
+    if(configure_warnings_as_errors=='') return []
+    if(configure_warnings_as_errors=='none')
+    {
+      if(!CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Wno-error=dev')
+    }
+    else if(configure_warnings_as_errors=='deprecated')
+    {
+      if(!CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Wno-error=dev','-Werror=deprecated')
+    }
+    else if(configure_warnings_as_errors=='warning')
+    {
+      if(!CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Werror=dev','-Wno-error=deprecated')
+    }
+    else if(configure_warnings_as_errors=='developer')
+    {
+      return Array('-Werror=dev')
+    }
+    else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
+  }
 
 
 
@@ -272,6 +296,7 @@ class CommandLineMaker
     options=options.concat(this.#toolchain())
     options=options.concat(this.#install_prefix())
     options=options.concat(this.#configure_warnings())
+    options=options.concat(this.#configure_warnings_as_errors())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
