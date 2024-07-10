@@ -277,7 +277,7 @@ class CommandLineMaker
 
   #list_cache_variables()
   {
-    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'none' });
+    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'' });
     if(list_cache_variables=='') return []
     else if(list_cache_variables=='cache') return Array('-L')
     else if(list_cache_variables=='cache_help') return Array('-LH')
@@ -288,7 +288,7 @@ class CommandLineMaker
 
   #graphviz()
   {
-    let graphviz = core.getInput('graphviz', { required: false, default:'none' });
+    let graphviz = core.getInput('graphviz', { required: false, default:'' });
     if(graphviz=='')
     {
       this.install_graphviz=false;
@@ -304,11 +304,22 @@ class CommandLineMaker
 
   #log_level()
   {
-    let log_level = core.getInput('log_level', { required: false, default:'none' });
+    let log_level = core.getInput('log_level', { required: false, default:'' });
     if(log_level!='')
     {
       if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
       if(CMakeVersionGreaterEqual('3.15')) return ['--log-level='+log_level]
+    }
+    return []
+  }
+
+  #log_context()
+  {
+    let log_level = core.getInput('log_level', { required: false, type: 'boolean',default:'' });
+    if(log_level)
+    {
+      if(CMakeVersionGreaterEqual('3.17')) return ['--log-context']
+      else return []
     }
     return []
   }

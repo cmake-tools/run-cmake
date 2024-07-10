@@ -70,6 +70,10 @@ inputs:
     description: 'Set the log level'
     required: false
     default: ''
+  log_context:
+    description: 'Enable the outputting context attached to each message.'
+    required: false
+    default: ''
 
   # Build mode options:
   parallel:

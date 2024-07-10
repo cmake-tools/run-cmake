@@ -41,6 +41,7 @@ jobs:
           list_cache_variables: 'advanced_help'
           graphviz: './graph.dot'
           log_level: 'TRACE'
+          log_context: true
 
       - name: 🛠️ run-cmake (build)
         uses: ./

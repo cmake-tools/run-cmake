@@ -24,7 +24,8 @@ CMake command options and corresponding action parameters :
 |  -N                                                            |                        |  View mode only                                                         |          |                                  |  ❌        |
 |  --graphviz                                                    |  graphviz              |  Generate graphviz of dependencies                                      |  file    |  ""                              |  ✔️         |
 |  --system-information                                          |                        |  Dump information about this system                                     |          |                                  |  ❌        |
-|  --log-level                                                   |  log-level             |  Set the log level                                                      |  string  |  ""                              |  ✔️         |
+|  --log-level                                                   |  log_level             |  Set the log level                                                      |  string  |  ""                              |  ✔️         |
+|  --log-context                                                 |  log_context           |  Enable the outputting context attached to each message                 |  bool    |                                  |  ✔️         |
 
 ## Build a Build a Project
 
