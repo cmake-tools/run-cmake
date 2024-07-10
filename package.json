@@ -2,7 +2,6 @@
   "name": "run-cmake",
   "version": "0.1.0",
   "description": "GitHub action to run CMake",
-  "build": "copyfiles --flat dist/*.json ErrorMatchers",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,7 +17,6 @@
     "@actions/io": "^1.1.3",
     "action-input-parser": "^1.2.38",
     "compare-versions": "^6.1.0",
-    "copyfiles": "^2.4.1",
     "os": "^0.1.2",
     "path": "^0.12.7",
     "semver": "^7.6.2",
