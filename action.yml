@@ -66,7 +66,10 @@ inputs:
     description: 'Generate graphviz of dependencies, see CMakeGraphVizOptions for more'
     required: false
     default: ''
-
+  log_level:
+    description: 'Set the log level'
+    required: false
+    default: ''
 
   # Build mode options:
   parallel:

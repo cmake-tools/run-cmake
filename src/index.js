@@ -302,6 +302,17 @@ class CommandLineMaker
     }
   }
 
+  #log_level()
+  {
+    let log_level = core.getInput('log_level', { required: false, default:'none' });
+    if(log_level!='')
+    {
+      if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
+      if(CMakeVersionGreaterEqual('3.15')) return ['--log-level='+log_level]
+    }
+    return []
+  }
+
   configureCommandParameters() 
   {
     let options=[]
@@ -325,6 +336,7 @@ class CommandLineMaker
     options=options.concat(this.#fresh())
     options=options.concat(this.#list_cache_variables())
     options=options.concat(this.#graphviz())
+    options=options.concat(this.#log_level())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)

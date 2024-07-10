@@ -43,6 +43,7 @@ jobs:
           configure_warnings_as_errors: ''
           list_cache_variables: 'advanced_help'
           graphviz: './graph.dot'
+          log_level: 'TRACE'
 
       - name: 🛠️ run-cmake (build)
         uses: ./

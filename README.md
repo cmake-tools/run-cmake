@@ -19,9 +19,12 @@ CMake command options and corresponding action parameters :
 |  --install-prefix                                              |  install_prefix        |  Specify the installation directory                                     |  path    |  ""                              |  ✔️         |
 |  -Wno-dev/-Wdev -Wdeprecated/-Wno-deprecated (CMake3.5+)       |  configure_warnings    |  Specify the warnings to print (none, deprecated, warning, developer)   |  string  |  ""                              |  ✔️         |
 |  -Werror=dev/deprecated -Wno-error=dev/deprecated (CMake3.5+)  |  configure_warnings    |  The warnings to throw error (none, deprecated, warning, developer)     |  string  |  ""                              |  ✔️         |
-|  --fresh                                                       |  fresh                 |  Perform a fresh configuration of the build tree                        |          |                                  |  ❌        |
+|  --fresh                                                       |                        |  Perform a fresh configuration of the build tree                        |          |                                  |  ❌        |
 |  -L[A][H]                                                      |  list_cache_variables  |  List cached variables                                                  |  string  |  "none"                          |  ✔️         |
+|  -N                                                            |                        |  View mode only                                                         |          |                                  |  ❌        |
 |  --graphviz                                                    |  graphviz              |  Generate graphviz of dependencies                                      |  file    |  ""                              |  ✔️         |
+|  --system-information                                          |                        |  Dump information about this system                                     |          |                                  |  ❌        |
+|  --log-level                                                   |  log-level             |  Set the log level                                                      |  string  |  ""                              |  ✔️         |
 
 ## Build a Build a Project
 
