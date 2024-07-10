@@ -348,6 +348,7 @@ class CommandLineMaker
     options=options.concat(this.#list_cache_variables())
     options=options.concat(this.#graphviz())
     options=options.concat(this.#log_level())
+    options=options.concat(this.#log_context())
 
     options=options.concat(this.#source_dir()) // Need to be the last
     console.log(options)
