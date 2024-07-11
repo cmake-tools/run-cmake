@@ -52,9 +52,10 @@ jobs:
         id: build
         with:
           mode: build
+          config: Debug
+          clean_first: true
           build_targets: |
             Main
-            Main2
 
       - name: 📥 run-cmake (install)
         uses: ./

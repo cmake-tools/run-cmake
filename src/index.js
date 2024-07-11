@@ -371,7 +371,7 @@ class CommandLineMaker
     return Array('--parallel',String(value))
   }
 
-  #build_targets()
+  #build_targets() /* FIXME for CMAKE<3.15 */
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     if (build_targets.length === 0) return []
@@ -386,27 +386,52 @@ class CommandLineMaker
     }
   }
 
+  #config()
+  {
+    const config = core.getInput('config', { required: false, default: '' })
+    if(config!='')
+    {
+      core.exportVariable('config',config)
+      if(CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
+      else return Array('-DBUILD_TYPE',config)
+    }
+    else return []
+  }
+
+  #clean_first()
+  {
+    const clean_first = core.getInput('clean_first', { required: false, type: 'boolean', default: '' })
+    if(clean_first) return ['--clean-first']
+    else return []
+  }
+
   buildCommandParameters()
   {
     let parameters=['--build']
     parameters=parameters.concat(this.#binary_build_dir())
     parameters=parameters.concat(this.#parallel())
     parameters=parameters.concat(this.#build_targets())
+    parameters=parameters.concat(this.#config())
+    parameters=parameters.concat(this.#clean_first())
     console.log(parameters)
     return parameters
   }
 
   /** install step */
-  #config()
+  #install_config()
   {
-    const config = core.getInput('config', { required: false, default: '' })
+    // Find the config from build first
+    if(process.env.config) config = process.env.config
+    else config = core.getInput('config', { required: false, default: '' })
     if(config!='')
     {
+      core.exportVariable('config',config)
       if(CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
       else return Array('-DBUILD_TYPE',config)
     }
     else return []
   }
+
 
   #component()
   {
@@ -478,7 +503,7 @@ class CommandLineMaker
     {
       parameters=parameters.concat('--install')
       parameters=parameters.concat(process.env.binary_dir)
-      parameters=parameters.concat(this.#config())
+      parameters=parameters.concat(this.#install_config())
       parameters=parameters.concat(this.#component())
       parameters=parameters.concat(this.#default_directory_permissions())
       parameters=parameters.concat(this.#override_install_prefix())
@@ -487,7 +512,7 @@ class CommandLineMaker
     }
     else
     {
-      parameters=parameters.concat(this.#config())
+      parameters=parameters.concat(this.#install_config())
       parameters=parameters.concat(this.#component())
       parameters=parameters.concat(this.#default_directory_permissions())
       parameters=parameters.concat(this.#override_install_prefix())

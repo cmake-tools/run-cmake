@@ -84,12 +84,16 @@ inputs:
     description: "Build targets provided instead of the default target. Multiple targets may be given, separated by spaces"
     required: false
     default: ''
-
-  # Install mode options:
-  config: 
-    description: 'For multi-configuration generators, choose configuration'
+  config:
+    description: "For multi-configuration tools, choose configuration"
     required: false
     default: ''
+
+  # Install mode options:
+  #config: 
+  #  description: 'For multi-configuration generators, choose configuration'
+  #  required: false
+  #  default: ''
   component: 
     description: 'Component-based install. Only install component'
     required: false

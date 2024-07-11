@@ -36,6 +36,8 @@ CMake command options and corresponding action parameters :
 |  --build                          |  binary_dir                     |  Project binary directory to be built                                                             |  path    |  "../build"      |  ✔️          |
 |  --parallel                       |  parallel                       |  The maximum number of concurrent processes to use when building                                  |  int     |  core available  |  3.12+      |
 |  --target                         |  build_targets                  |  Build targets instead of the default target. Multiple targets may be given, separated by spaces  |  vector  |  []              |  ✔️          |
+|  --config                         |  config                         |  For multi-configuration tools, choose configuration                                              |  string  |  ""              |  ✔️          |
+|  --clean-first                    |  clean_first                    |  Build target clean first, then build                                                             |  bool    |  false           |  ✔️          |
 
 ## Install a Project
 
