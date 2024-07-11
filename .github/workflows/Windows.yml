@@ -45,6 +45,7 @@ jobs:
           graphviz: './graph.dot'
           log_level: 'TRACE'
           log_context: true
+          
 
       - name: 🛠️ run-cmake (build)
         uses: ./
@@ -57,3 +58,4 @@ jobs:
         id: install
         with:
           mode: install
+          install_verbose: true

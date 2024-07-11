@@ -54,4 +54,5 @@ jobs:
         id: install
         with:
           mode: install
+          install_verbose: false
         

@@ -381,6 +381,81 @@ class CommandLineMaker
     return parameters
   }
 
+  /** install step */
+  #config()
+  {
+    const config = core.getInput('config', { required: false, default: '' })
+    if(config!='')
+    {
+      if(CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
+      else return Array('-DBUILD_TYPE',config)
+    }
+    else return []
+  }
+
+  #component()
+  {
+    const component = core.getInput('component', { required: false, default: '' })
+    if(component!='')
+    {
+      if(CMakeVersionGreaterEqual('3.15.0')) return Array('--component',component)
+      else return Array('-DCOMPONENT',component)
+    }
+    else return []
+  }
+
+  #default_directory_permissions()
+  {
+    const default_directory_permissions = core.getInput('default_directory_permissions', { required: false, default: '' })
+    if(default_directory_permissions!='')
+    {
+      if(CMakeVersionGreaterEqual('3.19')) return Array('--default-directory-permissions',default_directory_permissions)
+      else return []
+    }
+    else return []
+  }
+
+  #override_install_prefix()
+  {
+    const override_install_prefix = core.getInput('override_install_prefix', { required: false, default: '' })
+    if(override_install_prefix!='')
+    {
+      if(CMakeVersionGreaterEqual('3.15')) return Array('--prefix',override_install_prefix)
+      else return []
+    }
+    else return []
+  }
+
+  #strip()
+  {
+    const strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
+    if(CMakeVersionGreaterEqual('3.15'))
+    {
+      if(strip) return Array('--strip')
+      else return []
+    }
+    else return []
+  }
+
+  #install_verbose()
+  {
+    delete process.env.VERBOSE;
+    const install_verbose = core.getInput('install_verbose', { required: false, type: 'boolean', default: false })
+    if(install_verbose)
+    {
+      if(CMakeVersionGreaterEqual('3.15'))
+      {
+        return Array('--verbose')
+      }
+      else
+      {
+        process.env.VERBOSE="TRUE"
+        return []
+      }
+    }
+    return []
+  }
+
   installCommandParameters()
   {
     let parameters=[]
@@ -388,10 +463,21 @@ class CommandLineMaker
     {
       parameters=parameters.concat('--install')
       parameters=parameters.concat(process.env.binary_dir)
+      parameters=parameters.concat(this.#config())
+      parameters=parameters.concat(this.#component())
+      parameters=parameters.concat(this.#default_directory_permissions())
+      parameters=parameters.concat(this.#override_install_prefix())
       parameters=parameters.concat(this.#strip())
+      parameters=parameters.concat(this.#install_verbose())
     }
     else
     {
+      parameters=parameters.concat(this.#config())
+      parameters=parameters.concat(this.#component())
+      parameters=parameters.concat(this.#default_directory_permissions())
+      parameters=parameters.concat(this.#override_install_prefix())
+      parameters=parameters.concat(this.#strip())
+      parameters=parameters.concat(this.#install_verbose())
       parameters=parameters.concat('-P')
       parameters=parameters.concat(process.env.binary_dir+'/cmake_install.cmake')
     }
@@ -403,13 +489,6 @@ class CommandLineMaker
   {
     if(this.old_style==true) return this.binary_dir
     else return this.actual_path
-  }
-
-  #strip()
-  {
-    const strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
-    if(strip) return Array('--strip')
-    else return Array()
   }
 
   #getGeneratorList()

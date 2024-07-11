@@ -8,16 +8,16 @@ inputs:
     description: 'Mode in which CMake is running : configure, build, install, all'
     required: false
     default: 'configure'
+  binary_dir:
+    description: 'Path to directory which CMake will use as the root of build directory.'
+    required: false
+    default: '../build'
   
   # Configure mode options:
   source_dir:
     description: 'Path to root directory of the CMake project to build.'
     required: false
     default: ''
-  binary_dir:
-    description: 'Path to directory which CMake will use as the root of build directory.'
-    required: false
-    default: '../build'
   initial_cache:
     description: 'Pre-load a script to populate the cache.'
     required: false
@@ -82,10 +82,31 @@ inputs:
     default: ''
 
   # Install mode options:
+  config: 
+    description: 'For multi-configuration generators, choose configuration'
+    required: false
+    default: ''
+  component: 
+    description: 'Component-based install. Only install component'
+    required: false
+    default: ''
+  default_directory_permissions:
+    description: 'Default directory install permissions'
+    required: false
+    default: ''
+  override_install_prefix:
+    description: 'Override the installation prefix'
+    required: false
+    default: ''
   strip:
     description: 'Strip before installing'
     required: false
     default: 'false'
+  install_verbose:
+    description: 'Enable verbose output'
+    required: false
+    default: 'false'
+
 
 
 runs:

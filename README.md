@@ -31,6 +31,20 @@ CMake command options and corresponding action parameters :
 
 CMake command options and corresponding action parameters :
 
-|  CMake option      |  Action parameter  |  Descritpion                                                                                                       |  Type  |  Default  | Available  |
-|:------------------:|:------------------:|:------------------------------------------------------------------------------------------------------------------:|:------:|:---------:|:----------:|
-|  --parallel        |  parallel          |  The maximum number of concurrent processes to use when building. If omitted the number of core available is used  |        |           |  3.12+     |
+|  CMake option                     |  Action parameter               |  Description                                                                                                       |  Type    |  Default     | Available  |
+|:---------------------------------:|:-------------------------------:|:------------------------------------------------------------------------------------------------------------------:|:--------:|:------------:|:----------:|
+|  --parallel                       |  parallel                       |  The maximum number of concurrent processes to use when building. If omitted the number of core available is used  |          |              |  3.12+     |
+
+## Install a Project
+
+CMake command options and corresponding action parameters :
+
+|  CMake option                     |  Action parameter               |  Description                                                                                                       |  Type    |  Default     | Available   |
+|:---------------------------------:|:-------------------------------:|:------------------------------------------------------------------------------------------------------------------:|:--------:|:------------:|:-----------:|
+|  --install                        |  binary_dir                     |  Project binary directory to install                                                                               |  string  |  "../build"  |  ✔️          |
+|  --config                         |  config                         |  For multi-configuration generators, choose configuration                                                          |  string  |  ""          |  ✔️          |
+|  --component                      |  component                      |  Component-based install. Only install component                                                                   |  string  |  ""          |  ✔️          |
+|  --default-directory-permissions  |  default_directory_permissions  |  Default directory install permissions                                                                             |  string  |  ""          | CMake3.19+  |
+|  --prefix                         |  override_install_prefix        |  Override the installation prefix                                                                                  |  string  |  ""          | CMake3.15+  |
+|  --strip                          |  strip                          |  Strip before installing                                                                                           |  bool    |  false       | CMake3.15+  |
+|  -v, --verbose                    |  install_verbose                |  Enable verbose output                                                                                             |  bool    |  false       |  ✔️          |
