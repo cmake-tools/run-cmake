@@ -17,4 +17,9 @@ message(STATUS "\t- AFTER_CACHE_STRING : ${AFTER_CACHE_STRING}")
 
 message(AUTHOR_WARNING "I'm a warning")
 message(DEPRECATION "I'm a deprecation")
+
 add_executable(Main src/main.cpp)
+
+add_executable(Main2 src/main.cpp)
+
+add_executable(Main3 src/main.cpp)

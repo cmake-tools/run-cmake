@@ -371,12 +371,27 @@ class CommandLineMaker
     return Array('--parallel',String(value))
   }
 
+  #build_targets()
+  {
+    const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
+    if (build_targets.length === 0) return []
+    else
+    {
+      let ret=['--target']
+      for(const i in build_targets)
+      {
+        ret=ret.concat(build_targets[i])
+      }
+      return ret;
+    }
+  }
+
   buildCommandParameters()
   {
-    let parameters=[]
-    parameters=parameters.concat('--build') // Need to be the first
+    let parameters=['--build']
     parameters=parameters.concat(this.#binary_build_dir())
     parameters=parameters.concat(this.#parallel())
+    parameters=parameters.concat(this.#build_targets())
     console.log(parameters)
     return parameters
   }

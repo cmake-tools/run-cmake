@@ -52,6 +52,9 @@ jobs:
         id: build
         with:
           mode: build
+          build_targets: |
+            Main
+            Main2
 
       - name: 📥 run-cmake (install)
         uses: ./

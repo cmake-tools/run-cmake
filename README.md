@@ -31,20 +31,22 @@ CMake command options and corresponding action parameters :
 
 CMake command options and corresponding action parameters :
 
-|  CMake option                     |  Action parameter               |  Description                                                                                                       |  Type    |  Default     | Available  |
-|:---------------------------------:|:-------------------------------:|:------------------------------------------------------------------------------------------------------------------:|:--------:|:------------:|:----------:|
-|  --parallel                       |  parallel                       |  The maximum number of concurrent processes to use when building. If omitted the number of core available is used  |          |              |  3.12+     |
+|  CMake option                     |  Action parameter               |  Description                                                                                      |  Type    |  Default         |  Available  |
+|:---------------------------------:|:-------------------------------:|:-------------------------------------------------------------------------------------------------:|:--------:|:----------------:|:-----------:|
+|  --build                          |  binary_dir                     |  Project binary directory to be built                                                             |  path    |  "../build"      |  ✔️          |
+|  --parallel                       |  parallel                       |  The maximum number of concurrent processes to use when building                                  |  int     |  core available  |  3.12+      |
+|  --target                         |  build_targets                  |  Build targets instead of the default target. Multiple targets may be given, separated by spaces  |  vector  |  []              |  ✔️          |
 
 ## Install a Project
 
 CMake command options and corresponding action parameters :
 
-|  CMake option                     |  Action parameter               |  Description                                                                                                       |  Type    |  Default     | Available   |
-|:---------------------------------:|:-------------------------------:|:------------------------------------------------------------------------------------------------------------------:|:--------:|:------------:|:-----------:|
-|  --install                        |  binary_dir                     |  Project binary directory to install                                                                               |  string  |  "../build"  |  ✔️          |
-|  --config                         |  config                         |  For multi-configuration generators, choose configuration                                                          |  string  |  ""          |  ✔️          |
-|  --component                      |  component                      |  Component-based install. Only install component                                                                   |  string  |  ""          |  ✔️          |
-|  --default-directory-permissions  |  default_directory_permissions  |  Default directory install permissions                                                                             |  string  |  ""          | CMake3.19+  |
-|  --prefix                         |  override_install_prefix        |  Override the installation prefix                                                                                  |  string  |  ""          | CMake3.15+  |
-|  --strip                          |  strip                          |  Strip before installing                                                                                           |  bool    |  false       | CMake3.15+  |
-|  -v, --verbose                    |  install_verbose                |  Enable verbose output                                                                                             |  bool    |  false       |  ✔️          |
+|  CMake option                     |  Action parameter               |  Description                                                                                                       |  Type    |  Default     | Available  |
+|:---------------------------------:|:-------------------------------:|:------------------------------------------------------------------------------------------------------------------:|:--------:|:------------:|:----------:|
+|  --install                        |  binary_dir                     |  Project binary directory to install                                                                               |  path    |  "../build"  |  ✔️         |
+|  --config                         |  config                         |  For multi-configuration generators, choose configuration                                                          |  string  |  ""          |  ✔️         |
+|  --component                      |  component                      |  Component-based install. Only install component                                                                   |  string  |  ""          |  ✔️         |
+|  --default-directory-permissions  |  default_directory_permissions  |  Default directory install permissions                                                                             |  string  |  ""          | 3.19+      |
+|  --prefix                         |  override_install_prefix        |  Override the installation prefix                                                                                  |  string  |  ""          | 3.15+      |
+|  --strip                          |  strip                          |  Strip before installing                                                                                           |  bool    |  false       | 3.15+      |
+|  -v, --verbose                    |  install_verbose                |  Enable verbose output                                                                                             |  bool    |  false       |  ✔️         |
