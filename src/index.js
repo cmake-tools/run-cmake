@@ -375,12 +375,21 @@ class CommandLineMaker
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     if (build_targets.length === 0) return []
-    else
+    else if(CMakeVersionGreaterEqual('3.15'))
     {
-      let ret=['--target']
+      let ret='--target '
       for(const i in build_targets)
       {
-        ret=ret.concat(build_targets[i])
+        ret=ret+build_targets[i]+' '
+      }
+      return [ret];
+    }
+    else
+    {
+      let ret=[]
+      for(const i in build_targets)
+      {
+        ret=ret.concat('--target '+build_targets[i])
       }
       return ret;
     }
@@ -407,14 +416,34 @@ class CommandLineMaker
 
   buildCommandParameters()
   {
-    let parameters=['--build']
-    parameters=parameters.concat(this.#binary_build_dir())
-    parameters=parameters.concat(this.#parallel())
-    parameters=parameters.concat(this.#build_targets())
-    parameters=parameters.concat(this.#config())
-    parameters=parameters.concat(this.#clean_first())
-    console.log(parameters)
-    return parameters
+    let targets = this.#build_targets()
+    let commands = []
+    if(targets.length ==0)
+    {
+      let parameters=['--build']
+      parameters=parameters.concat(this.#binary_build_dir())
+      parameters=parameters.concat(this.#parallel())
+      parameters=parameters.concat(this.#build_targets())
+      parameters=parameters.concat(this.#config())
+      parameters=parameters.concat(this.#clean_first())
+      console.log(parameters)
+      commands.push(parameters)
+    }
+    else
+    {
+      for(const i in targets)
+      {
+        let parameters=['--build']
+        parameters=parameters.concat(this.#binary_build_dir())
+        parameters=parameters.concat(this.#parallel())
+        parameters=parameters.concat(targets[i])
+        parameters=parameters.concat(this.#config())
+        parameters=parameters.concat(this.#clean_first())
+        console.log(parameters)
+        commands.push(parameters)
+      }
+    }
+    return commands
   }
 
   /** install step */
@@ -702,7 +731,11 @@ function build(command_line_maker)
     } 
   }
   options.silent = false
-  exec.exec('cmake',command_line_maker.buildCommandParameters(), options)
+  let commands = command_line_maker.buildCommandParameters()
+  for(const i in commands)
+  {
+    exec.exec('cmake',commands[i], options)
+  }
 }
 
 async function install(command_line_maker)
