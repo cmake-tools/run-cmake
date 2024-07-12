@@ -391,7 +391,7 @@ class CommandLineMaker
       for(const i in build_targets)
       {
         let ret=[]
-        ret=ret.concat('--target ',build_targets[i])
+        ret=ret.concat('--target',build_targets[i])
         targets.push(ret)
       }
       return targets;
