@@ -420,6 +420,7 @@ class CommandLineMaker
   /** install step */
   #install_config()
   {
+    let config
     // Find the config from build first
     if(process.env.config) config = process.env.config
     else config = core.getInput('config', { required: false, default: '' })
