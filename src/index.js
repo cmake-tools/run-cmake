@@ -374,24 +374,27 @@ class CommandLineMaker
   #build_targets() /* FIXME for CMAKE<3.15 */
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
-    if (build_targets.length === 0) return []
+    let targets= []
+    if (build_targets.length === 0) targets;
     else if(CMakeVersionGreaterEqual('3.15'))
     {
-      let ret='--target '
+      let ret=['--target']
       for(const i in build_targets)
       {
-        ret=ret+build_targets[i]+' '
+        ret=ret.concat(build_targets[i])
       }
-      return [ret];
+      targets.push(ret)
+      return targets;
     }
     else
     {
-      let ret=[]
       for(const i in build_targets)
       {
-        ret=ret.concat('--target '+build_targets[i])
+        let ret=[]
+        ret=ret.concat('--target ',build_targets[i])
+        targets.push(ret)
       }
-      return ret;
+      return targets;
     }
   }
 
