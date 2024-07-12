@@ -433,7 +433,7 @@ class CommandLineMaker
     delete process.env.VERBOSE;
     delete process.env.CMAKE_VERBOSE_MAKEFILE;
     const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
-    if(install_verbose)
+    if(build_verbose)
     {
       if(CMakeVersionGreaterEqual('3.14'))
       {
