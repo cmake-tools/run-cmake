@@ -404,8 +404,7 @@ class CommandLineMaker
     if(config!='')
     {
       core.exportVariable('config',config)
-      if(CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
-      else return Array('-DBUILD_TYPE',config)
+      return Array('--config',config)
     }
     else return []
   }
