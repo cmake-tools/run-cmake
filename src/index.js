@@ -462,6 +462,7 @@ class CommandLineMaker
       parameters=parameters.concat(this.#config())
       parameters=parameters.concat(this.#clean_first())
       parameters=parameters.concat(this.#resolve_package_references())
+      parameters=parameters.concat(this.#build_verbose())
       console.log(parameters)
       commands.push(parameters)
     }
@@ -474,8 +475,9 @@ class CommandLineMaker
         parameters=parameters.concat(this.#parallel())
         parameters=parameters.concat(targets[i])
         parameters=parameters.concat(this.#config())
-        parameters=parameters.concat(this.#clean_first())
+        if(i==1)parameters=parameters.concat(this.#clean_first())
         parameters=parameters.concat(this.#resolve_package_references())
+        parameters=parameters.concat(this.#build_verbose())
         console.log(parameters)
         commands.push(parameters)
       }
