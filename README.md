@@ -38,6 +38,7 @@ CMake command options and corresponding action parameters :
 |  --target                         |  build_targets                  |  Build targets instead of the default target. Multiple targets may be given, separated by spaces  |  vector  |  []              |  ✔️          |
 |  --config                         |  config                         |  For multi-configuration tools, choose configuration                                              |  string  |  ""              |  ✔️          |
 |  --clean-first                    |  clean_first                    |  Build target clean first, then build                                                             |  bool    |  false           |  ✔️          |
+|  --resolve-package-references     |  resolve_package_references     |  Resolve remote package references from external package managers (e.g. NuGet) before build       |  string  |  ""              |  ✔️          |
 
 ## Install a Project
 

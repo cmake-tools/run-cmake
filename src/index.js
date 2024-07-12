@@ -415,6 +415,39 @@ class CommandLineMaker
     if(clean_first) return ['--clean-first']
     else return []
   }
+  
+  #resolve_package_references()
+  {
+    const resolve_package_references = core.getInput('resolve_package_references', { required: false, default: '' })
+    if(resolve_package_references=='') return []
+    else if(resolve_package_references!='on' && resolve_package_references=='off' && resolve_package_references=='only')
+    {
+      throw String('resolve_package_references should be on,off,only. Received: '+resolve_package_references)
+    }
+    else if(CMakeVersionGreaterEqual('3.23')) return ['--resolve-package-references='+resolve_package_references]
+    else return []
+  }
+
+  #build_verbose()
+  {
+    delete process.env.VERBOSE;
+    delete process.env.CMAKE_VERBOSE_MAKEFILE;
+    const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
+    if(install_verbose)
+    {
+      if(CMakeVersionGreaterEqual('3.14'))
+      {
+        return Array('--verbose')
+      }
+      else
+      {
+        process.env.VERBOSE="TRUE"
+        process.env.CMAKE_VERBOSE_MAKEFILE="TRUE"
+        return []
+      }
+    }
+    return []
+  }
 
   buildCommandParameters()
   {
@@ -428,6 +461,7 @@ class CommandLineMaker
       parameters=parameters.concat(this.#build_targets())
       parameters=parameters.concat(this.#config())
       parameters=parameters.concat(this.#clean_first())
+      parameters=parameters.concat(this.#resolve_package_references())
       console.log(parameters)
       commands.push(parameters)
     }
@@ -441,6 +475,7 @@ class CommandLineMaker
         parameters=parameters.concat(targets[i])
         parameters=parameters.concat(this.#config())
         parameters=parameters.concat(this.#clean_first())
+        parameters=parameters.concat(this.#resolve_package_references())
         console.log(parameters)
         commands.push(parameters)
       }
@@ -463,7 +498,6 @@ class CommandLineMaker
     }
     else return []
   }
-
 
   #component()
   {

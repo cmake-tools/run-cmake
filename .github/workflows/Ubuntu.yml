@@ -55,6 +55,7 @@ jobs:
           build_targets: |
             Main
             Main2
+          build_verbose: true
 
       - name: 📥 run-cmake (install)
         uses: ./

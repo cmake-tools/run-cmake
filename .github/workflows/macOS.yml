@@ -49,6 +49,7 @@ jobs:
         with:
           mode: build
           clean_first: true
+          build_verbose: true
 
       - name: 📥 run-cmake (install)
         uses: ./

@@ -56,6 +56,7 @@ jobs:
           clean_first: true
           build_targets: |
             Main
+          build_verbose: true
 
       - name: 📥 run-cmake (install)
         uses: ./

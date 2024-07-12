@@ -88,6 +88,18 @@ inputs:
     description: "For multi-configuration tools, choose configuration"
     required: false
     default: ''
+  clean_first:
+    description: "Build target clean first, then build"
+    required: false
+    default: ''
+  resolve_package_references:
+    description: 'Resolve remote package references from external package managers (e.g. NuGet) before build'
+    required: false
+    default: ''
+  build_verbose:
+    description: 'Enable verbose output - if supported - including the build commands to be executed'
+    required: false
+    default: ''
 
   # Install mode options:
   #config: 
