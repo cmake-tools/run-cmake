@@ -19,6 +19,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: tests
+
       - name: Install libidn11
         run: sudo apt-get update ; sudo apt-get install --no-install-recommends -y libidn12; sudo ln -s  /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11
       - name: ⬇️ Setup CMake
@@ -35,6 +42,7 @@ jobs:
         with:
           mode: configure
           generator: Ninja
+          source_dir: './tests'
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE

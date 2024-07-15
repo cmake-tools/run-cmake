@@ -19,6 +19,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: tests
+      
       - name: ⬇️ Setup CMake
         uses: lukka/get-cmake@latest
         with:
@@ -35,6 +42,7 @@ jobs:
         id: configure
         with:
           mode: configure
+          source_dir: './tests'
           install_prefix: './MyInstallPrefix'
           variables: |
             AFTER_CACHE_BOOL:BOOL=TRUE
