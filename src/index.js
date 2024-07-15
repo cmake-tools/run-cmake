@@ -69,7 +69,7 @@ async function installGraphviz()
   {
     found_graphviz = which.sync('dot', { nothrow: true })
   }
-  if(found_graphviz)
+  if(!found_graphviz)
   {
     if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
     else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
@@ -651,7 +651,7 @@ class CommandLineMaker
         ['3.29', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
         ['3.30', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
       ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
       return myMap.get(version.toString());
     }
     else if(process.platform === "linux")
@@ -689,7 +689,7 @@ class CommandLineMaker
         ['3.29', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
         ['3.30', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
       ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
       return myMap.get(version.toString());
     }
     else
@@ -727,7 +727,7 @@ class CommandLineMaker
         ['3.29', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
         ['3.30', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
       ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.major(global.cmake_version)
+      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
       return myMap.get(version.toString());
     }
   }
