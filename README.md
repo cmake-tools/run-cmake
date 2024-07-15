@@ -39,6 +39,8 @@ CMake command options and corresponding action parameters :
 |  --config                         |  config                         |  For multi-configuration tools, choose configuration                                              |  string  |  ""              |  ✔️          |
 |  --clean-first                    |  clean_first                    |  Build target clean first, then build                                                             |  bool    |  false           |  ✔️          |
 |  --resolve-package-references     |  resolve_package_references     |  Resolve remote package references from external package managers (e.g. NuGet) before build       |  string  |  ""              |  ✔️          |
+|  -v, --verbose                    |  build_verbose                  |  Enable verbose output - if supported - including the build commands to be executed               |  bool    |  ""              |  ✔️          |
+|  --                               |  to_native_tool                 |  Pass remaining options to the native tool                                                        |  vector  |  []              |  ✔️          |
 
 ## Install a Project
 

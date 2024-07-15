@@ -449,6 +449,18 @@ class CommandLineMaker
     return []
   }
 
+  #to_native_tool()
+  {
+    const to_native_tool = parser.getInput('to_native_tool', {type: 'array',default:[]})
+    if(to_native_tool.length == 0) return []
+    else
+    {
+      let ret = ['--']
+      ret.concat(to_native_tool)
+      return ret
+    }
+  }
+
   buildCommandParameters()
   {
     let targets = this.#build_targets()
@@ -463,6 +475,7 @@ class CommandLineMaker
       parameters=parameters.concat(this.#clean_first())
       parameters=parameters.concat(this.#resolve_package_references())
       parameters=parameters.concat(this.#build_verbose())
+      parameters=parameters.concat(this.#to_native_tool())
       console.log(parameters)
       commands.push(parameters)
     }
@@ -478,6 +491,7 @@ class CommandLineMaker
         if(i==1)parameters=parameters.concat(this.#clean_first())
         parameters=parameters.concat(this.#resolve_package_references())
         parameters=parameters.concat(this.#build_verbose())
+        parameters=parameters.concat(this.#to_native_tool())
         console.log(parameters)
         commands.push(parameters)
       }

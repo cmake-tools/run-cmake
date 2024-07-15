@@ -100,6 +100,10 @@ inputs:
     description: 'Enable verbose output - if supported - including the build commands to be executed'
     required: false
     default: ''
+  to_native_tool:
+    description: 'Pass remaining options to the native tool'
+    required: false
+    default: ''
 
   # Install mode options:
   #config: 
