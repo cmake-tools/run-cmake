@@ -283,6 +283,7 @@ class CommandLineMaker
     else if(list_cache_variables=='cache_help') return Array('-LH')
     else if(list_cache_variables=='advanced') return Array('-LA')
     else if(list_cache_variables=='advanced_help') return Array('-LAH')
+    else if(list_cache_variables=='off') return []
     else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables) 
   }
 

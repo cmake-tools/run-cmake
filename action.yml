@@ -59,9 +59,9 @@ inputs:
     required: false
     default: ''
   list_cache_variables:
-    description: 'List cached variables. Choice is : none, cache, cache_help, advanced, advanced_help'
+    description: 'List cached variables. Choice is : no, cache, cache_help, advanced, advanced_help'
     required: false
-    default: 'none'
+    default: ''
   graphviz:
     description: 'Generate graphviz of dependencies, see CMakeGraphVizOptions for more'
     required: false
