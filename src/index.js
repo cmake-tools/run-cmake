@@ -826,7 +826,7 @@ async function main()
       let cpus = []
       cpus= os.cpus()
       global.number_cpus = cpus.length
-      core.log(global.number_cpus)
+      core.info(global.number_cpus)
     }
     let found = which.sync('cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
