@@ -819,7 +819,7 @@ async function main()
   try
   {
     const cmake_matcher = path.join(__dirname, "cmake.json");
-    console.log('::add-matcher::' + cmake_matcher);
+    core.info('::add-matcher::' + cmake_matcher);
     console.log(cmake_matcher)
     global.number_cpus = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
     let found = which.sync('cmake', { nothrow: true })
