@@ -363,7 +363,6 @@ class CommandLineMaker
     options=options.concat(this.#log_context())
 
     options=options.concat(this.#source_dir()) // Need to be the last
-    console.log(options)
     return options
   }
 
@@ -487,7 +486,6 @@ class CommandLineMaker
       parameters=parameters.concat(this.#resolve_package_references())
       parameters=parameters.concat(this.#build_verbose())
       parameters=parameters.concat(this.#to_native_tool())
-      console.log(parameters)
       commands.push(parameters)
     }
     else
@@ -503,7 +501,6 @@ class CommandLineMaker
         parameters=parameters.concat(this.#resolve_package_references())
         parameters=parameters.concat(this.#build_verbose())
         parameters=parameters.concat(this.#to_native_tool())
-        console.log(parameters)
         commands.push(parameters)
       }
     }
@@ -614,7 +611,6 @@ class CommandLineMaker
       parameters=parameters.concat('-P')
       parameters=parameters.concat(process.env.binary_dir+'/cmake_install.cmake')
     }
-    console.log(parameters)
     return parameters
   }
 
@@ -822,7 +818,8 @@ async function main()
 {
   try
   {
-    //console.log('::add-matcher::'+path.posix.resolve('./ErrorMatchers/cmake.json'))
+    const cmake_matcher = path.join(__dirname, "cmake.json");
+    console.log('::add-matcher::' + cmake_matcher);
     global.number_cpus = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
     let found = which.sync('cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
