@@ -4,8 +4,6 @@ const which = require('which')
 const compare_version = require('compare-versions')
 const io = require('@actions/io');
 const path = require('path')
-const {DefaultArtifactClient} = require('@actions/artifact')
-const github = require('@actions/github');
 const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
@@ -71,9 +69,22 @@ async function installGraphviz()
   }
   if(!found_graphviz)
   {
-    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'])
-    else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'])
-    else await exec.exec('brew', ['install', 'graphviz'])
+    let cout ='';
+    let cerr='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout = data.toString();
+      },
+      stderr: (data) => {
+        cerr = data.toString();
+      } 
+    }
+    options.silent = true
+    core.info('Installing graphviz')
+    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'],options)
+    else if(process.platform === "linux") await exec.exec('sudo apt-get',['install', 'graphviz'],options)
+    else await exec.exec('brew', ['install', 'graphviz'],options)
   }
 }
 
