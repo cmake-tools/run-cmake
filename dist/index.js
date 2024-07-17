@@ -32196,11 +32196,12 @@ async function main()
     const cmake_matcher = path.join(__dirname, "cmake.json");
     core.info('::add-matcher::' + cmake_matcher);
     if(os.availableParallelism === "function") global.number_cpus = os.availableParallelism()
-    else if(typeof os.cpus === "function" && typeof os.cpus() === "array") global.number_cpus = os.cpus().length
     else
     {
-      global.number_cpus = 1
-      core.warning('global.number_cpus set to 1')
+      let cpus = []
+      cpus= os.cpus()
+      global.number_cpus = cpus.length
+      core.log(global.number_cpus)
     }
     let found = which.sync('cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
