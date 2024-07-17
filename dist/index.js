@@ -31760,7 +31760,7 @@ class CommandLineMaker
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     let targets= []
-    if (build_targets.length === 0) return targets;
+    if (build_targets.length == 0) return targets;
     else if(CMakeVersionGreaterEqual('3.15'))
     {
       let ret=['--target']
