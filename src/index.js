@@ -81,10 +81,10 @@ async function installGraphviz()
       } 
     }
     options.silent = true
-    core.info('Installing graphviz')
-    if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'],options)
-    else if(process.platform === "linux") await exec.exec('apt-get',['-y','install', 'graphviz'],options)
-    else await exec.exec('brew', ['install', 'graphviz'],options)
+    //core.info('Installing graphviz')
+    //if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'],options)
+    //else if(process.platform === "linux") await exec.exec('apt-get',['-y','install', 'graphviz'],options)
+    //else await exec.exec('brew', ['install', 'graphviz'],options)
   }
 }
 
