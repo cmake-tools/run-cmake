@@ -31413,7 +31413,7 @@ async function fixes()
       }
     }
     options.silent = false
-    await exec.exec('sudo apt-get update ; sudo apt-get install --no-install-recommends -y libidn12; ln /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+    await exec.exec('apt-get -y update ; sudo apt-get -y install --no-install-recommends -y libidn12; ln /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
   }
 
 }
