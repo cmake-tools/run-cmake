@@ -8,6 +8,27 @@ const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
 
+async function fixes()
+{
+  if(process.platform === "linux" && !CMakeVersionGreaterEqual('3.5.0'))
+  {
+    let cout ='';
+    let cerr='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout = data.toString();
+      },
+      stderr: (data) => {
+        cerr = data.toString();
+      }
+    }
+    options.silent = false
+    await exec.exec('apt-get update ; apt-get install --no-install-recommends -y libidn12; ln -s  /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+  }
+
+}
+
 async function getCMakeVersion()
 {
   let cout ='';
@@ -832,6 +853,7 @@ async function main()
     if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
+    await fixes()
     const command_line_maker = new CommandLineMaker()
     if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
     let mode = getMode()
