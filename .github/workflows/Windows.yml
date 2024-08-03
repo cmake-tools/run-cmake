@@ -31,12 +31,13 @@ jobs:
         with:
           cmakeVersion: ~3.${{ matrix.cmake_version }}
           ninjaVersion: ^1
+
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
+
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
-      - name: CMake --help
-        run: cmake --help
+
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
