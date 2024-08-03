@@ -31399,7 +31399,7 @@ const os = __nccwpck_require__(612);
 
 async function fixes()
 {
-  if(process.platform === "linux" && !CMakeVersionGreaterEqual('3.5.0'))
+  if(process.platform === "linux")
   {
     let cout ='';
     let cerr='';
@@ -32238,13 +32238,12 @@ async function main()
       let cpus = []
       cpus= os.cpus()
       global.number_cpus = cpus.length
-      core.info(global.number_cpus)
     }
+    await fixes()
     let found = which.sync('cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
-    await fixes()
     const command_line_maker = new CommandLineMaker()
     if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
     let mode = getMode()
