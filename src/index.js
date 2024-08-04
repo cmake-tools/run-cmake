@@ -27,9 +27,9 @@ async function fixes()
     await exec.exec('sudo apt-get update', [], options)
     await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
     await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-    await exec.exec("mkdir -p ~/.ssh", [], options)
-    await exec.exec("touch  ~/.ssh/known_hosts", [], options)
-    await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts\"", [], options)
+    await exec.exec("mkdir -p /home/runner/.ssh", [], options)
+    await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
+    await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
 
   }
   else if(process.platform === "darwin")
