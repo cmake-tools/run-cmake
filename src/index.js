@@ -10,20 +10,20 @@ const os = require("node:os");
 
 async function fixes()
 {
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    }
+  }
+  options.silent = false
   if(process.platform === "linux")
   {
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    options.silent = false
     await exec.exec('sudo apt-get update', [], options)
     await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
     await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
