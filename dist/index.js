@@ -31410,7 +31410,7 @@ async function fixes()
       cerr = data.toString();
     }
   }
-  options.silent = false
+  options.silent = true
   if(process.platform === "linux")
   {
     await exec.exec('sudo apt-get update', [], options)
@@ -31420,10 +31420,6 @@ async function fixes()
     await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
     await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
 
-  }
-  else if(process.platform === "darwin")
-  {
-    await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
   }
 }
 
