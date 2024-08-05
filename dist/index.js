@@ -31412,9 +31412,9 @@ async function fixes()
   }
   else if(process.platform === "darwin")
   {
-    await exec.exec("mkdir -p /home/runner/.ssh", [], options)
-    await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
-    await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
+    await exec.exec("sudo mkdir -p /home/runner/.ssh", [], options)
+    await exec.exec("sudo touch  /home/runner/.ssh/known_hosts", [], options)
+    await exec.exec("sudo /bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
   }
 }
 
