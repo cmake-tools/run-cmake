@@ -31399,17 +31399,7 @@ const os = __nccwpck_require__(612);
 
 async function fixes()
 {
-  let cout ='';
-  let cerr='';
   const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
-    }
-  }
   options.silent = true
   if(process.platform === "linux")
   {
@@ -31419,7 +31409,10 @@ async function fixes()
     await exec.exec("mkdir -p /home/runner/.ssh", [], options)
     await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
     await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
-
+  }
+  else if(process.platform === "darwin")
+  {
+    await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
   }
 }
 
