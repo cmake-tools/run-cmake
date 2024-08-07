@@ -2,6 +2,13 @@ name: Ubuntu
 
 on:
   push:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/Ubuntu.yml'
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/Ubuntu.yml'
   workflow_dispatch:
 
 concurrency:

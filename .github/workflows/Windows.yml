@@ -2,6 +2,13 @@ name: Windows
 
 on:
   push:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/Windows.yml'
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/Windows.yml'
   workflow_dispatch:
 
 concurrency:
