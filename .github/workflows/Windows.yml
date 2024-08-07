@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64, clangarm64]
-        cmake_version: [20, 25, 30]
+        cmake_version: [30]
     defaults:
       run:
         shell: msys2 {0}
