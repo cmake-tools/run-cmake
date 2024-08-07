@@ -31432,7 +31432,8 @@ async function getCMakeVersion()
     }
   }
   options.silent = true
-  await exec.exec(global.msys2+'cmake', ['--version'], options)
+  let command = global.msys2+'cmake'
+  await exec.exec(command, ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -31454,7 +31455,8 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    await exec.exec(global.msys2+'cmake',['-E','capabilities'], options)
+    let command = global.msys2+'cmake'
+    await exec.exec(command,['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -31491,10 +31493,6 @@ async function installGraphviz()
       } 
     }
     options.silent = true
-    //core.info('Installing graphviz')
-    //if(process.platform === "win32") await exec.exec('choco',['install', 'graphviz'],options)
-    //else if(process.platform === "linux") await exec.exec('apt-get',['-y','install', 'graphviz'],options)
-    //else await exec.exec('brew', ['install', 'graphviz'],options)
   }
 }
 
@@ -32183,7 +32181,8 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  exec.exec(global.msys2+'cmake',command_line_maker.configureCommandParameters(), options)
+  let command = global.msys2+'cmake'
+  exec.exec(command,command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
@@ -32203,7 +32202,8 @@ function build(command_line_maker)
   let commands = command_line_maker.buildCommandParameters()
   for(const i in commands)
   {
-    exec.exec(global.msys2+'cmake',commands[i], options)
+    let command = global.msys2+'cmake'
+    exec.exec(command,commands[i], options)
   }
 }
 
@@ -32221,7 +32221,8 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  exec.exec(global.msys2+'cmake',command_line_maker.installCommandParameters(), options)
+  let command = global.msys2+'cmake'
+  exec.exec(command,command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
@@ -32270,26 +32271,7 @@ async function main()
       build(command_line_maker)
       install(command_line_maker)
     }
-    //await exec.exec('dot', ['-Tpng', '-o', png_file, dot_name])
-
-    //core.summary.addImage('./toto.dot', 'alt description of img', {width: '100', height: '100'})
-    //core.summary.write()
-
-    //const artifact = new DefaultArtifactClient()
-    //const {id, size} = await artifact.uploadArtifact(
-    // name of the artifact
-    //  'toto.dot',
-    // files to include (supports absolute and relative paths)
-    //  ['./png.png'],absolute,
-    //  {
-    // optional: how long to retain the artifact
-    // if unspecified, defaults to repository/org retention settings (the limit of this value)
-    //retentionDays: 1
-    //  }
-    // )
-    //console.log(id)
-    //${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}
-    }
+  }
   catch (error)
   {
     core.setFailed(error)
