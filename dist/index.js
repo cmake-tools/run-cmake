@@ -31433,6 +31433,7 @@ async function getCMakeVersion()
   }
   options.silent = true
   let command = global.msys2+'cmake'
+  core.info("DDDDDDD KDKKDK "+command)
   await exec.exec(command, ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
