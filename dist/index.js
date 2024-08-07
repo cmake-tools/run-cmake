@@ -31432,8 +31432,7 @@ async function getCMakeVersion()
     }
   }
   options.silent = true
-  let command = global.msys2
-  await exec.exec(command, ['--version'], options)
+  await exec.exec(global.msys2, ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -31455,8 +31454,7 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    let command = global.msys2
-    await exec.exec(command,['-E','capabilities'], options)
+    await exec.exec(global.msys2,['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -32181,8 +32179,7 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  let command = global.msys2
-  exec.exec(command,command_line_maker.configureCommandParameters(), options)
+  exec.exec(global.msys2,command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
@@ -32202,8 +32199,7 @@ function build(command_line_maker)
   let commands = command_line_maker.buildCommandParameters()
   for(const i in commands)
   {
-    let command = global.msys2
-    exec.exec(command,commands[i], options)
+    exec.exec(global.msys2,commands[i], options)
   }
 }
 
@@ -32221,8 +32217,7 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  let command = global.msys2
-  exec.exec(command,command_line_maker.installCommandParameters(), options)
+  exec.exec(global.msys2,command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
