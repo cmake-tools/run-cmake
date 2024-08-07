@@ -32237,19 +32237,12 @@ async function main()
       cpus= os.cpus()
       global.number_cpus = cpus.length
     }
-    global.msys2 = core.getInput('msys2-location')
-    if(global.msys2 == '')
+    if(process.env.MSYSTEM !== undefined)
     {
-        global.msys2 = ''
-        core.info('OUPS '+global.msys2)
+      core.info('FOUND MSYS 2 '+global.process.env.MSYSTEM)
+      global.msys2 = 'msys.cmd -c'
     }
-    else
-    {
-      core.info('FOUND MSYS 2 '+global.msys2)
-      global.msys2= path.join(global.msys2, 'msys2.cmd')
-      global.msys2= global.msys2+' -c '
-    }
-
+    else global.msys2 = ''
     await fixes()
     let found = which.sync(global.msys2+'cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
