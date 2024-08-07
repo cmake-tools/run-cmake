@@ -121,6 +121,7 @@ jobs:
           generator: 'Ninja Multi-Config'
           install_prefix: '../install'
           binary_dir: '../build'
+          source_dir: './tests'
       
       - name: 🛠️ run-cmake (build)
         uses: ./
@@ -129,7 +130,6 @@ jobs:
           mode: build
           config: Debug
           clean_first: true
-          source_dir: './tests'
           build_targets: |
             Main
           build_verbose: true
