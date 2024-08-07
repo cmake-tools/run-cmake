@@ -32244,8 +32244,8 @@ async function main()
     }
     else global.msys2 = ''
     await fixes()
-    let found = which.sync(global.msys2+'cmake', { nothrow: true })
-    if(!found) throw String('not found: CMake')
+    //let found = which.sync(global.msys2+'cmake', { nothrow: true })
+    //if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
