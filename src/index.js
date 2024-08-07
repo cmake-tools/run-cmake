@@ -43,8 +43,7 @@ async function getCMakeVersion()
     }
   }
   options.silent = true
-  let command = global.msys2+'cmake'
-  core.info("DDDDDDD KDKKDK "+command)
+  let command = global.msys2
   await exec.exec(command, ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
@@ -67,7 +66,7 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    let command = global.msys2+'cmake'
+    let command = global.msys2
     await exec.exec(command,['-E','capabilities'], options)
     return JSON.parse(cout);
   }
@@ -793,7 +792,7 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  let command = global.msys2+'cmake'
+  let command = global.msys2
   exec.exec(command,command_line_maker.configureCommandParameters(), options)
 }
 
@@ -814,7 +813,7 @@ function build(command_line_maker)
   let commands = command_line_maker.buildCommandParameters()
   for(const i in commands)
   {
-    let command = global.msys2+'cmake'
+    let command = global.msys2
     exec.exec(command,commands[i], options)
   }
 }
@@ -833,7 +832,7 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  let command = global.msys2+'cmake'
+  let command = global.msys2
   exec.exec(command,command_line_maker.installCommandParameters(), options)
 }
 
@@ -852,10 +851,9 @@ async function main()
     }
     if(process.env.MSYSTEM !== undefined)
     {
-      global.msys2 = 'cmd.exe /D /S /C msys2 -c '
-      //exec.exec(global.msys2,['cmake'])
+      global.msys2 = 'cmd.exe /D /S /C msys2 -c cmake'
     }
-    else global.msys2 = ''
+    else global.msys2 = 'cmake'
     await fixes()
     //let found = which.sync(global.msys2+'cmake', { nothrow: true })
     //if(!found) throw String('not found: CMake')
