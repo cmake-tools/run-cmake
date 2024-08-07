@@ -42,7 +42,7 @@ async function getCMakeVersion()
       cerr = data.toString();
     }
   }
-  options.silent = true
+  options.silent = false
   await exec.exec(global.msys2, ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
@@ -850,10 +850,10 @@ async function main()
       global.number_cpus = String(cpus.length)
     }
     await fixes()
-    let found = which.sync(global.msys2, { nothrow: true })
-    if(!found) throw String('not found: CMake')
+    //let found = which.sync(global.msys2, { nothrow: true })
+    //if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
-    global.capabilities = await getCapabilities()
+    //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
     if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
     let mode = getMode()
