@@ -32239,9 +32239,9 @@ async function main()
     }
     if(process.env.MSYSTEM !== undefined)
     {
-      core.info('FOUND MSYS 2 '+global.process.env.MSYSTEM)
-      exec.exec('msys2',['-c','ls'])
-      global.msys2 = ''
+      //core.info('FOUND MSYS 2 '+global.process.env.MSYSTEM)
+      //exec.exec('msys2',['-c','ls'])
+      global.msys2 = 'msys2 -c '
     }
     else global.msys2 = ''
     await fixes()
