@@ -75,12 +75,12 @@ jobs:
 
   msys2:
     runs-on: windows-latest
-    name: ${{ matrix.system }}
+    name: CMake v3.${{ matrix.cmake_version }} ${{ matrix.system }} 
     strategy:
       fail-fast: false
       matrix:
         system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64, clangarm64]
-        cmake_version: [0, 5, 10, 15, 20, 25, 30]
+        cmake_version: [20, 25, 30]
     defaults:
       run:
         shell: msys2 {0}
@@ -129,6 +129,7 @@ jobs:
           mode: build
           config: Debug
           clean_first: true
+          source_dir: './tests'
           build_targets: |
             Main
           build_verbose: true
