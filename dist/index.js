@@ -32241,7 +32241,7 @@ async function main()
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = 'cmd.exe msys2 -c'
-      core.exec(global.msys2,['cmake'])
+      exec.exec(global.msys2,['cmake'])
     }
     else global.msys2 = ''
     await fixes()
