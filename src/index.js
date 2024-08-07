@@ -851,7 +851,7 @@ async function main()
     if(process.env.MSYSTEM !== undefined)
     {
       core.info('FOUND MSYS 2 '+global.process.env.MSYSTEM)
-      global.msys2 = 'msys.cmd -c '
+      global.msys2 = 'msys2 '
     }
     else global.msys2 = ''
     await fixes()
