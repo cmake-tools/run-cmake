@@ -851,8 +851,8 @@ async function main()
     if(process.env.MSYSTEM !== undefined)
     {
       core.info('FOUND MSYS 2 '+global.process.env.MSYSTEM)
-      exec.exec('msys2','')
-      global.msys2 = 'sudo chmod +x msys2 ; msys2'
+      exec.exec('msys2',['-c','ls'])
+      global.msys2 = ''
     }
     else global.msys2 = ''
     await fixes()
