@@ -837,18 +837,18 @@ async function main()
   {
     const cmake_matcher = path.join(__dirname, "cmake.json");
     core.info('::add-matcher::' + cmake_matcher);
-    if(os.availableParallelism === "function") global.number_cpus = os.availableParallelism()
+    if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
     else
     {
       let cpus = []
       cpus= os.cpus()
-      global.number_cpus = cpus.length
+      global.number_cpus = String(cpus.length)
     }
     if(process.env.MSYSTEM !== undefined)
     {
-      global.msys2 = 'cmd.exe /D /S /C msys2 -c cmake'
+      global.msys2 = String('cmd.exe /D /S /C msys2 -c cmake')
     }
-    else global.msys2 = 'cmake'
+    else global.msys2 = String('cmake')
     await fixes()
     //let found = which.sync(global.msys2+'cmake', { nothrow: true })
     //if(!found) throw String('not found: CMake')
