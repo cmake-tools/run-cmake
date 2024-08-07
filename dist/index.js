@@ -32238,7 +32238,7 @@ async function main()
       cpus= os.cpus()
       global.number_cpus = cpus.length
     }
-    if(process.env.MSYSTEM !== undefined) global.msys2 = 'cmd.exe msys2 '
+    if(process.env.MSYSTEM !== undefined) global.msys2 = 'cmd.exe msys2 -c '
     else global.msys2 = ''
     await fixes()
     //let found = which.sync(global.msys2+'cmake', { nothrow: true })
