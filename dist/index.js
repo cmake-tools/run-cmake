@@ -31432,7 +31432,7 @@ async function getCMakeVersion()
     }
   }
   options.silent = true
-  await exec.exec('cmake', ['--version'], options)
+  await exec.exec(global.msys2+'cmake', ['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -31454,7 +31454,7 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    await exec.exec('cmake',['-E','capabilities'], options)
+    await exec.exec(global.msys2+'cmake',['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -32183,7 +32183,7 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
+  exec.exec(global.msys2+'cmake',command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
@@ -32203,7 +32203,7 @@ function build(command_line_maker)
   let commands = command_line_maker.buildCommandParameters()
   for(const i in commands)
   {
-    exec.exec('cmake',commands[i], options)
+    exec.exec(global.msys2+'cmake',commands[i], options)
   }
 }
 
@@ -32221,7 +32221,7 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  exec.exec('cmake',command_line_maker.installCommandParameters(), options)
+  exec.exec(global.msys2+'cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
@@ -32237,8 +32237,16 @@ async function main()
       cpus= os.cpus()
       global.number_cpus = cpus.length
     }
+    global.msys2 = core.getInput('msys2-location')
+    if(global.msys2 === '') global.msys2 = ''
+    else
+    {
+      global.msys2= path.join(global.msys2, 'msys2.cmd')
+      global.msys2= global.msys2+' -c '
+    }
+
     await fixes()
-    let found = which.sync('cmake', { nothrow: true })
+    let found = which.sync(global.msys2+'cmake', { nothrow: true })
     if(!found) throw String('not found: CMake')
     global.cmake_version= await getCMakeVersion()
     global.capabilities = await getCapabilities()
