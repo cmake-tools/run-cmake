@@ -205,7 +205,7 @@ jobs:
 
   clang-cl:
     runs-on: windows-latest
-    name: windows-2019 clang-cl-11 ${{ matrix.architecture }}
+    name: windows-2022 clang-cl-11 ${{ matrix.architecture }}
     strategy:
       fail-fast: false
       matrix:
