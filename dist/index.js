@@ -31423,7 +31423,6 @@ async function fixes()
  * @param {object} opts
  */
 async function runMsys(args, opts) {
-  assert.ok(cmd);
   const quotedArgs = args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with: `
   await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
 }
