@@ -31431,8 +31431,9 @@ async function getCMakeVersion()
       cerr = data.toString();
     }
   }
+  options.shell = 'msys2'
   options.silent = false
-  await exec.exec(global.msys2+" 'cmake --version'",[], options)
+  await exec.exec('cmake',['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -32226,7 +32227,7 @@ async function main()
   {
     if(process.env.MSYSTEM !== undefined)
     {
-      global.msys2 = String('cmd.exe /D /S /C msys2 -c')
+      global.msys2 = String('msys2')
     }
     else global.msys2 = String('cmake')
     const cmake_matcher = path.join(__dirname, "cmake.json");
