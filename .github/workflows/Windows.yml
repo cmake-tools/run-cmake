@@ -85,9 +85,6 @@ jobs:
       matrix:
         system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64 ]
         cmake_version: [25]
-    defaults:
-      run:
-        shell: msys2 {0}
 
     steps:
       - name: Checkout
@@ -113,7 +110,10 @@ jobs:
           release: true
           update: true
           cache: true
-          pacboy: >-
+          install: |
+            cmake
+            ninja
+          pacboy: |
             cmake:p
             ninja:p
             ${{ (matrix.system=='clang32' || matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
