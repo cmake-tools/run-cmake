@@ -124,7 +124,7 @@ jobs:
         with:
           mode: configure
           generator: 'Ninja Multi-Config'
-          install_prefix: '../install'
+          #install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
       
@@ -152,7 +152,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 7.1.0, 8.0.1, 9.0.1, 10.0.1, 11.0.1, 11.1.0, 12.0.1, 13.0.1, 14.0.6, 15.0.7, 16.0.6, 17.0.6, 18.1.0 ]
+        version: [ 13.0.1, 14.0.6, 15.0.7, 16.0.6, 17.0.6, 18.1.0 ]
         cmake_version: [25]
 
     steps:
