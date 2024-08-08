@@ -42,10 +42,10 @@ async function run(cmd,args, opts)
       core.setFailed('environment variable RUNNER_TEMP is undefined');
       return;
     }
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd');
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     quotedArgs = [cmd].concat(args)
-    quotedArgs =  args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with:
-    await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts);
+    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else await exec.exec(cmd,args,opts)
 }
