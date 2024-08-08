@@ -46,15 +46,6 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
-          variables: |
-            AFTER_CACHE_BOOL:BOOL=TRUE
-            AFTER_CACHE_STRING:STRING="MyString"
-          configure_warnings: deprecated
-          configure_warnings_as_errors: ''
-          list_cache_variables: 'advanced_help'
-          graphviz: './graph.dot'
-          log_level: 'TRACE'
-          log_context: true
 
       - name: 🛠️ run-cmake (build)
         uses: ./
@@ -70,4 +61,3 @@ jobs:
         with:
           mode: install
           install_verbose: false
-        

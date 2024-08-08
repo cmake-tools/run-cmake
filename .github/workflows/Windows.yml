@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  msvc:
     runs-on: windows-latest
     name: CMake v3.${{ matrix.cmake_version }}
     strategy:
@@ -51,10 +51,7 @@ jobs:
         with:
           mode: configure
           source_dir: './tests'
-          install_prefix: './MyInstallPrefix'
-          variables: |
-            AFTER_CACHE_BOOL:BOOL=TRUE
-            AFTER_CACHE_STRING:STRING="MyString"
+          install_prefix: '../install'
           configure_warnings: warning
           configure_warnings_as_errors: ''
           list_cache_variables: 'advanced_help'
@@ -148,3 +145,92 @@ jobs:
         with:
           mode: install
           install_verbose: true
+
+  clang:
+    runs-on: windows-latest
+    name: clang-${{ matrix.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ 11.1.0, 12.0.1, 13.0.1, 14.0.6, 15.0.2 ]
+
+    steps:
+      - uses: ammaraskar/gcc-problem-matcher@master
+
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⬇️ Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ^3
+          ninjaVersion: ^1
+
+      - name: ⬇️ Install Clang
+        run: curl -fsSL -o LLVM${{ matrix.version }}.exe https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ matrix.version }}/LLVM-${{ matrix.version }}-win64.exe ; 7z x LLVM${{ matrix.version }}.exe -y -o"C:/Program Files/LLVM"
+
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: configure
+        with:
+          mode: configure
+          source_dir: './tests'
+          install_prefix:  '../install'
+
+      - name: 🛠️ run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+          clean_first: true
+          build_verbose: true
+
+      - name: 📥 run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
+          install_verbose: false
+
+  clang-cl:
+    runs-on: windows-latest
+    name: windows-2019 clang-cl-11 ${{ matrix.architecture }} (c++${{ matrix.standard }})
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [ Win32, x64 ]
+
+    steps:
+      - uses: ammaraskar/msvc-problem-matcher@master
+
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⬇️ Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ^3
+          ninjaVersion: ^1
+
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: configure
+        with:
+          mode: configure
+          source_dir: './tests'
+          install_prefix: '../install'
+  
+      - name: 🛠️ run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+          clean_first: true
+          build_verbose: true
+  
+      - name: 📥 run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
+          install_verbose: false
