@@ -33,7 +33,7 @@ jobs:
           repository: cmake-tools/runs.test
           path: tests
 
-      - name: ⬇️ Setup CMake
+      - name: ⬇️ Setup CMake (${{ matrix.cmake_version }})
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: ~3.${{ matrix.cmake_version }}
