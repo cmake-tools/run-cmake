@@ -153,6 +153,7 @@ jobs:
       fail-fast: false
       matrix:
         version: [ 11.1.0, 12.0.1, 13.0.1, 14.0.6, 15.0.2 ]
+        cmake_version: [25]
 
     steps:
       - uses: ammaraskar/gcc-problem-matcher@master
@@ -160,7 +161,7 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: ⬇️ Setup CMake
+      - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: ^3
@@ -176,6 +177,10 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix:  '../install'
+          generator: 'Ninja Multi-Config'
+          variables: |
+            CMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe
+            CMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe
 
       - name: 🛠️ run-cmake (build)
         uses: ./
@@ -194,11 +199,12 @@ jobs:
 
   clang-cl:
     runs-on: windows-latest
-    name: windows-2019 clang-cl-11 ${{ matrix.architecture }} (c++${{ matrix.standard }})
+    name: windows-2019 clang-cl-11 ${{ matrix.architecture }}
     strategy:
       fail-fast: false
       matrix:
         architecture: [ Win32, x64 ]
+        cmake_version: [25]
 
     steps:
       - uses: ammaraskar/msvc-problem-matcher@master
@@ -206,7 +212,7 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: ⬇️ Setup CMake
+      - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: ^3
@@ -219,6 +225,9 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix: '../install'
+          generator: 'Visual Studio 17 2022'
+          toolset: ClangCL
+          platform: ${{ matrix.architecture }}
   
       - name: 🛠️ run-cmake (build)
         uses: ./
