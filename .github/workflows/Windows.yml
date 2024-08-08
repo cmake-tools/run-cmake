@@ -160,7 +160,13 @@ jobs:
 
       - name: 📥 Checkout
         uses: actions/checkout@v4
-
+      
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: tests
+      
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -211,6 +217,12 @@ jobs:
 
       - name: 📥 Checkout
         uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: tests
 
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
