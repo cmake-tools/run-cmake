@@ -31422,7 +31422,14 @@ async function fixes()
  * @param {string[]} args
  * @param {object} opts
  */
-async function runMsys(args, opts) {
+async function runMsys(args, opts)
+{
+  const tmp_dir = process.env['RUNNER_TEMP'];
+  if (!tmp_dir) {
+    core.setFailed('environment variable RUNNER_TEMP is undefined');
+    return;
+  }
+  const cmd = path.join(tmp_dir, 'setup-msys2/msys2.cmd');
   const quotedArgs = args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with: `
   await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
 }
