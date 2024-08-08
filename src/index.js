@@ -29,6 +29,16 @@ async function fixes()
   }
 }
 
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ */
+async function runMsys(args, opts) {
+  assert.ok(cmd);
+  const quotedArgs = args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with: `
+  await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
+}
+
 async function getCMakeVersion()
 {
   let cout ='';
@@ -42,9 +52,9 @@ async function getCMakeVersion()
       cerr = data.toString();
     }
   }
-  if(global.is_msys2) options.shell = 'msys2'
   options.silent = false
-  await exec.exec('cmake',['--version'], options)
+  if(global.is_msys2) await runMsys(['cmake','--version'],options)
+  else await exec.exec('cmake',['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -792,8 +802,8 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  if(global.is_msys2) options.shell = 'msys2'
-  exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
+  if(global.is_msys2) runMsys(['cmake'].concat(command_line_maker.configureCommandParameters()),options)
+  else exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
