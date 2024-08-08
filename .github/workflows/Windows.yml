@@ -119,6 +119,7 @@ jobs:
           pacboy: >-
             cmake:p
             ninja:p
+            ${{ (matrix.system=='clang32' || matrix.system=='clang64' || matrix.system=='clangarm64') && 'clang:p' || 'gcc:p' }}
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
