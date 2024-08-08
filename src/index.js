@@ -33,16 +33,21 @@ async function fixes()
  * @param {string[]} args
  * @param {object} opts
  */
-async function runMsys(args, opts)
+async function run(cmd,args, opts)
 {
-  const tmp_dir = process.env['RUNNER_TEMP'];
-  if (!tmp_dir) {
-    core.setFailed('environment variable RUNNER_TEMP is undefined');
-    return;
+  if(global.msys)
+  {
+    const tmp_dir = process.env['RUNNER_TEMP'];
+    if(!tmp_dir) {
+      core.setFailed('environment variable RUNNER_TEMP is undefined');
+      return;
+    }
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd');
+    const quotedArgs = [cmd].concat(args)
+    quotedArgs =  args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with:
+    await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts);
   }
-  const cmd = path.join(tmp_dir, 'setup-msys2/msys2.cmd');
-  const quotedArgs = args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with: `
-  await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
+  else await exec.exec(cmd,args,opts)
 }
 
 async function getCMakeVersion()
@@ -59,8 +64,7 @@ async function getCMakeVersion()
     }
   }
   options.silent = false
-  if(global.is_msys2) await runMsys(['cmake','--version'],options)
-  else await exec.exec('cmake',['--version'], options)
+  await run('cmake',['--version'],options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
   if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
   else return version_number[0]
@@ -83,7 +87,7 @@ async function getCapabilities()
     }
     options.silent = true
     if(global.is_msys2) options.shell = 'msys2'
-    await exec.exec('cmake',['-E','capabilities'], options)
+    run('cmake',['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -808,8 +812,7 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  if(global.is_msys2) runMsys(['cmake'].concat(command_line_maker.configureCommandParameters()),options)
-  else exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
+  run('cmake',command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
@@ -827,10 +830,9 @@ function build(command_line_maker)
   }
   options.silent = false
   let commands = command_line_maker.buildCommandParameters()
-  if(global.is_msys2) options.shell = 'msys2'
   for(const i in commands)
   {
-    exec.exec('cmake',commands[i], options)
+    run('cmake',commands[i], options)
   }
 }
 
@@ -848,8 +850,7 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  if(global.is_msys2) options.shell = 'msys2'
-  exec.exec('cmake',command_line_maker.installCommandParameters(), options)
+  run('cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()

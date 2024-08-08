@@ -126,7 +126,7 @@ jobs:
         with:
           mode: configure
           generator: 'Ninja Multi-Config'
-          install_prefix: '../install'
+          #install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
       
