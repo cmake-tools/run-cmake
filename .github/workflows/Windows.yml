@@ -119,7 +119,6 @@ jobs:
           pacboy: >-
             cmake:p
             ninja:p
-            toolchain:p
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
