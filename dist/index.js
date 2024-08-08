@@ -31431,7 +31431,7 @@ async function getCMakeVersion()
       cerr = data.toString();
     }
   }
-  options.shell = 'msys2'
+  if(global.is_msys2) options.shell = 'msys2'
   options.silent = false
   await exec.exec('cmake',['--version'], options)
   let version_number = cout.match(/\d\.\d[\\.\d]+/)
@@ -31455,7 +31455,8 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    await exec.exec(global.msys2,['-E','capabilities'], options)
+    if(global.is_msys2) options.shell = 'msys2'
+    await exec.exec('cmake',['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -32180,7 +32181,8 @@ function configure(command_line_maker)
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
-  exec.exec(global.msys2,command_line_maker.configureCommandParameters(), options)
+  if(global.is_msys2) options.shell = 'msys2'
+  exec.exec('cmake',command_line_maker.configureCommandParameters(), options)
 }
 
 function build(command_line_maker)
@@ -32198,9 +32200,10 @@ function build(command_line_maker)
   }
   options.silent = false
   let commands = command_line_maker.buildCommandParameters()
+  if(global.is_msys2) options.shell = 'msys2'
   for(const i in commands)
   {
-    exec.exec(global.msys2,commands[i], options)
+    exec.exec('cmake',commands[i], options)
   }
 }
 
@@ -32218,7 +32221,8 @@ async function install(command_line_maker)
     } 
   }
   options.silent = false
-  exec.exec(global.msys2,command_line_maker.installCommandParameters(), options)
+  if(global.is_msys2) options.shell = 'msys2'
+  exec.exec('cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
@@ -32228,8 +32232,13 @@ async function main()
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = String('msys2')
+      global.is_msys2 = true
     }
-    else global.msys2 = String('cmake')
+    else
+    {
+      global.msys2 = String('cmake')
+      global.is_msys2 = false
+    }
     const cmake_matcher = path.join(__dirname, "cmake.json");
     core.info('::add-matcher::' + cmake_matcher);
     if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
