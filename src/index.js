@@ -251,7 +251,7 @@ class CommandLineMaker
     if(toolchain!='')
     {
       if(CMakeVersionGreaterEqual('3.21.0')) return Array('--toolchain',toolchain)
-      else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+install_prefix)
+      else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+toolchain)
     }
     return []
   }
