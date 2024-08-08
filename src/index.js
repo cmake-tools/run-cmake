@@ -35,7 +35,7 @@ async function fixes()
  */
 async function run(cmd,args, opts)
 {
-  if(global.msys)
+  if(global.is_msys2)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     if(!tmp_dir) {
