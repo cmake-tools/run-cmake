@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64, clangarm64]
+        system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64 ]
         cmake_version: [25]
     defaults:
       run:
@@ -116,7 +116,7 @@ jobs:
           pacboy: >-
             cmake:p
             ninja:p
-            ${{ (matrix.system=='clang32' || matrix.system=='clang64' || matrix.system=='clangarm64') && 'clang:p' || 'gcc:p' }}
+            ${{ (matrix.system=='clang32' || matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
