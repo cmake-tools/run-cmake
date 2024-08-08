@@ -32,7 +32,7 @@ jobs:
         with:
           repository: cmake-tools/runs.test
           path: tests
-      
+
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -79,7 +79,7 @@ jobs:
 
   msys2:
     runs-on: windows-latest
-    name: CMake v3.${{ matrix.cmake_version }} ${{ matrix.system }} 
+    name: CMake v3.${{ matrix.cmake_version }} ${{ matrix.system }}
     strategy:
       fail-fast: false
       matrix:
@@ -95,7 +95,7 @@ jobs:
         with:
           repository: cmake-tools/runs.test
           path: tests
-      
+
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -127,7 +127,7 @@ jobs:
           #install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
-      
+
       - name: 🛠️ run-cmake (build)
         uses: ./
         id: build
@@ -138,7 +138,7 @@ jobs:
           build_targets: |
             Main
           build_verbose: true
-  
+
       - name: 📥 run-cmake (install)
         uses: ./
         id: install
@@ -160,13 +160,13 @@ jobs:
 
       - name: 📥 Checkout
         uses: actions/checkout@v4
-      
+
       - name: Checkout tests repository
         uses: actions/checkout@v4
         with:
           repository: cmake-tools/runs.test
           path: tests
-      
+
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -240,7 +240,7 @@ jobs:
           generator: 'Visual Studio 17 2022'
           toolset: ClangCL
           platform: ${{ matrix.architecture }}
-  
+
       - name: 🛠️ run-cmake (build)
         uses: ./
         id: build
@@ -248,7 +248,7 @@ jobs:
           mode: build
           clean_first: true
           build_verbose: true
-  
+
       - name: 📥 run-cmake (install)
         uses: ./
         id: install

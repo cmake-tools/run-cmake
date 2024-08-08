@@ -121,7 +121,7 @@ async function installGraphviz()
       },
       stderr: (data) => {
         cerr = data.toString();
-      } 
+      }
     }
     options.silent = true
   }
@@ -334,7 +334,7 @@ class CommandLineMaker
     else if(list_cache_variables=='advanced') return Array('-LA')
     else if(list_cache_variables=='advanced_help') return Array('-LAH')
     else if(list_cache_variables=='off') return []
-    else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables) 
+    else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables)
   }
 
   #graphviz()
@@ -375,7 +375,7 @@ class CommandLineMaker
     return []
   }
 
-  configureCommandParameters() 
+  configureCommandParameters()
   {
     let options=[]
 
@@ -464,7 +464,7 @@ class CommandLineMaker
     if(clean_first) return ['--clean-first']
     else return []
   }
-  
+
   #resolve_package_references()
   {
     const resolve_package_references = core.getInput('resolve_package_references', { required: false, default: '' })
@@ -784,12 +784,12 @@ class CommandLineMaker
 }
 
 /* Detect which mode the user wants :
-   - configure: CMake configure the project only.
-   - build: CMake build the project only.
-   - install: CMake install the project.
-   - all: CMake configure, build and install in a row.
-   By default CMake is in configure mode.
-*/ 
+- configure: CMake configure the project only.
+- build: CMake build the project only.
+- install: CMake install the project.
+- all: CMake configure, build and install in a row.
+By default CMake is in configure mode.
+*/
 function getMode()
 {
   const mode = parser.getInput('mode', {type: 'string',default:'configure'})
@@ -808,7 +808,7 @@ function configure(command_line_maker)
     },
     stderr: (data) => {
       cerr = data.toString();
-    } 
+    }
   }
   options.silent = false
   options.cwd = command_line_maker.workingDirectory()
@@ -826,7 +826,7 @@ function build(command_line_maker)
     },
     stderr: (data) => {
       cerr = data.toString();
-    } 
+    }
   }
   options.silent = false
   let commands = command_line_maker.buildCommandParameters()
@@ -847,7 +847,7 @@ async function install(command_line_maker)
     },
     stderr: (data) => {
       cerr = data.toString();
-    } 
+    }
   }
   options.silent = false
   run('cmake',command_line_maker.installCommandParameters(), options)

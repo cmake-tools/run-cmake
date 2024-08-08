@@ -32,13 +32,13 @@ jobs:
         with:
           repository: cmake-tools/runs.test
           path: tests
-      
+
       - name: ⬇️ Setup CMake v3.${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: ~3.${{ matrix.cmake_version }}
           ninjaVersion: ^1
-      
+
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
