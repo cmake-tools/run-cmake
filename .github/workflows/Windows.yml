@@ -113,7 +113,7 @@ jobs:
 
   msys2:
     runs-on: windows-latest
-    name: ${{ matrix.system }}
+    name: ${{ matrix.system }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
