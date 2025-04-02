@@ -35,7 +35,7 @@ async function fixes()
  */
 async function run(cmd,args, opts)
 {
-  if(global.is_msys2)
+  /*if(global.is_msys2)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     if(!tmp_dir) {
@@ -47,7 +47,7 @@ async function run(cmd,args, opts)
     quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
     await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
-  else await exec.exec(cmd,args,opts)
+  else */await exec.exec(cmd,args,opts)
 }
 
 async function getCMakeVersion()
