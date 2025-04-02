@@ -30939,19 +30939,20 @@ async function fixes()
  */
 async function run(cmd,args, opts)
 {
-  /*if(global.is_msys2)
+  if(global.is_msys2)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
-    if(!tmp_dir) {
+    if(!tmp_dir)
+    {
       core.setFailed('environment variable RUNNER_TEMP is undefined');
       return;
     }
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     quotedArgs = [cmd].concat(args)
     quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
+    await exec.exec('cmd.exe', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
-  else */await exec.exec(cmd,args,opts)
+  else await exec.exec(cmd,args,opts)
 }
 
 async function getCMakeVersion()
