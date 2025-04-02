@@ -30948,9 +30948,9 @@ async function run(cmd,args, opts)
       return;
     }
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs = [cmd].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    await exec.exec('cmd.exe', ['/D', '/S', '/C', msys, '-c', args.join(' ')], opts)
+    //let quotedArgs = [cmd].concat(args)
+    //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    await exec.exec('cmd.exe', ['/D', '/S', '/C', msys, '-c', cmd, args.join(' ')], opts)
   }
   else await exec.exec(cmd,args,opts)
 }
