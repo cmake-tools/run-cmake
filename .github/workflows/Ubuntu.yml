@@ -56,6 +56,42 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+        generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
+        exclude:
+          - cmake_version: 3.0
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.1
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.2
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.3
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.4
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.5
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.6
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.7
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.8
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.9
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.10
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.11
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.12
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.13
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.14
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.15
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.16
+            generator: 'Ninja Multi-Config'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
