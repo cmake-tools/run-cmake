@@ -18,7 +18,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: CMake v3.${{ matrix.cmake_version }}
+    name: CMake v${{ matrix.cmake_version }}
     strategy:
       fail-fast: false
       matrix:
