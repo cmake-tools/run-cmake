@@ -112,45 +112,11 @@ jobs:
 
   msys2:
     runs-on: windows-latest
-    name: CMake v${{ matrix.cmake_version }} ${{ matrix.system }}
+    name: ${{ matrix.system }}
     strategy:
       fail-fast: false
       matrix:
-        system: [ msys, mingw64, mingw32, ucrt64 , clang32, clang64 ]
-        cmake_version:
-          - '3.0'
-          - '3.1'
-          - '3.2'
-          - '3.3'
-          - '3.4'
-          - '3.5'
-          - '3.6'
-          - '3.7'
-          - '3.8'
-          - '3.9'
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-          - '3.14'
-          - '3.15'
-          - '3.16'
-          - '3.17'
-          - '3.18'
-          - '3.19'
-          - '3.20'
-          - '3.21'
-          - '3.22'
-          - '3.23'
-          - '3.24'
-          - '3.25'
-          - '3.26'
-          - '3.27'
-          - '3.28'
-          - '3.29'
-          - '3.30'
-          - '3.31'
-          - '4.0'
+        system: [ msys, mingw64, mingw32, ucrt64, clang64 ]
 
     steps:
       - name: Checkout
@@ -161,12 +127,6 @@ jobs:
         with:
           repository: cmake-tools/runs.test
           path: tests
-
-      - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
-        uses: lukka/get-cmake@latest
-        with:
-          cmakeVersion: ~${{ matrix.cmake_version }}
-          ninjaVersion: ^1
 
       - name: ⬇️ Setup MSYS2 (${{matrix.system}})
         uses: msys2/setup-msys2@v2
@@ -182,7 +142,7 @@ jobs:
           pacboy: |
             cmake:p
             ninja:p
-            ${{ (matrix.system=='clang32' || matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
+            ${{ (matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
