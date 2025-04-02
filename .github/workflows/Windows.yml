@@ -117,6 +117,7 @@ jobs:
       fail-fast: false
       matrix:
         system: [ msys, mingw64, ucrt64, clang64 ]
+        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
 
     steps:
       - name: Checkout
@@ -128,7 +129,7 @@ jobs:
           repository: cmake-tools/runs.test
           path: tests
 
-      - name: ⬇️ Setup MSYS2 (${{matrix.system}})
+      - name: ⬇️ Setup MSYS2 (${{matrix.system}},${{matrix.generator}})
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.system}}
@@ -149,8 +150,8 @@ jobs:
         id: 'configure'
         with:
           mode: configure
-          generator: 'Ninja Multi-Config'
-          #install_prefix: '../install'
+          generator: ${{matrix.generator}}
+          install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
 

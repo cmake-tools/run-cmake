@@ -56,7 +56,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
-        generator: ['Ninja', 'Xcode', 'Ninja Multi-Config']
+        generator: ['Unix Makefiles', 'Xcode', 'Ninja', 'Ninja Multi-Config']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
@@ -92,6 +92,50 @@ jobs:
             generator: 'Ninja Multi-Config'
           - cmake_version: 3.16
             generator: 'Ninja Multi-Config'
+          - cmake_version: 3.0
+            generator: 'Xcode'
+          - cmake_version: 3.1
+            generator: 'Xcode'
+          - cmake_version: 3.2
+            generator: 'Xcode'
+          - cmake_version: 3.3
+            generator: 'Xcode'
+          - cmake_version: 3.4
+            generator: 'Xcode'
+          - cmake_version: 3.5
+            generator: 'Xcode'
+          - cmake_version: 3.6
+            generator: 'Xcode'
+          - cmake_version: 3.7
+            generator: 'Xcode'
+          - cmake_version: 3.8
+            generator: 'Xcode'
+          - cmake_version: 3.9
+            generator: 'Xcode'
+          - cmake_version: 3.10
+            generator: 'Xcode'
+          - cmake_version: 3.11
+            generator: 'Xcode'
+          - cmake_version: 3.12
+            generator: 'Xcode'
+          - cmake_version: 3.13
+            generator: 'Xcode'
+          - cmake_version: 3.14
+            generator: 'Xcode'
+          - cmake_version: 3.15
+            generator: 'Xcode'
+          - cmake_version: 3.16
+            generator: 'Xcode'
+          - cmake_version: 3.17
+            generator: 'Xcode'
+          - cmake_version: 3.18
+            generator: 'Xcode'
+          - cmake_version: 3.19
+            generator: 'Xcode'
+          - cmake_version: 3.20
+            generator: 'Xcode'
+          - cmake_version: 3.21
+            generator: 'Xcode'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
