@@ -18,7 +18,7 @@ concurrency:
 jobs:
   msvc:
     runs-on: windows-latest
-    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (MSVC,${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
@@ -84,6 +84,7 @@ jobs:
         id: configure
         with:
           mode: configure
+          generator: ${{ matrix.generator }}
           source_dir: './tests'
           install_prefix: '../install'
           configure_warnings: warning
@@ -176,7 +177,7 @@ jobs:
 
   clang:
     runs-on: windows-latest
-    name: clang-${{ matrix.version }} (${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (clang-${{ matrix.version }},${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
@@ -267,7 +268,7 @@ jobs:
 
   clang-cl:
     runs-on: windows-latest
-    name: windows-2022 clang-cl ${{ matrix.architecture }} (${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (windows-2022,clang-cl,${{ matrix.architecture }},${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
