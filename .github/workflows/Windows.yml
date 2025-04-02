@@ -307,9 +307,11 @@ jobs:
           install: |
             cmake
             ninja
+            make
           pacboy: |
             cmake:p
             ninja:p
+            make:p
             ${{ (matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
 
       - name: ⚙️ run-cmake (configure)
