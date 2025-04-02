@@ -18,10 +18,11 @@ concurrency:
 jobs:
   msvc:
     runs-on: windows-latest
-    name: CMake v${{ matrix.cmake_version }}
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -175,11 +176,12 @@ jobs:
 
   clang:
     runs-on: windows-latest
-    name: clang-${{ matrix.version }}
+    name: clang-${{ matrix.version }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
-        version: [ 13.0.1, 14.0.6, 15.0.7, 16.0.6, 17.0.6, 18.1.0 ]
+        version: [ 15.0.7 ]
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM','Visual Studio 16 2019', 'Visual Studio 17 2022']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -243,7 +245,7 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix:  '../install'
-          generator: 'Ninja Multi-Config'
+          generator: ${{ matrix.generator }}
           variables: |
             CMAKE_C_COMPILER:PATH=C:/Program Files/LLVM/bin/clang.exe
             CMAKE_CXX_COMPILER:PATH=C:/Program Files/LLVM/bin/clang++.exe
@@ -265,7 +267,7 @@ jobs:
 
   clang-cl:
     runs-on: windows-latest
-    name: windows-2022 clang-cl-11 ${{ matrix.architecture }}
+    name: windows-2022 clang-cl ${{ matrix.architecture }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
@@ -304,6 +306,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM','Visual Studio 16 2019', 'Visual Studio 17 2022']
 
     steps:
       - uses: ammaraskar/msvc-problem-matcher@master
@@ -330,7 +333,7 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix: '../install'
-          generator: 'Visual Studio 17 2022'
+          generator: ${{ matrix.generator }}
           toolset: ClangCL
           platform: ${{ matrix.architecture }}
 
