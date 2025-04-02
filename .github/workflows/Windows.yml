@@ -269,7 +269,7 @@ jobs:
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: ^3
+          cmakeVersion: ~${{ matrix.cmake_version }}
           ninjaVersion: ^1
 
       - name: ⬇️ Install Clang
@@ -359,7 +359,7 @@ jobs:
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: ^3
+          cmakeVersion: ~${{ matrix.cmake_version }}
           ninjaVersion: ^1
 
       - name: ⚙️ run-cmake (configure)
