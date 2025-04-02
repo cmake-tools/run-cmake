@@ -190,8 +190,8 @@ jobs:
           log_level: 'TRACE'
           log_context: true
           variables: |
-            CMAKE_C_COMPILER="cl.exe"
-            CMAKE_CXX_COMPILER="cl.exe"
+            CMAKE_C_COMPILER=cl.exe
+            CMAKE_CXX_COMPILER=cl.exe
 
       - name: 🛠️ run-cmake (build)
         uses: ./
