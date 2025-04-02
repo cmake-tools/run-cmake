@@ -28,11 +28,11 @@ jobs:
       matrix:
         system: [ msys, mingw64, ucrt64, clang64 ]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
-        #exclude:
-        #  - system: msys
-        #    generator: 'MSYS Makefiles'
-        #  - system: msys
-        #    generator: 'MinGW Makefiles'
+        exclude:
+          - system: msys
+            generator: 'MSYS Makefiles'
+          - system: msys
+            generator: 'MinGW Makefiles'
 
     steps:
       - name: Checkout
