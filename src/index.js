@@ -262,7 +262,7 @@ class CommandLineMaker
     this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
     if(this.install_prefix!='')
     {
-      this.install_prefix=path.resolve(this.install_prefix)
+      this.install_prefix=path.resolve(path.resolve(''),this.install_prefix)
       if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
     }
