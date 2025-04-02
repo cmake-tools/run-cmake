@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        system: [ msys, mingw64, mingw32, ucrt64, clang64 ]
+        system: [ msys, mingw64, ucrt64, clang64 ]
 
     steps:
       - name: Checkout
