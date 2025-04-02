@@ -18,7 +18,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: CMake v${{ matrix.cmake_version }}
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
@@ -113,7 +113,7 @@ jobs:
         id: configure
         with:
           mode: configure
-          generator: Ninja
+          generator: ${{ matrix.generator }}
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
 

@@ -18,7 +18,7 @@ concurrency:
 jobs:
   test:
     runs-on: macos-latest
-    name: CMake v${{ matrix.cmake_version }}
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
