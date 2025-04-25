@@ -157,7 +157,7 @@ class CommandLineMaker
   #binary_dir()
   {
     if(process.env.binary_dir!='') this.binary_dir = core.getInput('binary_dir', { required: false, default: process.env.binary_dir });
-    else this.binary_dir = core.getInput('binary_dir', { required: false, default: '../build' });
+    else this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
     this.binary_dir=path.resolve(this.binary_dir)
     core.exportVariable('binary_dir',this.binary_dir)
     if(!this.old_style) return Array('-B',this.binary_dir)
