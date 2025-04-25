@@ -31568,8 +31568,16 @@ class CommandLineMaker
 
   workingDirectory()
   {
-    if(this.old_style==true) return process.env.binary_dir
-    else return this.actual_path
+    if(this.old_style==true)
+    {
+      console.log(`using ${process.env.binary_dir}`)
+        return process.env.binary_dir
+    }
+    else
+    {
+      console.log(`using ${this.actual_path}`)
+      return this.actual_path
+    }
   }
 
   #getGeneratorList()
