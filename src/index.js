@@ -822,6 +822,7 @@ function getMode()
 
 function configure(command_line_maker)
 {
+  let params=command_line_maker.configureCommandParameters()
   let cout ='';
   let cerr='';
   const options = {};
@@ -834,8 +835,8 @@ function configure(command_line_maker)
     }
   }
   options.silent = false
-  options.cwd = command_line_maker.workingDirectory()
-  run('cmake',command_line_maker.configureCommandParameters(), options)
+  options.cwd = command_line_maker.workingDirectory();
+  run('cmake',params, options)
 }
 
 function build(command_line_maker)
