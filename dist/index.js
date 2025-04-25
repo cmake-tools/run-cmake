@@ -31060,7 +31060,7 @@ class CommandLineMaker
 
   #binary_dir()
   {
-    this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
+    this.binary_dir = core.getInput('binary_dir', { required: false, default: '../build' });
     this.binary_dir=path.resolve(this.binary_dir)
     console.log(`set binary_dir ${this.binary_dir}!`);
     core.exportVariable('binary_dir', this.binary_dir);
@@ -31568,7 +31568,7 @@ class CommandLineMaker
 
   workingDirectory()
   {
-    if(this.old_style==true) return this.binary_dir
+    if(this.old_style==true) return process.env.binary_dir
     else return this.actual_path
   }
 
