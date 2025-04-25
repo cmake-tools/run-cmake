@@ -156,8 +156,7 @@ class CommandLineMaker
 
   #binary_dir()
   {
-    if(process.env.binary_dir!='') this.binary_dir = core.getInput('binary_dir', { required: false, default: process.env.binary_dir });
-    else this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
+    this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
     this.binary_dir=path.resolve(this.binary_dir)
     core.exportVariable('binary_dir',this.binary_dir)
     if(!this.old_style) return Array('-B',this.binary_dir)
@@ -408,10 +407,13 @@ class CommandLineMaker
   }
 
 
-  /*#binary_build_dir()
+  #binary_build_dir()
   {
-    return Array(process.env.binary_dir)
-  }*/
+    if(process.env.binary_dir!='') this.binary_dir = core.getInput('binary_dir', { required: false, default: process.env.binary_dir });
+    else this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
+    this.binary_dir=path.resolve(this.binary_dir)
+    return Array(this.binary_dir)
+  }
 
   #parallel()
   {
@@ -519,7 +521,7 @@ class CommandLineMaker
     if(targets.length ==0)
     {
       let parameters=['--build']
-      parameters=parameters.concat(this.#binary_dir())
+      parameters=parameters.concat(this.#binary_build_dir())
       parameters=parameters.concat(this.#parallel())
       parameters=parameters.concat(this.#build_targets())
       parameters=parameters.concat(this.#config())
@@ -534,7 +536,7 @@ class CommandLineMaker
       for(const i in targets)
       {
         let parameters=['--build']
-        parameters=parameters.concat(this.#binary_dir())
+        parameters=parameters.concat(this.#binary_build_dir())
         parameters=parameters.concat(this.#parallel())
         parameters=parameters.concat(targets[i])
         parameters=parameters.concat(this.#config())
@@ -633,7 +635,7 @@ class CommandLineMaker
     if(CMakeVersionGreaterEqual('3.15.0'))
     {
       parameters=parameters.concat('--install')
-      parameters=parameters.concat(process.env.binary_dir)
+      parameters=parameters.concat(this.#binary_build_dir())
       parameters=parameters.concat(this.#install_config())
       parameters=parameters.concat(this.#component())
       parameters=parameters.concat(this.#default_directory_permissions())
@@ -650,7 +652,7 @@ class CommandLineMaker
       parameters=parameters.concat(this.#strip())
       parameters=parameters.concat(this.#install_verbose())
       parameters=parameters.concat('-P')
-      parameters=parameters.concat(process.env.binary_dir+'/cmake_install.cmake')
+      parameters=parameters.concat(this.#binary_build_dir()+'/cmake_install.cmake')
     }
     return parameters
   }
