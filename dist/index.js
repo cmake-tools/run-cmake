@@ -31062,7 +31062,9 @@ class CommandLineMaker
   {
     this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
     this.binary_dir=path.resolve(this.binary_dir)
-    core.setOutput('binary_dir', this.binary_dir)
+    console.log(`set binary_dir ${this.binary_dir}!`);
+    core.setOutput('last_binary_dir', this.binary_dir)
+    console.log(`setOutput last_binary_dir ${this.last_binary_dir}!`);
     if(!this.old_style) return Array('-B',this.binary_dir)
     else
     {
@@ -31313,9 +31315,12 @@ class CommandLineMaker
 
   #binary_build_dir()
   {
-    this.binary_dir = core.getInput('binary_dir');
+    console.log(`this.binary_dir ${this.binary_dir}!`);
+    this.binary_dir = core.getInput('last_binary_dir');
+    console.log(`this.binary_dir2 ${this.binary_dir}!`);
     if(this.binary_dir=='') this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
     this.binary_dir=path.resolve(this.binary_dir)
+    console.log(`this.binary_dir3 ${this.binary_dir}!`);
     return Array(this.binary_dir)
   }
 
