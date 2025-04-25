@@ -31312,10 +31312,10 @@ class CommandLineMaker
   }
 
 
-  #binary_build_dir()
+  /*#binary_build_dir()
   {
     return Array(process.env.binary_dir)
-  }
+  }*/
 
   #parallel()
   {
@@ -31423,7 +31423,7 @@ class CommandLineMaker
     if(targets.length ==0)
     {
       let parameters=['--build']
-      parameters=parameters.concat(this.#binary_build_dir())
+      parameters=parameters.concat(this.#binary_dir())
       parameters=parameters.concat(this.#parallel())
       parameters=parameters.concat(this.#build_targets())
       parameters=parameters.concat(this.#config())
@@ -31438,7 +31438,7 @@ class CommandLineMaker
       for(const i in targets)
       {
         let parameters=['--build']
-        parameters=parameters.concat(this.#binary_build_dir())
+        parameters=parameters.concat(this.#binary_dir())
         parameters=parameters.concat(this.#parallel())
         parameters=parameters.concat(targets[i])
         parameters=parameters.concat(this.#config())
