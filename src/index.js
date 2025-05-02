@@ -121,7 +121,7 @@ async function runGraphviz()
     }
   }
   await run(command,params, options)
-  const {id, size} = await artifact.uploadArtifact(
+  const {id, size} = await artifact.ArtifactClient.uploadArtifact(
     // name of the artifact
     'CMake dependencies',
     // files to include (supports absolute and relative paths)
