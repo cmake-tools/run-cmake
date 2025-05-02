@@ -30992,7 +30992,7 @@ async function getCapabilities()
     }
     options.silent = true
     if(global.is_msys2) options.shell = 'msys2'
-    run('cmake',['-E','capabilities'], options)
+    await run('cmake',['-E','capabilities'], options)
     return JSON.parse(cout);
   }
   else return '{}'
@@ -31023,7 +31023,7 @@ async function runGraphviz()
       cerr = data.toString();
     }
   }
-  run(command,params, options)
+  await run(command,params, options)
   core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
   core.summary.write()
 }
@@ -31079,7 +31079,7 @@ async function installGraphviz()
       command = 'sudo'
     }
     core.info('Installing Graphviz')
-    run(command,params, options)
+    await run(command,params, options)
   }
   return true
 }
@@ -31832,7 +31832,7 @@ async function install(command_line_maker)
     }
   }
   options.silent = false
-  run('cmake',command_line_maker.installCommandParameters(), options)
+  await run('cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
