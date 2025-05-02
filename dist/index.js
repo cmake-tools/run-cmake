@@ -34008,7 +34008,7 @@ const path = __nccwpck_require__(1017)
 const parser = __nccwpck_require__(3455)
 const semver = __nccwpck_require__(3071)
 const os = __nccwpck_require__(612);
-const {DefaultArtifactClient} = __nccwpck_require__(5253)
+const Artifact = __nccwpck_require__(5253)
 
 async function fixes()
 {
@@ -34948,7 +34948,7 @@ async function main()
 {
   try
   {
-    const artifact = new DefaultArtifactClient();
+    const artifact = new Artifact.DefaultArtifactClient();
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = String('msys2')
