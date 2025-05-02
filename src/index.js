@@ -7,6 +7,7 @@ const path = require('path')
 const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
+const {DefaultArtifactClient} = require('@actions/artifact')
 
 async function fixes()
 {
@@ -120,6 +121,17 @@ async function runGraphviz()
     }
   }
   await run(command,params, options)
+  const {id, size} = await artifact.uploadArtifact(
+    // name of the artifact
+    'CMake dependencies',
+    // files to include (supports absolute and relative paths)
+    ['./toto.png'],
+    {
+      // optional: how long to retain the artifact
+      // if unspecified, defaults to repository/org retention settings (the limit of this value)
+      retentionDays: 10
+    }
+  )
   core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
   core.summary.write()
 }
@@ -935,6 +947,7 @@ async function main()
 {
   try
   {
+    const artifact = new DefaultArtifactClient();
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = String('msys2')
