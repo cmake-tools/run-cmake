@@ -7,7 +7,7 @@ const path = require('path')
 const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
-const Artifact = require('@actions/artifact')
+const artifact = require('@actions/artifact')
 
 async function fixes()
 {
@@ -947,7 +947,6 @@ async function main()
 {
   try
   {
-    const artifact = new Artifact.DefaultArtifactClient();
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = String('msys2')
