@@ -31009,7 +31009,8 @@ async function installGraphviz()
   let found_graphviz = false
   if(process.platform === "win32")
   {
-    found_graphviz = which.sync('dot.exe', { nothrow: true })
+    if(process.env.MSYSTEM !== undefined) found_graphviz = which.sync('dot', { nothrow: true })
+    else found_graphviz = which.sync('dot.exe', { nothrow: true })
   }
   else
   {
@@ -31032,8 +31033,16 @@ async function installGraphviz()
     let command
     if(process.platform === "win32")
     {
-      params = ['install', 'graphviz']
-      command = 'choco'
+      if(process.env.MSYSTEM !== undefined)
+      {
+        params = ['-S', 'graphviz:p']
+        command = 'pacboy'
+      }
+      else
+      {
+        params = ['install', 'graphviz']
+        command = 'choco'
+      }
     }
     else if(process.platform === "darwin")
     {
@@ -31042,9 +31051,10 @@ async function installGraphviz()
     }
     else
     {
-      params = ['install', 'graphviz']
-      command = 'apt-get'
+      params = ['apt-get','install', 'graphviz']
+      command = 'sudo'
     }
+    core.info('Installing Graphviz')
     run(command,params, options)
   }
 }
