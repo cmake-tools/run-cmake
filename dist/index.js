@@ -34109,7 +34109,7 @@ async function runGraphviz()
   else command= 'dot'
   let graphviz = core.getInput('graphviz', { required: false, default:'' });
   graphviz=path.resolve(graphviz)
-  let params = ['-Tpng','-o', 'toto.png',graphviz]
+  let params = ['-Tpng','-o', './toto.png',graphviz]
   let cout ='';
   let cerr='';
   const options = {};
