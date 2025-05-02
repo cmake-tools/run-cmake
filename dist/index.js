@@ -31028,7 +31028,7 @@ async function runGraphviz()
   core.summary.write()
 }
 
-function installGraphviz()
+async function installGraphviz()
 {
   let found_graphviz = false
   if(process.platform === "win32")
@@ -31081,6 +31081,7 @@ function installGraphviz()
     core.info('Installing Graphviz')
     run(command,params, options)
   }
+  return true
 }
 
 class CommandLineMaker
@@ -31860,7 +31861,7 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      if(command_line_maker.InstallGraphvizNeeded()) installGraphviz()
+      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
       configure(command_line_maker)
     }
     else if(mode==='build')
