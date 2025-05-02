@@ -125,7 +125,7 @@ async function runGraphviz()
     // name of the artifact
     'CMake dependencies',
     // files to include (supports absolute and relative paths)
-    ['./dependencies.dot'],
+    ['/home/runner/work/run-cmake/run-cmake/dependencies.dot'],
     {
       // optional: how long to retain the artifact
       // if unspecified, defaults to repository/org retention settings (the limit of this value)
