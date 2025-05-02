@@ -957,8 +957,8 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
-      configure(command_line_maker)
+      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz().then(configure(command_line_maker))
+      else configure(command_line_maker)
     }
     else if(mode==='build')
     {
