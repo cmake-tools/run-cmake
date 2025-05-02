@@ -888,6 +888,7 @@ function configure(command_line_maker)
   options.silent = false
   options.cwd = command_line_maker.workingDirectory();
   run('cmake',params, options)
+  if(command_line_maker.InstallGraphvizNeeded()) runGraphviz()
 }
 
 function build(command_line_maker)
@@ -957,7 +958,6 @@ async function main()
     if(mode==='configure')
     {
       configure(command_line_maker)
-      if(command_line_maker.InstallGraphvizNeeded()) runGraphviz()
     }
     else if(mode==='build')
     {
