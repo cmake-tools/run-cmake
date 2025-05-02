@@ -124,7 +124,7 @@ async function runGraphviz()
   core.summary.write()
 }
 
-async function installGraphviz()
+function installGraphviz()
 {
   let found_graphviz = false
   if(process.platform === "win32")
@@ -871,7 +871,7 @@ function getMode()
   return mode;
 }
 
-async function configure(command_line_maker)
+function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
   let cout ='';
@@ -956,8 +956,8 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
-      await configure(command_line_maker)
+      if(command_line_maker.InstallGraphvizNeeded()) installGraphviz()
+      configure(command_line_maker)
     }
     else if(mode==='build')
     {
