@@ -124,7 +124,24 @@ async function installGraphviz()
         cerr = data.toString();
       }
     }
-    options.silent = true
+    let params = []
+    let command
+    if(process.platform === "win32")
+    {
+      params = ['install', 'graphviz']
+      command = 'choco'
+    }
+    else if(process.platform === "darwin")
+    {
+      params = ['install', 'graphviz']
+      command = 'brew'
+    }
+    else
+    {
+      params = ['install', 'graphviz']
+      command = 'apt-get'
+    }
+    run(command,params, options)
   }
 }
 

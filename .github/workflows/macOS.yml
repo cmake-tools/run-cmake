@@ -160,6 +160,7 @@ jobs:
           generator: ${{ matrix.generator }}
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
+          graphviz: ./dependencies.dot
 
       - name: 🛠️ run-cmake (build)
         uses: ./

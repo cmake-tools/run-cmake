@@ -120,9 +120,9 @@ jobs:
           configure_warnings: warning
           configure_warnings_as_errors: ''
           list_cache_variables: 'advanced_help'
-          graphviz: './graph.dot'
           log_level: 'TRACE'
           log_context: true
+          graphviz: ./dependencies.dot
 
       - name: 🛠️ run-cmake (build)
         uses: ./

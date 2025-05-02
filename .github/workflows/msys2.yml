@@ -70,6 +70,7 @@ jobs:
           install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
+          graphviz: ./dependencies.dot
 
       - name: 🛠️ run-cmake (build)
         uses: ./
