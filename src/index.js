@@ -100,6 +100,30 @@ function CMakeVersionGreaterEqual(version)
   return compare_version.compare(global.cmake_version, version, '>=')
 }
 
+async function runGraphviz()
+{
+  let command
+  if(process.platform === "win32") command = 'dot.exe'
+  else command= 'dot'
+  let graphviz = core.getInput('graphviz', { required: false, default:'' });
+  graphviz=path.resolve(graphviz)
+  let params = ['-Tpng','-o', 'toto.png',graphviz]
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    }
+  }
+  run(command,params, options)
+  core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
+  core.summary.write()
+}
+
 async function installGraphviz()
 {
   let found_graphviz = false
@@ -933,6 +957,7 @@ async function main()
     if(mode==='configure')
     {
       configure(command_line_maker)
+      if(command_line_maker.InstallGraphvizNeeded()) runGraphviz()
     }
     else if(mode==='build')
     {
