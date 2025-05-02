@@ -871,7 +871,7 @@ function getMode()
   return mode;
 }
 
-function configure(command_line_maker)
+async function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
   let cout ='';
@@ -953,11 +953,11 @@ async function main()
     global.cmake_version= await getCMakeVersion()
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
-    if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
     let mode = getMode()
     if(mode==='configure')
     {
-      configure(command_line_maker)
+      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
+      await configure(command_line_maker)
     }
     else if(mode==='build')
     {
