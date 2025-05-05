@@ -34062,7 +34062,7 @@ async function run(cmd,args, opts)
 
 async function getCMakeVersion()
 {
-  if(process.env.cmake_version==='')
+  if(!process.env.cmake_version)
   {
     let cout ='';
     let cerr='';
@@ -34958,7 +34958,7 @@ async function main()
 {
   try
   {
-    global.cmake_version = getCMakeVersion()
+    global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     let toto = await os_is()
     console.log(`OS ${toto}!`)
