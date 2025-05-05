@@ -16,21 +16,21 @@ async function os_is()
   else return process.platform
 }
 
-async function fixes()
+async function fixCMake()
 {
   let ret;
-  const options = {};
-  options.silent = false
+  let options = {};
+  options.silent = true
   if( await os_is() === "linux")
   {
-    console.log('Fixing CMake')
-    ret = await exec.exec('sudo apt-get update', [], options)
-    ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-    ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+    ret = await exec.exec('cmake --help', [], options)
+    if(!ret)
+    {
+      ret = await exec.exec('sudo apt-get update', [], options)
+      ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+      ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+    }
     global.fix_done = true;
-    //ret = await exec.exec("mkdir -p /home/runner/.ssh", [], options)
-    //ret = await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
-    //ret = await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
   }
   return true;
 }
@@ -956,7 +956,7 @@ async function main()
   try
   {
     let ret;
-    ret = await fixes()
+    ret = await fixCMake()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     let toto = await os_is()
