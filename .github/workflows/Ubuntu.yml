@@ -117,7 +117,15 @@ jobs:
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
           graphviz: ./dependencies.dot
-
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          path: ./*.dot
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
+          overwrite: true
+          include-hidden-files: false
       - name: 🛠️ run-cmake (build)
         uses: ./
         id: build
