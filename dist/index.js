@@ -34956,7 +34956,7 @@ async function main()
   try
   {
     let toto = await os_is()
-    console.log(`OS ${this.toto}!`)
+    console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
     {
       global.msys2 = String('msys2')
