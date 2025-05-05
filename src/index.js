@@ -955,7 +955,7 @@ async function main()
   try
   {
     let ret;
-    ret = await fixes()
+    ret = fixes()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     let toto = await os_is()
