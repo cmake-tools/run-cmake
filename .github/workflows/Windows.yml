@@ -194,40 +194,47 @@ jobs:
           - '4.0'
         exclude:
           - cmake_version: 3.0
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.1
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.2
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.3
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.4
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.5
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.6
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.7
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.8
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.9
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.10
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.11
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.12
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.13
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.14
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.15
-            generator: 'Ninja Multi-Config'
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
           - cmake_version: 3.16
-            generator: 'Ninja Multi-Config'
-
+            generator: ['Ninja Multi-Config', 'Visual Studio 17 2022']
+          - cmake_version: 3.17
+            generator: ['Visual Studio 17 2022']
+          - cmake_version: 3.18
+            generator: ['Visual Studio 17 2022']
+          - cmake_version: 3.19
+            generator: ['Visual Studio 17 2022']
+          - cmake_version: 3.20
+            generator: ['Visual Studio 17 2022']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
