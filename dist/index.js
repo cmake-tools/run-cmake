@@ -34184,7 +34184,7 @@ async function installGraphviz()
     }
     else if( os == "cygwin")
     {
-      params = ['-S', 'graphviz']
+      params = ['-S', 'mingw-w64-graphviz']
       command = 'pacman'
     }
     else if( os == "darwin")
