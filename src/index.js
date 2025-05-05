@@ -907,11 +907,11 @@ async function configure(command_line_maker)
   options.silent = false
   options.cwd = command_line_maker.workingDirectory();
   await run('cmake',params, options)
-  if(command_line_maker.InstallGraphvizNeeded()) await runGraphviz()
+  //if(command_line_maker.InstallGraphvizNeeded()) await runGraphviz()
   return true;
 }
 
-function build(command_line_maker)
+async function build(command_line_maker)
 {
   let cout ='';
   let cerr='';
@@ -928,7 +928,7 @@ function build(command_line_maker)
   let commands = command_line_maker.buildCommandParameters()
   for(const i in commands)
   {
-    run('cmake',commands[i], options)
+    await run('cmake',commands[i], options)
   }
 }
 
@@ -978,22 +978,22 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
+      //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
       await configure(command_line_maker)
     }
     else if(mode==='build')
     {
-      build(command_line_maker)
+      await build(command_line_maker)
     }
     else if(mode==='install')
     {
-      install(command_line_maker)
+      await install(command_line_maker)
     }
     else if(mode==='all')
     {
-      configure(command_line_maker)
-      build(command_line_maker)
-      install(command_line_maker)
+      await configure(command_line_maker)
+      await build(command_line_maker)
+      await install(command_line_maker)
     }
   }
   catch (error)
