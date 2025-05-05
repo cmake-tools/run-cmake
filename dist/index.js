@@ -34022,8 +34022,9 @@ async function fixes()
   let ret;
   const options = {};
   options.silent = false
-  if( os_is() === "linux")
+  if( await os_is() === "linux")
   {
+    console.log('Fixing CMake')
     ret = await exec.exec('sudo apt-get update', [], options)
     ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
     ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
@@ -34956,7 +34957,7 @@ async function main()
   try
   {
     let ret;
-    ret = fixes()
+    ret = await fixes()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     let toto = await os_is()
