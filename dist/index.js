@@ -34108,7 +34108,7 @@ async function getCapabilities()
 }
 
 
-async function CMakeVersionGreaterEqual(version)
+function CMakeVersionGreaterEqual(version)
 {
   return compare_version.compare(global.cmake_version, version, '>=')
 }
@@ -34216,7 +34216,7 @@ class CommandLineMaker
 
   /* Configure */
 
-  async #source_dir()
+   #source_dir()
   {
     let source_dir = core.getInput('source_dir', { required: false, default: '' });
     if(source_dir=='')
@@ -34229,7 +34229,7 @@ class CommandLineMaker
     else return Array(source_dir)
   }
 
-  async #binary_dir()
+   #binary_dir()
   {
     this.binary_dir = core.getInput('binary_dir', { required: false, default: '../build' });
     this.binary_dir=path.resolve(this.binary_dir)
@@ -34244,7 +34244,7 @@ class CommandLineMaker
     }
   }
 
-  async #initial_cache()
+   #initial_cache()
   {
     let initial_cache = core.getInput('initial_cache', { required: false })
     if(initial_cache!='')
@@ -34255,7 +34255,7 @@ class CommandLineMaker
     else return Array()
   }
 
-  async #variables()
+   #variables()
   {
     const value = parser.getInput('variables', {type: 'array',default:[]})
     let ret=[]
@@ -34266,7 +34266,7 @@ class CommandLineMaker
     return ret;
   }
 
-  async #remove_variables()
+   #remove_variables()
   {
     const value = parser.getInput('remove_variables', {type: 'array',default:[]})
     let ret=[]
@@ -34313,11 +34313,11 @@ class CommandLineMaker
   }
 
   /* Must be called before generator to allow to add the toolset to the generator string !!!*/
-  async #platform()
+   #platform()
   {
     this.platform = core.getInput('platform', { required: false })
     /* CMake 3.0 only allow platform to be addind to the generator string */
-    if(!await CMakeVersionGreaterEqual('3.1.0')) return Array()
+    if(! CMakeVersionGreaterEqual('3.1.0')) return Array()
     if(this.platform!='') return Array('-A',this.platform)
     else return Array()
   }
@@ -34561,7 +34561,7 @@ class CommandLineMaker
     else return []
   }
 
-  async #build_verbose()
+   #build_verbose()
   {
     delete process.env.VERBOSE;
     delete process.env.CMAKE_VERBOSE_MAKEFILE;
