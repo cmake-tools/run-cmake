@@ -124,10 +124,8 @@ jobs:
           log_context: true
           graphviz: ./dots/dependencies.dot
       - uses: actions/upload-artifact@v4
-        env:
-          DOT_NAME: "{{ dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}|replace(' ', '_') }}"
         with:
-          name: ${{ env.DOT_NAME }}
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
           path: ./dots/*
           if-no-files-found: warn
           retention-days: 90
