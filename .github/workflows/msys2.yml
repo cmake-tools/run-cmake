@@ -54,13 +54,9 @@ jobs:
           update: true
           cache: true
           install: |
-            cmake
-            ninja
-            make
+            ${{ (matrix.system=='msys') && 'cmake ninja make gcc' }}
           pacboy: |
-            cmake:p
-            ninja:p
-            make:p
+            ${{ (matrix.system!='msys') && 'cmake:p ninja:p make:p' }}
             ${{ (matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
       - name: ⚙️ run-cmake (configure)
         uses: ./
