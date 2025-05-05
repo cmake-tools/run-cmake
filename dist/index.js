@@ -34062,22 +34062,26 @@ async function run(cmd,args, opts)
 
 async function getCMakeVersion()
 {
-  let cout ='';
-  let cerr='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
+  if(process.env.cmake_version==='')
+  {
+    let cout ='';
+    let cerr='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout = data.toString();
+      },
+      stderr: (data) => {
+        cerr = data.toString();
+      }
     }
+    options.silent = false
+    await run('cmake',['--version'],options)
+    let version_number = cout.match(/\d\.\d[\\.\d]+/)
+    if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
+    else core.exportVariable('cmake_version', version_number[0]);
   }
-  options.silent = false
-  await run('cmake',['--version'],options)
-  let version_number = cout.match(/\d\.\d[\\.\d]+/)
-  if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
-  else return version_number[0]
+  return process.env.cmake_version
 }
 
 async function getCapabilities()
@@ -34884,7 +34888,7 @@ class CommandLineMaker
 - all: CMake configure, build and install in a row.
 By default CMake is in configure mode.
 */
-async function getMode()
+function getMode()
 {
   const mode = parser.getInput('mode', {type: 'string',default:'configure'})
   if(mode!='configure' && mode!='build' && mode!='install' && mode!='all') throw String('mode should be configure, build, install or all')
@@ -34954,6 +34958,7 @@ async function main()
 {
   try
   {
+    global.cmake_version= await getCMakeVersion()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
@@ -34973,7 +34978,6 @@ async function main()
     await fixes()
     //let found = which.sync(global.msys2, { nothrow: true })
     //if(!found) throw String('not found: CMake')
-    global.cmake_version= await getCMakeVersion()
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
     let mode = getMode()
