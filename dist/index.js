@@ -34203,7 +34203,7 @@ class CommandLineMaker
 {
   constructor()
   {
-    if(awaitCMakeVersionGreaterEqual('3.13.0')) this.old_style=false
+    if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
     this.actual_path=path.resolve('./')
     //this.#binary_dir()
@@ -34970,31 +34970,31 @@ async function main()
     core.info('::add-matcher::' + cmake_matcher);
     if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
     else global.number_cpus = 1;
-    await fixes()
+    fixes()
     //let found = which.sync(global.msys2, { nothrow: true })
     //if(!found) throw String('not found: CMake')
-    global.cmake_version= await getCMakeVersion()
+    global.cmake_version= getCMakeVersion()
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
     let mode = getMode()
     if(mode==='configure')
     {
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
-      await configure(command_line_maker)
+      configure(command_line_maker)
     }
     else if(mode==='build')
     {
-      await build(command_line_maker)
+      build(command_line_maker)
     }
     else if(mode==='install')
     {
-      await install(command_line_maker)
+      install(command_line_maker)
     }
     else if(mode==='all')
     {
-      await configure(command_line_maker)
-      await build(command_line_maker)
-      await install(command_line_maker)
+      configure(command_line_maker)
+      build(command_line_maker)
+      install(command_line_maker)
     }
   }
   catch (error)
