@@ -46,6 +46,7 @@ jobs:
 
       - name: ⬇️ Setup MSYS2 (${{matrix.system}},${{matrix.generator}})
         uses: msys2/setup-msys2@v2
+        id: msys2
         with:
           msystem: ${{matrix.system}}
           path-type: minimal
@@ -64,6 +65,8 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         with:
           mode: configure
           generator: ${{matrix.generator}}

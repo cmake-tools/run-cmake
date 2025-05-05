@@ -968,7 +968,7 @@ async function main()
 {
   try
   {
-    console.log(`Location ${process.env.msys2-location}`)
+    console.log(`Location ${process.env.MSYS2_LOCATION}`)
     let ret;
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
