@@ -34022,8 +34022,8 @@ async function fixCMake()
   if(!global.fix_done)
   {
     let ret;
-    let options = {};
-    options.silent = false
+    const options = {};
+    options.silent = true
     if( await os_is() === "linux")
     {
       ret = await exec.exec('sudo apt-get update', [], options)
@@ -34064,6 +34064,7 @@ async function getCMakeVersion()
 {
   if(!process.env.cmake_version)
   {
+    let ret
     let cout ='';
     let cerr='';
     const options = {};
@@ -34075,7 +34076,7 @@ async function getCMakeVersion()
         cerr = data.toString();
       }
     }
-    options.silent = false
+    options.silent = true
     /* First time it can fail due to this fucking shitty Ubuntu ! */
     try
     {
@@ -34096,7 +34097,7 @@ async function getCMakeVersion()
 
 async function getCapabilities()
 {
-  if(await CMakeVersionGreaterEqual('3.7'))
+  if(CMakeVersionGreaterEqual('3.7'))
   {
     let cout ='';
     let cerr='';
@@ -34110,8 +34111,8 @@ async function getCapabilities()
       }
     }
     options.silent = true
-    if(global.is_msys2) options.shell = 'msys2'
     await run('cmake',['-E','capabilities'], options)
+    console.log(JSON.parse(cout))
     return JSON.parse(cout);
   }
   else return '{}'
@@ -34971,6 +34972,7 @@ async function main()
     let ret;
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
+    getCapabilities()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
