@@ -24,7 +24,7 @@ async function fixCMake()
   if( await os_is() === "linux")
   {
     ret = await exec.exec('cmake --help', [], options)
-    if(!ret)
+    if(ret!=0)
     {
       ret = await exec.exec('sudo apt-get update', [], options)
       ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
