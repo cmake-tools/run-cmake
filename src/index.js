@@ -975,7 +975,7 @@ async function main()
     core.info('::add-matcher::' + cmake_matcher);
     if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
     else global.number_cpus = 1;
-    await fixes()
+    let ret = await fixes()
     //let found = which.sync(global.msys2, { nothrow: true })
     //if(!found) throw String('not found: CMake')
     //global.capabilities = await getCapabilities()
