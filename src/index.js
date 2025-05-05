@@ -957,7 +957,8 @@ async function main()
 {
   try
   {
-    global.cmake_version= await getCMakeVersion()
+    global.cmake_version = await getCMakeVersion()
+    console.log('Running CMake v${global.cmake_version}')
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
