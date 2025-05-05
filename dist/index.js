@@ -34026,22 +34026,16 @@ async function fixCMake()
     options.silent = false
     if( await os_is() === "linux")
     {
-
-      try
-      {
-        ret = await exec.exec('cmake --help', [], options)
-      }
-      catch(error)
-      {
-        console.log(`return ${ret}`)
-        ret = await exec.exec('sudo apt-get update', [], options)
-        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-      }
+      ret = await exec.exec('sudo apt-get update', [], options)
+      if(ret!=0) return ret;
+      ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+      if(ret!=0) return ret;
+      ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+      if(ret!=0) return ret;
       global.fix_done = true;
     }
   }
-  return true;
+  return 0;
 }
 
 /**
@@ -34082,8 +34076,16 @@ async function getCMakeVersion()
       }
     }
     options.silent = false
-    let ret = await fixCMake()
-    ret = await run('cmake',['--version'],options)
+    /* First time it can fail due to this fucking shitty Ubuntu ! */
+    try
+    {
+      ret = await run('cmake',['--version'],options)
+    }
+    catch(error)
+    {
+      ret = await fixCMake()
+      ret = await run('cmake',['--version'],options)
+    }
     if(ret!=0) throw cerr.toString()
     let version_number = cout.match(/\d\.\d[\\.\d]+/)
     if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
