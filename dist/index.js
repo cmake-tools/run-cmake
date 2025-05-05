@@ -34012,7 +34012,7 @@ const artifact = __nccwpck_require__(5253)
 
 async function os_is()
 {
-  if(process.env.MSYSTEM === 'MSYS') return 'msys'
+  if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
   else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
   else return process.platform
 }
@@ -34171,20 +34171,22 @@ async function installGraphviz()
     }
     let params = []
     let command
-    if(process.platform === "win32")
+    if( os_is() == "win32")
     {
-      if(process.env.MSYSTEM !== undefined)
-      {
-        params = ['-S', 'graphviz:p']
-        command = 'pacboy'
-      }
-      else
-      {
-        params = ['install', 'graphviz']
-        command = 'choco'
-      }
+      params = ['install', 'graphviz']
+      command = 'choco'
     }
-    else if(process.platform === "darwin")
+    else if(os_is() == "msys2")
+    {
+      params = ['-S', 'graphviz:p']
+      command = 'pacboy'
+    }
+    else if(os_is() == "cygwin")
+    {
+      params = ['-S', 'graphviz']
+      command = 'pacman'
+    }
+    else if(os_is() == "darwin")
     {
       params = ['install', 'graphviz']
       command = 'brew'
