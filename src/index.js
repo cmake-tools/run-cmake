@@ -73,8 +73,9 @@ async function getCMakeVersion()
       }
     }
     options.silent = false
-    fixCMake()
-    let ret = await run('cmake',['--version'],options)
+    let ret = await fixCMake()
+    ret = await run('cmake',['--version'],options)
+    if(!ret) throw cerr.toString()
     let version_number = cout.match(/\d\.\d[\\.\d]+/)
     if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
     else core.exportVariable('cmake_version', version_number[0]);
