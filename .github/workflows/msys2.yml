@@ -1,8 +1,8 @@
 name: msys2
 
-defaults:
-  run:
-    shell: msys2 {0}
+#defaults:
+#  run:
+#    shell: msys2 {0}
 
 on:
   push:
@@ -57,8 +57,8 @@ jobs:
             ${{ (matrix.system=='msys') && 'cmake gcc' || 'pacman'}}
             ${{ (matrix.generator=='Ninja' || matrix.generator=='Ninja Multi-Config') && 'ninja' || 'make' }}
           pacboy: |
-            ${{ (matrix.system!='msys' && (matrix.generator=='Ninja' || matrix.generator=='Ninja Multi-Config')) && 'ninja:p cmake:p' || 'pacman'}}
-            ${{ (matrix.system!='msys' && matrix.generator!='Ninja' && matrix.generator!='Ninja Multi-Config') && 'make:p cmake:p' || 'pacman' }}
+            ${{ (matrix.system!='msys' && (matrix.generator=='Ninja' || matrix.generator=='Ninja Multi-Config')) && 'ninja:p cmake:p' || 'binutils:p'}}
+            ${{ (matrix.system!='msys' && matrix.generator!='Ninja' && matrix.generator!='Ninja Multi-Config') && 'make:p cmake:p' || 'binutils:p' }}
             ${{ (matrix.system=='clang64') && 'clang:p' || 'gcc:p' }}
       - name: ⚙️ run-cmake (configure)
         uses: ./
