@@ -34074,7 +34074,7 @@ async function getCMakeVersion()
       }
     }
     options.silent = false
-    let ret = await run('cmake',['--version'],options)
+    let ret = await run('cmake',['--help'],options)
     console.log(`eroror  ${ret}`)
     if(ret!=0)
     {
