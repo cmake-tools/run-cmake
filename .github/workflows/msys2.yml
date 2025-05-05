@@ -70,11 +70,11 @@ jobs:
           install_prefix: '../install'
           binary_dir: '../build'
           source_dir: './tests'
-          graphviz: ./dependencies.dot
+          graphviz: ./dots/dependencies.dot
       - uses: actions/upload-artifact@v4
         with:
-          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
-          path: ./*.dot
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}|replace(' ', '_')
+          path: ./dots/*
           if-no-files-found: warn
           retention-days: 90
           compression-level: 0
