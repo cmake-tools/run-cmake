@@ -25,13 +25,20 @@ async function fixCMake()
     options.silent = false
     if( await os_is() === "linux")
     {
-      ret = await exec.exec('cmake --help', [], options)
-      console.log(`return ${ret}`)
-      if(ret!=0)
+
+      try
       {
-        ret = await exec.exec('sudo apt-get update', [], options)
-        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+        ret = await exec.exec('cmake --help', [], options)
+      }
+      catch(error)
+      {
+        console.log(`return ${ret}`)
+        if(ret!=0)
+        {
+          ret = await exec.exec('sudo apt-get update', [], options)
+          ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+          ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+        }
       }
       global.fix_done = true;
     }
