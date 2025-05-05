@@ -202,7 +202,7 @@ class CommandLineMaker
 {
   constructor()
   {
-    if(awaitCMakeVersionGreaterEqual('3.13.0')) this.old_style=false
+    if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
     this.actual_path=path.resolve('./')
     //this.#binary_dir()
