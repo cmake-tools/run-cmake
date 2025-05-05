@@ -171,7 +171,8 @@ async function installGraphviz()
     let params = []
     let command
     let os = await os_is()
-    if( os == "win32")
+    /* cygwin doesn't have graphviz so install the windows one */
+    if( os == "win32" || os == "cygwin" )
     {
       params = ['install', 'graphviz']
       command = 'choco'
@@ -180,11 +181,6 @@ async function installGraphviz()
     {
       params = ['-S', 'graphviz:p']
       command = 'pacboy'
-    }
-    else if( os == "cygwin")
-    {
-      params = ['-S', 'mingw-w64-graphviz']
-      command = 'pacman'
     }
     else if( os == "darwin")
     {
