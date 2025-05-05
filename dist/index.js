@@ -34027,6 +34027,7 @@ async function fixCMake()
     if( await os_is() === "linux")
     {
       ret = await exec.exec('cmake --help', [], options)
+      console.log(`return ${ret}`)
       if(!ret)
       {
         ret = await exec.exec('sudo apt-get update', [], options)
