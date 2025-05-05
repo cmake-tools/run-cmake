@@ -34027,6 +34027,7 @@ async function fixes()
     ret = await exec.exec('sudo apt-get update', [], options)
     ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
     ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+    global.fix_done = true;
     //ret = await exec.exec("mkdir -p /home/runner/.ssh", [], options)
     //ret = await exec.exec("touch  /home/runner/.ssh/known_hosts", [], options)
     //ret = await exec.exec("/bin/bash -c \"curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> /home/runner/.ssh/known_hosts\"", [], options)
@@ -34953,6 +34954,8 @@ async function main()
 {
   try
   {
+    let ret;
+    if(!global.fix_done) ret = await fixes()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     let toto = await os_is()
@@ -34971,7 +34974,6 @@ async function main()
     core.info('::add-matcher::' + cmake_matcher);
     if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
     else global.number_cpus = 1;
-    let ret = await fixes()
     //let found = which.sync(global.msys2, { nothrow: true })
     //if(!found) throw String('not found: CMake')
     //global.capabilities = await getCapabilities()
