@@ -34028,7 +34028,7 @@ async function fixCMake()
     {
       ret = await exec.exec('cmake --help', [], options)
       console.log(`return ${ret}`)
-      if(!ret)
+      if(ret!=0)
       {
         ret = await exec.exec('sudo apt-get update', [], options)
         ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
