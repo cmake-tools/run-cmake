@@ -34277,7 +34277,7 @@ class CommandLineMaker
     return ret;
   }
 
-  async #generator()
+  #generator()
   {
     this.generator = core.getInput('generator', { required: false });
     if(this.generator=='')
@@ -34297,7 +34297,7 @@ class CommandLineMaker
         throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
       }
     }
-    if(!await CMakeVersionGreaterEqual('3.1.0'))
+    if(!CMakeVersionGreaterEqual('3.1.0'))
     {
       this.#platform() /** TODO fix this mess dude */
       if(this.platform!='')this.generator=this.generator+' '+this.platform
@@ -34305,10 +34305,10 @@ class CommandLineMaker
     return Array('-G',this.generator)
   }
 
-  async #toolset()
+  #toolset()
   {
     this.toolset = core.getInput('toolset', { required: false })
-    if(this.toolset!='' && await CMakeVersionGreaterEqual('3.1.0')) return Array('-T',this.toolset)
+    if(this.toolset!='' && CMakeVersionGreaterEqual('3.1.0')) return Array('-T',this.toolset)
     else return Array()
   }
 
@@ -34322,32 +34322,32 @@ class CommandLineMaker
     else return Array()
   }
 
-  async #toolchain()
+  #toolchain()
   {
     delete process.env.CMAKE_TOOLCHAIN_FILE;
     let toolchain = core.getInput('toolchain', { required: false })
     if(toolchain!='')
     {
-      if(await CMakeVersionGreaterEqual('3.21.0')) return Array('--toolchain',toolchain)
+      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--toolchain',toolchain)
       else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+toolchain)
     }
     return []
   }
 
-  async #install_prefix()
+  #install_prefix()
   {
     delete process.env.CMAKE_INSTALL_PREFIX;
     this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
     if(this.install_prefix!='')
     {
       this.install_prefix=path.resolve(path.resolve(''),this.install_prefix)
-      if(await CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
+      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
     }
     return []
   }
 
-  async #configure_warnings()
+   #configure_warnings()
   {
     let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
     if(configure_warnings=='') return []
@@ -34357,12 +34357,12 @@ class CommandLineMaker
     }
     else if(configure_warnings=='deprecated')
     {
-      if(!await CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
       else return Array('-Wno-dev','-Wdeprecated')
     }
     else if(configure_warnings=='warning')
     {
-      if(!await CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
       else return Array('-Wdev','-Wno-deprecated')
     }
     else if(configure_warnings=='developer')
@@ -34372,23 +34372,23 @@ class CommandLineMaker
     else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings)
   }
 
-  async #configure_warnings_as_errors()
+   #configure_warnings_as_errors()
   {
     let configure_warnings_as_errors = core.getInput('configure_warnings_as_errors', { required: false, default:'none' });
     if(configure_warnings_as_errors=='') return []
     if(configure_warnings_as_errors=='none')
     {
-      if(!await CMakeVersionGreaterEqual('3.5')) return []
+      if(! CMakeVersionGreaterEqual('3.5')) return []
       else return Array('-Wno-error=dev')
     }
     else if(configure_warnings_as_errors=='deprecated')
     {
-      if(!await CMakeVersionGreaterEqual('3.5')) return []
+      if(! CMakeVersionGreaterEqual('3.5')) return []
       else return Array('-Wno-error=dev','-Werror=deprecated')
     }
     else if(configure_warnings_as_errors=='warning')
     {
-      if(!await CMakeVersionGreaterEqual('3.5')) return []
+      if(! CMakeVersionGreaterEqual('3.5')) return []
       else return Array('-Werror=dev','-Wno-error=deprecated')
     }
     else if(configure_warnings_as_errors=='developer')
@@ -34398,12 +34398,12 @@ class CommandLineMaker
     else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
   }
 
-  async #fresh()
+   #fresh()
   {
     return []
   }
 
-  async #list_cache_variables()
+   #list_cache_variables()
   {
     let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'' });
     if(list_cache_variables=='') return []
@@ -34415,7 +34415,7 @@ class CommandLineMaker
     else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables)
   }
 
-  async #graphviz()
+   #graphviz()
   {
     let graphviz = core.getInput('graphviz', { required: false, default:'' });
     if(graphviz=='')
@@ -34431,29 +34431,29 @@ class CommandLineMaker
     }
   }
 
-  async #log_level()
+   #log_level()
   {
     let log_level = core.getInput('log_level', { required: false, default:'' });
     if(log_level!='')
     {
       if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
-      if(await CMakeVersionGreaterEqual('3.15')) return ['--log-level='+log_level]
+      if( CMakeVersionGreaterEqual('3.15')) return ['--log-level='+log_level]
     }
     return []
   }
 
-  async #log_context()
+   #log_context()
   {
     let log_level = core.getInput('log_level', { required: false, type: 'boolean',default:'' });
     if(log_level)
     {
-      if(await CMakeVersionGreaterEqual('3.17')) return ['--log-context']
+      if( CMakeVersionGreaterEqual('3.17')) return ['--log-context']
       else return []
     }
     return []
   }
 
-  async configureCommandParameters()
+   configureCommandParameters()
   {
     let options=[]
 
@@ -34484,7 +34484,7 @@ class CommandLineMaker
   }
 
 
-  async #binary_build_dir()
+   #binary_build_dir()
   {
     console.log(`this.binary_dir ${process.env.binary_dir}!`);
     this.binary_dir = process.env.binary_dir;
@@ -34495,21 +34495,21 @@ class CommandLineMaker
     return Array(this.binary_dir)
   }
 
-  async #parallel()
+   #parallel()
   {
-    if(!await CMakeVersionGreaterEqual('3.12.0')) return Array()
+    if(! CMakeVersionGreaterEqual('3.12.0')) return Array()
     let value = parser.getInput('parallel',{default:global.number_cpus})
     value = parseInt(value, 10)
     if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
     return Array('--parallel',String(value))
   }
 
-  async #build_targets() /* FIXME for CMAKE<3.15 */
+   #build_targets() /* FIXME for CMAKE<3.15 */
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     let targets= []
     if (build_targets.length == 0) return targets;
-    else if(await CMakeVersionGreaterEqual('3.15'))
+    else if( CMakeVersionGreaterEqual('3.15'))
     {
       let ret=['--target']
       for(const i in build_targets)
@@ -34531,7 +34531,7 @@ class CommandLineMaker
     }
   }
 
-  async #config()
+   #config()
   {
     const config = core.getInput('config', { required: false, default: '' })
     if(config!='')
@@ -34542,14 +34542,14 @@ class CommandLineMaker
     else return []
   }
 
-  async #clean_first()
+   #clean_first()
   {
     const clean_first = core.getInput('clean_first', { required: false, type: 'boolean', default: '' })
     if(clean_first) return ['--clean-first']
     else return []
   }
 
-  async #resolve_package_references()
+   #resolve_package_references()
   {
     const resolve_package_references = core.getInput('resolve_package_references', { required: false, default: '' })
     if(resolve_package_references=='') return []
@@ -34557,7 +34557,7 @@ class CommandLineMaker
     {
       throw String('resolve_package_references should be on,off,only. Received: '+resolve_package_references)
     }
-    else if(await CMakeVersionGreaterEqual('3.23')) return ['--resolve-package-references='+resolve_package_references]
+    else if( CMakeVersionGreaterEqual('3.23')) return ['--resolve-package-references='+resolve_package_references]
     else return []
   }
 
@@ -34568,7 +34568,7 @@ class CommandLineMaker
     const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
     if(build_verbose)
     {
-      if(await CMakeVersionGreaterEqual('3.14'))
+      if( CMakeVersionGreaterEqual('3.14'))
       {
         return Array('--verbose')
       }
@@ -34582,19 +34582,19 @@ class CommandLineMaker
     return []
   }
 
-  async #to_native_tool()
+   #to_native_tool()
   {
     const to_native_tool = parser.getInput('to_native_tool', {type: 'array',default:[]})
     if(to_native_tool.length == 0) return []
     else
     {
       let ret = ['--']
-      ret.concat(to_native_tool)
+      ret=ret.concat(to_native_tool)
       return ret
     }
   }
 
-  async buildCommandParameters()
+   buildCommandParameters()
   {
     let targets = this.#build_targets()
     let commands = []
@@ -34631,7 +34631,7 @@ class CommandLineMaker
   }
 
   /** install step */
-  async #install_config()
+   #install_config()
   {
     let config
     // Find the config from build first
@@ -34640,49 +34640,49 @@ class CommandLineMaker
     if(config!='')
     {
       core.exportVariable('config',config)
-      if(await CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
+      if( CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
       else return Array('-DBUILD_TYPE:STRING='+config)
     }
     else return []
   }
 
-  async #component()
+   #component()
   {
     const component = core.getInput('component', { required: false, default: '' })
     if(component!='')
     {
-      if(await CMakeVersionGreaterEqual('3.15.0')) return Array('--component',component)
+      if( CMakeVersionGreaterEqual('3.15.0')) return Array('--component',component)
       else return Array('-DCOMPONENT',component)
     }
     else return []
   }
 
-  async #default_directory_permissions()
+   #default_directory_permissions()
   {
     const default_directory_permissions = core.getInput('default_directory_permissions', { required: false, default: '' })
     if(default_directory_permissions!='')
     {
-      if(await CMakeVersionGreaterEqual('3.19')) return Array('--default-directory-permissions',default_directory_permissions)
+      if( CMakeVersionGreaterEqual('3.19')) return Array('--default-directory-permissions',default_directory_permissions)
       else return []
     }
     else return []
   }
 
-  async #override_install_prefix()
+   #override_install_prefix()
   {
     const override_install_prefix = core.getInput('override_install_prefix', { required: false, default: '' })
     if(override_install_prefix!='')
     {
-      if(await CMakeVersionGreaterEqual('3.15')) return Array('--prefix',override_install_prefix)
+      if( CMakeVersionGreaterEqual('3.15')) return Array('--prefix',override_install_prefix)
       else return []
     }
     else return []
   }
 
-  async #strip()
+   #strip()
   {
     const strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
-    if(await CMakeVersionGreaterEqual('3.15'))
+    if( CMakeVersionGreaterEqual('3.15'))
     {
       if(strip) return Array('--strip')
       else return []
@@ -34690,13 +34690,13 @@ class CommandLineMaker
     else return []
   }
 
-  async #install_verbose()
+   #install_verbose()
   {
     delete process.env.VERBOSE;
     const install_verbose = core.getInput('install_verbose', { required: false, type: 'boolean', default: false })
     if(install_verbose)
     {
-      if(await CMakeVersionGreaterEqual('3.15'))
+      if( CMakeVersionGreaterEqual('3.15'))
       {
         return Array('--verbose')
       }
@@ -34709,10 +34709,10 @@ class CommandLineMaker
     return []
   }
 
-  async installCommandParameters()
+   installCommandParameters()
   {
     let parameters=[]
-    if(await CMakeVersionGreaterEqual('3.15.0'))
+    if( CMakeVersionGreaterEqual('3.15.0'))
     {
       parameters=parameters.concat('--install')
       parameters=parameters.concat(this.#binary_build_dir())
@@ -34737,7 +34737,7 @@ class CommandLineMaker
     return parameters
   }
 
-  async workingDirectory()
+   workingDirectory()
   {
     if(this.old_style==true)
     {
@@ -34751,7 +34751,7 @@ class CommandLineMaker
     }
   }
 
-  async #getGeneratorList()
+   #getGeneratorList()
   {
     if(process.platform === "win32")
     {
@@ -34875,7 +34875,7 @@ class CommandLineMaker
     }
   }
 
-  async InstallGraphvizNeeded()
+   InstallGraphvizNeeded()
   {
     return this.need_to_install_graphviz
   }
