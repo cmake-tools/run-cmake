@@ -34024,13 +34024,13 @@ async function fixCMake()
   options.silent = true
   if( await os_is() === "linux")
   {
-    ret = await exec.exec('cmake --help', [], options)
-    if(!ret)
-    {
+    //ret = await exec.exec('cmake --help', [], options)
+    //if(!ret)
+    //{
       ret = await exec.exec('sudo apt-get update', [], options)
       ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
       ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-    }
+    //}
     global.fix_done = true;
   }
   return true;
@@ -34075,7 +34075,7 @@ async function getCMakeVersion()
     }
     options.silent = false
     let ret = await run('cmake',['--version'],options)
-    if(!ret) fixCMake()
+    if(ret) fixCMake()
     ret = await run('cmake',['--version'],options)
     let version_number = cout.match(/\d\.\d[\\.\d]+/)
     if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
