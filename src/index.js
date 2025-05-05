@@ -33,12 +33,9 @@ async function fixCMake()
       catch(error)
       {
         console.log(`return ${ret}`)
-        if(ret!=0)
-        {
-          ret = await exec.exec('sudo apt-get update', [], options)
-          ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-          ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-        }
+        ret = await exec.exec('sudo apt-get update', [], options)
+        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
       }
       global.fix_done = true;
     }
