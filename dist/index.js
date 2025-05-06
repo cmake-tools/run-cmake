@@ -28298,8 +28298,7 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
     else
     {
-      await _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir)
-      return Array()
+      await _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir).then( () => {return Array()} )
     }
   }
   #source_dir()
