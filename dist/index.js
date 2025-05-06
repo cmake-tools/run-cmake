@@ -28298,7 +28298,7 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
     else
     {
-      _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir).then( () => {return Array()} )
+      _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir).then( (ret)=> {return Array()} )
     }
   }
   #source_dir()
@@ -29082,6 +29082,12 @@ function getMode()
   await run('cmake',command_line_maker.installCommandParameters(), options)
 }*/
 
+async function runCMake(args,options)
+{
+  if(os_is()=='cygwin' || os_is=='msys2') return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('msys2_shell.cmd cmake',args,options)
+  else return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
+}
+
 async function main()
 {
   try
@@ -29094,9 +29100,9 @@ async function main()
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
         let args = new GenerateProjectBuildsystem();
-        console.log(args.toString())
+        console.log(args.args().toString())
         options.cwd = args.cwd();
-        let ret= _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args.args(),options)
+        let ret= runCMake(args.args(),options)
         break;
       }
       case "build":

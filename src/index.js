@@ -240,7 +240,7 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
     else
     {
-      io.mkdirP(this.binary_dir).then( () => {return Array()} )
+      io.mkdirP(this.binary_dir).then( (ret)=> {return Array()} )
     }
   }
   #source_dir()
@@ -1024,6 +1024,12 @@ function getMode()
   await run('cmake',command_line_maker.installCommandParameters(), options)
 }*/
 
+async function runCMake(args,options)
+{
+  if(os_is()=='cygwin' || os_is=='msys2') return exec.exec('msys2_shell.cmd cmake',args,options)
+  else return exec.exec('cmake',args,options)
+}
+
 async function main()
 {
   try
@@ -1036,9 +1042,9 @@ async function main()
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
         let args = new GenerateProjectBuildsystem();
-        console.log(args.toString())
+        console.log(args.args().toString())
         options.cwd = args.cwd();
-        let ret= exec.exec('cmake',args.args(),options)
+        let ret= runCMake(args.args(),options)
         break;
       }
       case "build":
