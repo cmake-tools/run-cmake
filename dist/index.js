@@ -28260,7 +28260,7 @@ class GenerateProjectBuildsystem
 {
   constructor()
   {
-    this.pwd = toPosixPath(path__WEBPACK_IMPORTED_MODULE_4__.resolve(__dirname))
+    this.pwd = path__WEBPACK_IMPORTED_MODULE_4__.posix.resolve(__dirname)
     this.binary_dir = this.#parse_binary_dir()
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.exportVariable('binary_dir', this.binary_dir);
   }
@@ -28273,7 +28273,7 @@ class GenerateProjectBuildsystem
         type:'string',
         required: false,
         default: '../build',
-        modifier: (val) => { return path__WEBPACK_IMPORTED_MODULE_4__.resolve(val)}
+        modifier: (val) => { return path__WEBPACK_IMPORTED_MODULE_4__.posix.resolve(val)}
       }
     )
   }
@@ -28294,7 +28294,7 @@ class GenerateProjectBuildsystem
         type:'string',
         required: false,
         default: process.env.GITHUB_WORKSPACE === undefined ? this.pwd : process.env.GITHUB_WORKSPACE,
-        modifier: (val) => { return path__WEBPACK_IMPORTED_MODULE_4__.resolve(val)}
+        modifier: (val) => { return path__WEBPACK_IMPORTED_MODULE_4__.posix.resolve(val)}
       }
     )
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
