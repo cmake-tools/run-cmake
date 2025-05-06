@@ -28069,7 +28069,7 @@ const artifact = require('@actions/artifact')*/
 
 function os_is()
 {
-  if (process.env.MSYSTEM === undefined ) return String(process.env.MSYSTEM).toLowerCase()
+  if (process.env.MSYSTEM !== undefined ) return String(process.env.MSYSTEM).toLowerCase()
   else return process.platform
 }
 
