@@ -64,9 +64,9 @@ jobs:
         with:
           mode: configure
           generator: ${{matrix.generator}}
-          install_prefix: '../install'
-          binary_dir: '../build'
-          source_dir: './tests'
+          install_prefix: ../install
+          binary_dir: ../build
+          source_dir: ./tests
           graphviz: ./dots/dependencies.dot
       - uses: actions/upload-artifact@v4
         name: 📤 Upload dot files
