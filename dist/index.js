@@ -28304,7 +28304,7 @@ class GenerateProjectBuildsystem
   #generator()
   {
     let generator_default =''
-    switch(os_is)
+    switch(os_is())
     {
       case "linux":
       {
