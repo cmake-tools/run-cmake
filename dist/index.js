@@ -27615,12 +27615,12 @@ const semver = require('semver')
 const os = require("node:os");
 const artifact = require('@actions/artifact')*/
 
-/*async function os_is()
+async function os_is()
 {
   if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
   else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
   else return process.platform
-}*/
+}
 
 async function fixCMake()
 {
