@@ -29094,10 +29094,7 @@ async function main()
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
         let args = new GenerateProjectBuildsystem();
-        args.forEach((element) => {
-          console.log(element)
-      }
-  );
+        console.log(args.toString())
         options.cwd = args.cwd();
         let ret= _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args.args(),options)
         break;
