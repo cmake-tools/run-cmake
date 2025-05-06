@@ -51,7 +51,7 @@ jobs:
           msystem: ${{matrix.system}}
           path-type: minimal
           release: true
-          update: true
+          #update: true
           cache: true
           install: |
             ${{ (matrix.system=='msys') && 'cmake gcc' || 'pacman'}}
