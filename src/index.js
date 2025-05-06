@@ -1036,7 +1036,7 @@ async function runCMake(args,options)
   if(is_msys2())
   {
     let out = JSON.parse(process.env.GITHUB_OUTPUT)
-    console.log(JSON.stringify(out))
+    console.log(out)
     const tmp_dir = process.env['RUNNER_TEMP'];
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     return exec.exec('cmd', ['/D', '/S', '/C', msys, '-c','cmake', args.join(' ')], options)
