@@ -330,7 +330,7 @@ jobs:
       fail-fast: false
       matrix:
         version: [ 15.0.7 ]
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM','Visual Studio 16 2019', 'Visual Studio 17 2022']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -400,7 +400,48 @@ jobs:
             generator: 'Ninja Multi-Config'
           - cmake_version: 3.16
             generator: 'Ninja Multi-Config'
-
+          - cmake_version: 3.0
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.1
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.2
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.3
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.4
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.5
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.6
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.7
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.8
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.9
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.10
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.11
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.12
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.13
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.14
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.15
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.16
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.17
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.18
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.19
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.20
+            generator: 'Visual Studio 17 2022'
     steps:
       - uses: ammaraskar/gcc-problem-matcher@master
 
@@ -490,7 +531,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM','Visual Studio 16 2019', 'Visual Studio 17 2022']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
@@ -526,6 +567,48 @@ jobs:
             generator: 'Ninja Multi-Config'
           - cmake_version: 3.16
             generator: 'Ninja Multi-Config'
+          - cmake_version: 3.0
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.1
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.2
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.3
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.4
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.5
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.6
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.7
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.8
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.9
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.10
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.11
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.12
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.13
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.14
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.15
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.16
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.17
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.18
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.19
+            generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.20
+            generator: 'Visual Studio 17 2022'
 
     steps:
       - uses: ammaraskar/msvc-problem-matcher@master
