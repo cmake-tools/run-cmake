@@ -235,12 +235,12 @@ class GenerateProjectBuildsystem
       }
     )
   }
-  async #binary_dir()
+  #binary_dir()
   {
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
     else
     {
-      await io.mkdirP(this.binary_dir).then( () => {return Array()} )
+      io.mkdirP(this.binary_dir).then( () => {return Array()} )
     }
   }
   #source_dir()
