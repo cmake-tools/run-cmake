@@ -1037,10 +1037,11 @@ async function runCMake(args,options)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs =  args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return exec.exec('cmd', ['/D', '/S', '/C', msys, '-c','cmake', quotedArgs.join(' ')], options)
+    let quotedArgs = ['cmake'].concat(args)
+    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c','cmake', quotedArgs.join(' ')], options)
   }
-  else return exec.exec('cmake',args,options)
+  else return await exec.exec('cmake',args,options)
 }
 
 async function main()
