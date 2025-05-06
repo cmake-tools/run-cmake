@@ -1,5 +1,6 @@
-const core = require('@actions/core');
-const exec = require('@actions/exec');
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+/*const exec = require('@actions/exec');
 const which = require('which')
 const compare_version = require('compare-versions')
 const io = require('@actions/io');
@@ -7,14 +8,14 @@ const path = require('path')
 const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
-const artifact = require('@actions/artifact')
+const artifact = require('@actions/artifact')*/
 
-async function os_is()
+/*async function os_is()
 {
   if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
   else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
   else return process.platform
-}
+}*/
 
 async function fixCMake()
 {
@@ -41,7 +42,7 @@ async function fixCMake()
  * @param {string[]} args
  * @param {object} opts
  */
-async function run(cmd,args, opts)
+/*async function run(cmd,args, opts)
 {
   if(global.is_msys2)
   {
@@ -57,7 +58,7 @@ async function run(cmd,args, opts)
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
-}
+}*/
 
 async function getCMakeVersion()
 {
@@ -94,7 +95,7 @@ async function getCMakeVersion()
   return process.env.cmake_version
 }
 
-async function getCapabilities()
+/*async function getCapabilities()
 {
   if(CMakeVersionGreaterEqual('3.7'))
   {
@@ -115,7 +116,7 @@ async function getCapabilities()
     return JSON.parse(cout);
   }
   else return '{}'
-}
+}*/
 
 
 function CMakeVersionGreaterEqual(version)
@@ -123,7 +124,7 @@ function CMakeVersionGreaterEqual(version)
   return compare_version.compare(global.cmake_version, version, '>=')
 }
 
-async function runGraphviz()
+/*async function runGraphviz()
 {
   let command
   if(process.platform === "win32") command = 'dot.exe'
@@ -156,9 +157,9 @@ async function runGraphviz()
   )
   core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
   core.summary.write()
-}
+}*/
 
-async function installGraphviz()
+/*async function installGraphviz()
 {
   let found_graphviz = false
   if(process.platform === "win32")
@@ -186,7 +187,7 @@ async function installGraphviz()
     let params = []
     let command
     let os = await os_is()
-    /* cygwin doesn't have graphviz so install the windows one */
+    // cygwin doesn't have graphviz so install the windows one
     if( os == "win32" || os == "cygwin" )
     {
       params = ['install', 'graphviz']
@@ -211,10 +212,10 @@ async function installGraphviz()
     await run(command,params, options)
   }
   return true
-}
+}*/
 
 // https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem
-class GenerateProjectCommand
+class GenerateProjectBuildsystem
 {
   constructor()
   {
@@ -268,7 +269,7 @@ class GenerateProjectCommand
   }
 }
 
-class CommandLineMaker
+/*class CommandLineMaker
 {
   constructor()
   {
@@ -279,7 +280,7 @@ class CommandLineMaker
     //this.need_to_install_graphviz=this.#graphviz()
   }
 
-  /* Configure */
+  // Configure
 
    #source_dir()
   {
@@ -364,7 +365,7 @@ class CommandLineMaker
     }
     if(!CMakeVersionGreaterEqual('3.1.0'))
     {
-      this.#platform() /** TODO fix this mess dude */
+      this.#platform() // TODO fix this mess dude
       if(this.platform!='')this.generator=this.generator+' '+this.platform
     }
     return Array('-G',this.generator)
@@ -377,11 +378,11 @@ class CommandLineMaker
     else return Array()
   }
 
-  /* Must be called before generator to allow to add the toolset to the generator string !!!*/
+  // Must be called before generator to allow to add the toolset to the generator string !!!
    #platform()
   {
     this.platform = core.getInput('platform', { required: false })
-    /* CMake 3.0 only allow platform to be addind to the generator string */
+    /// CMake 3.0 only allow platform to be addind to the generator string
     if(! CMakeVersionGreaterEqual('3.1.0')) return Array()
     if(this.platform!='') return Array('-A',this.platform)
     else return Array()
@@ -570,7 +571,7 @@ class CommandLineMaker
     return Array('--parallel',String(value))
   }
 
-   #build_targets() /* FIXME for CMAKE<3.15 */
+   #build_targets() // FIXME for CMAKE<3.15
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     let targets= []
@@ -696,7 +697,7 @@ class CommandLineMaker
     return commands
   }
 
-  /** install step */
+  // install step
    #install_config()
   {
     let config
@@ -825,7 +826,8 @@ class CommandLineMaker
         ['3.0', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Watcom WMake']],
         ['3.1', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.2', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        /*Maybe add some */['3.3', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
+        //Maybe add some
+        ['3.3', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.4', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.5', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.6', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
@@ -945,7 +947,7 @@ class CommandLineMaker
   {
     return this.need_to_install_graphviz
   }
-}
+}*/
 
 /* Detect which mode the user wants :
 - configure: CMake configure the project only.
@@ -961,7 +963,7 @@ function getMode()
   return mode;
 }
 
-async function configure(command_line_maker)
+/*async function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
   let cout ='';
@@ -980,9 +982,9 @@ async function configure(command_line_maker)
   await run('cmake',params, options)
   //if(command_line_maker.InstallGraphvizNeeded()) await runGraphviz()
   return true;
-}
+}*/
 
-async function build(command_line_maker)
+/*async function build(command_line_maker)
 {
   let cout ='';
   let cerr='';
@@ -1001,9 +1003,9 @@ async function build(command_line_maker)
   {
     await run('cmake',commands[i], options)
   }
-}
+}*/
 
-async function install(command_line_maker)
+/*async function install(command_line_maker)
 {
   let cout ='';
   let cerr='';
@@ -1018,24 +1020,22 @@ async function install(command_line_maker)
   }
   options.silent = false
   await run('cmake',command_line_maker.installCommandParameters(), options)
-}
+}*/
 
 async function main()
 {
   try
   {
-    let ret;
     global.cmake_version = await getCMakeVersion()
-    let cout = '';
-    let cerr = '';
+    const options = {};
     switch(getMode())
     {
       case "configure":
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
-        let command = GenerateProjectCommand();
-        options.cwd = command.cwd();
-        ret= exec.exec('cmake',command.args(),options)
+        let args = new GenerateProjectCommand();
+        options.cwd = args.cwd();
+        ret= exec.exec('cmake',args.args(),options)
         break;
       }
       case "build":
