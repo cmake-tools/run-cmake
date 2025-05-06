@@ -28069,8 +28069,7 @@ const artifact = require('@actions/artifact')*/
 
 async function os_is()
 {
-  if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
-  else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
+  if (process.env.MSYSTEM === undefined ) return process.env.MSYSTEM.toLowerCase()
   else return process.platform
 }
 
@@ -28298,7 +28297,8 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
     else
     {
-      _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir).then( (ret)=> {return Array()} )
+      _actions_io__WEBPACK_IMPORTED_MODULE_3__.mkdirP(this.binary_dir).then( (ret)=> {} )
+      return Array();
     }
   }
   #source_dir()
@@ -29084,7 +29084,7 @@ function getMode()
 
 async function runCMake(args,options)
 {
-  if(os_is()=='cygwin' || os_is=='msys2') return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('msys2_shell.cmd cmake',args,options)
+  if(os_is()=='cygwin' || os_is=='msys2') return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`msys2_shell.cmd -${os_is()} cmake`,args,options)
   else return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
 }
 
