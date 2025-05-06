@@ -28067,15 +28067,15 @@ const semver = require('semver')
 const os = require("node:os");
 const artifact = require('@actions/artifact')*/
 
-async function os_is()
+function os_is()
 {
-  if (process.env.MSYSTEM === undefined ) return process.env.MSYSTEM.toLowerCase()
+  if (process.env.MSYSTEM === undefined ) return String(process.env.MSYSTEM).toLowerCase()
   else return process.platform
 }
 
-async function is_msys2()
+function is_msys2()
 {
-  return (process.env.MSYSTEM !== undefined)
+  return !(process.env.MSYSTEM === undefined)
 }
 
 async function fixCMake()
