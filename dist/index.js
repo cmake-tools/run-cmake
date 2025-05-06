@@ -28087,7 +28087,6 @@ async function fixCMake()
     options.silent = true
     if(os_is() === "linux")
     {
-      console.log('ssllslsls')
       ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('sudo apt-get update', [], options)
       if(ret!=0) return ret;
       ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
@@ -28117,7 +28116,7 @@ async function run(cmd,args, opts)
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     let quotedArgs = [cmd].concat(args)
     quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
+    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c', quotedArgs.join(' ')], opts)
   }
   else return await exec.exec(cmd,args,opts)
 }
