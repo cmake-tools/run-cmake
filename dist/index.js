@@ -34214,6 +34214,61 @@ async function installGraphviz()
   return true
 }
 
+// https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem
+class GenerateProjectCommand
+{
+  constructor()
+  {
+    this.pwd = path.resolve(__dirname)
+    this.binary_dir = this.#parse_binary_dir()
+    core.exportVariable('binary_dir', this.binary_dir);
+  }
+  // binary_dir is a bit special so parse it first and make it a member variable/ environment variable
+  #parse_binary_dir()
+  {
+    return parser.getInput(
+      {
+        key:'binary_dir',
+        type:'string',
+        required: false,
+        default: '../build',
+        modifier: (val) => { return path.resolve(val)}
+      }
+    )
+  }
+  #binary_dir()
+  {
+    if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
+    else return Array()
+  }
+  #source_dir()
+  {
+    let source_dir = parser.getInput(
+      {
+        key:'source_dir',
+        type:'string',
+        required: false,
+        default: process.env.GITHUB_WORKSPACE === undefined ? this.pwd : process.env.GITHUB_WORKSPACE,
+        modifier: (val) => { return path.resolve(val)}
+      }
+    )
+    if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
+    else return Array(source_dir)
+  }
+  args()
+  {
+    let command = []
+    command=command.concat(this.#binary_dir())
+    command=command.concat(this.#source_dir()) // Should be the last
+    return command
+  }
+  cwd()
+  {
+    if(CMakeVersionGreaterEqual('3.13.0')) return this.pwd;
+    else return this.binary_dir;
+  }
+}
+
 class CommandLineMaker
 {
   constructor()
@@ -34229,7 +34284,7 @@ class CommandLineMaker
 
    #source_dir()
   {
-    let source_dir = core.getInput('source_dir', { required: false, default: '' });
+    let source_dir = core.getInput('source_dir', { required: false, default: process.env.GITHUB_WORKSPACE === undefined ? process.cwd() : process.env.GITHUB_WORKSPACE });
     if(source_dir=='')
     {
       source_dir = process.env.GITHUB_WORKSPACE;
@@ -34970,11 +35025,37 @@ async function main()
 {
   try
   {
-    console.log(`Location ${process.env.MSYS2_LOCATION}`)
     let ret;
     global.cmake_version = await getCMakeVersion()
-    console.log(`Running CMake v${global.cmake_version}`)
-    getCapabilities()
+    let cout = '';
+    let cerr = '';
+    switch(getMode())
+    {
+      case "configure":
+      {
+        console.log(`Running CMake v${global.cmake_version} in configure mode`)
+        let command = GenerateProjectCommand();
+        options.cwd = command.cwd();
+        ret= exec.exec('cmake',command.args(),options)
+        break;
+      }
+      case "build":
+      {
+        console.log(`Running CMake v${global.cmake_version} in build mode`)
+        break;
+      }
+      case "install":
+      {
+        console.log(`Running CMake v${global.cmake_version} in install mode`)
+        break;
+      }
+      case "all":
+      {
+        console.log(`Running CMake v${global.cmake_version} in configure mode`)
+        break;
+      }
+    }
+    /*getCapabilities()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
@@ -35014,7 +35095,7 @@ async function main()
       await configure(command_line_maker)
       await build(command_line_maker)
       await install(command_line_maker)
-    }
+    }*/
   }
   catch (error)
   {
