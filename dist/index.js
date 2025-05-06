@@ -29094,7 +29094,7 @@ async function runCMake(args,options)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     const msys = path__WEBPACK_IMPORTED_MODULE_4__.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let arg = '"cmake '+args.join(" ")+'"'
+    let arg = 'cmake '+args.join(" ")
     return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`cmd /d /c ${msys} -c ${arg}`,[],options)
   }
   else return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
