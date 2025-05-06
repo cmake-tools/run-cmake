@@ -1037,7 +1037,7 @@ async function main()
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
         let args = new GenerateProjectBuildsystem();
-        core.console(`Args : ${args}`)
+        console.log(`Args : ${args}`)
         options.cwd = args.cwd();
         ret= exec.exec('cmake',args.args(),options)
         break;
