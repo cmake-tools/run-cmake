@@ -1,9 +1,5 @@
 name: msys2
 
-#defaults:
-#  run:
-#    shell: msys2 {0}
-
 on:
   push:
     paths-ignore:
@@ -42,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cmake-tools/runs.test
-          path: tests
+          path: ./tests
 
       - name: ⬇️ Setup MSYS2 (${{matrix.system}},${{matrix.generator}})
         uses: msys2/setup-msys2@v2
