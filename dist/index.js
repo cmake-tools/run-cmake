@@ -28085,8 +28085,9 @@ async function fixCMake()
     let ret;
     const options = {};
     options.silent = true
-    if( await os_is() === "linux")
+    if(os_is() === "linux")
     {
+      console.log('ssllslsls')
       ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('sudo apt-get update', [], options)
       if(ret!=0) return ret;
       ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
@@ -29093,7 +29094,8 @@ async function runCMake(args,options)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     const msys = path__WEBPACK_IMPORTED_MODULE_4__.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`cmd /d /c ${msys} -c cmake`,args,options)
+    let arg = 'cmake '+args.toString()
+    return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`cmd /d /c ${msys} -c ${arg}`,[],options)
   }
   else return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
 }
