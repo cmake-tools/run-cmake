@@ -1036,7 +1036,7 @@ async function runCMake(args,options)
   {
     const tmp_dir = process.env['RUNNER_TEMP'];
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let arg = 'cmake '+args.toString()
+    let arg = '"cmake '+args.join(" ")+'"'
     return exec.exec(`cmd /d /c ${msys} -c ${arg}`,[],options)
   }
   else return exec.exec('cmake',args,options)
