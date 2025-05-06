@@ -27685,12 +27685,12 @@ async function getCMakeVersion()
     /* First time it can fail due to this fucking shitty Ubuntu ! */
     try
     {
-      ret = await run('cmake',['--version'],options)
+      ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',['--version'],options)
     }
     catch(error)
     {
       ret = await fixCMake()
-      ret = await run('cmake',['--version'],options)
+      ret = await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',['--version'],options)
     }
     if(ret!=0) throw cerr.toString()
     let version_number = cout.match(/\d\.\d[\\.\d]+/)
