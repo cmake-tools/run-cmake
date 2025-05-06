@@ -28073,6 +28073,11 @@ async function os_is()
   else return process.platform
 }
 
+async function is_msys2()
+{
+  return (process.env.MSYSTEM !== undefined)
+}
+
 async function fixCMake()
 {
   if(!global.fix_done)
@@ -28098,7 +28103,7 @@ async function fixCMake()
  * @param {string[]} args
  * @param {object} opts
  */
-/*async function run(cmd,args, opts)
+async function run(cmd,args, opts)
 {
   if(global.is_msys2)
   {
@@ -28114,7 +28119,7 @@ async function fixCMake()
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
-}*/
+}
 
 async function getCMakeVersion()
 {
@@ -29084,7 +29089,12 @@ function getMode()
 
 async function runCMake(args,options)
 {
-  if(os_is()=='cygwin' || os_is=='msys2') return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`msys2_shell.cmd -${os_is()} cmake`,args,options)
+  if(is_msys2())
+  {
+    const tmp_dir = process.env['RUNNER_TEMP'];
+    const msys = path__WEBPACK_IMPORTED_MODULE_4__.join(tmp_dir, 'setup-msys2/msys2.cmd')
+    return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec(`cmd /d /c ${msys} -c cmake`,args,options)
+  }
   else return _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
 }
 
