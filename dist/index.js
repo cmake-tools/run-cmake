@@ -28313,7 +28313,7 @@ class GenerateProjectBuildsystem
       }
       case "msys":
       {
-        generator_default = "MSYS Makefiles"
+        generator_default = "Unix Makefiles"
         break
       }
       case "mingw64":
