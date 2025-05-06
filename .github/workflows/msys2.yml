@@ -59,8 +59,6 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
-        env:
-          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         with:
           mode: configure
           generator: ${{matrix.generator}}
