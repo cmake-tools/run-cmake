@@ -215,7 +215,7 @@ class GenerateProjectBuildsystem
         type:'string',
         required: false,
         default: '../build',
-        modifier: (val) => { return /*path.resolve(*/val/*)*/}
+        modifier: (val) => { return path.resolve(val)}
       }
     )
   }
@@ -236,7 +236,7 @@ class GenerateProjectBuildsystem
         type:'string',
         required: false,
         default: process.env.GITHUB_WORKSPACE === undefined ? this.pwd : process.env.GITHUB_WORKSPACE,
-        modifier: (val) => { return /*path.resolve(*/val/*)*/}
+        modifier: (val) => { return path.resolve(val)}
       }
     )
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
