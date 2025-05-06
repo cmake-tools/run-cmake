@@ -28316,7 +28316,7 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
     else return Array(source_dir)
   }
-  async args()
+  args()
   {
     let command = []
     command=command.concat(this.#binary_dir())
@@ -29095,6 +29095,7 @@ async function main()
       {
         console.log(`Running CMake v${global.cmake_version} in configure mode`)
         let args = new GenerateProjectBuildsystem();
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.console(`Args : ${args}`)
         options.cwd = args.cwd();
         ret= _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args.args(),options)
         break;
