@@ -28300,9 +28300,37 @@ class GenerateProjectBuildsystem
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
     else return Array(source_dir)
   }
+
+  #generator()
+  {
+    let generator_default =''
+    switch(os_is)
+    {
+      case "linux":
+      {
+        generator_default = "Unix Makefiles"
+        break
+      }
+      case "msys":
+      {
+        generator_default = "MSYS Makefiles"
+        break
+      }
+      case "mingw64":
+      case "mingw32":
+      {
+        generator_default = "MinGW Makefiles"
+        break
+      }
+    }
+    if(generator_default != '') return Array('-G',generator_default)
+    else return Array()
+  }
+
   args()
   {
     let command = []
+    command=command.concat(this.#generator())
     command=command.concat(this.#binary_dir())
     command=command.concat(this.#source_dir()) // Should be the last
     return command
@@ -29072,7 +29100,7 @@ function getMode()
  * @param {string[]} args
  * @param {object} opts
  */
-async function run(cmd,args, opts)
+/*async function run(cmd,args, opts)
 {
   if(global.is_msys2)
   {
@@ -29090,7 +29118,7 @@ async function run(cmd,args, opts)
     return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c', quotedArgs.join(' ')], opts)
   }
   else return await exec.exec(cmd,args,opts)
-}
+}*/
 
 async function runCMake(args,options)
 {
