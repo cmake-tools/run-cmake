@@ -28099,29 +28099,7 @@ async function fixCMake()
   return 0;
 }
 
-/**
- * @param {string[]} args
- * @param {object} opts
- */
-async function run(cmd,args, opts)
-{
-  if(global.is_msys2)
-  {
-    let out = JSON.parse(process.env.GITHUB_OUTPUT)
-    console.log(JSON.stringify(out))
-    const tmp_dir = process.env['RUNNER_TEMP'];
-    if(!tmp_dir)
-    {
-      core.setFailed('environment variable RUNNER_TEMP is undefined');
-      return;
-    }
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs = [cmd].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c', quotedArgs.join(' ')], opts)
-  }
-  else return await exec.exec(cmd,args,opts)
-}
+
 
 async function getCMakeVersion()
 {
@@ -29089,6 +29067,31 @@ function getMode()
   await run('cmake',command_line_maker.installCommandParameters(), options)
 }*/
 
+
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ */
+async function run(cmd,args, opts)
+{
+  if(global.is_msys2)
+  {
+    let out = JSON.parse(process.env.GITHUB_OUTPUT)
+    console.log(JSON.stringify(out))
+    const tmp_dir = process.env['RUNNER_TEMP'];
+    if(!tmp_dir)
+    {
+      core.setFailed('environment variable RUNNER_TEMP is undefined');
+      return;
+    }
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
+    let quotedArgs = [cmd].concat(args)
+    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c', quotedArgs.join(' ')], opts)
+  }
+  else return await exec.exec(cmd,args,opts)
+}
+
 async function runCMake(args,options)
 {
   if(is_msys2())
@@ -29097,7 +29100,7 @@ async function runCMake(args,options)
     const msys = path__WEBPACK_IMPORTED_MODULE_4__.join(tmp_dir, 'setup-msys2/msys2.cmd')
     let quotedArgs = ['cmake'].concat(args)
     quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmd', ['/D', '/S', '/C', msys, '-c','cmake', quotedArgs.join(' ')], options)
+    return await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmd', ['/D', '/S', '/C', msys, '-c',quotedArgs.join(' ')], options)
   }
   else return await _actions_exec__WEBPACK_IMPORTED_MODULE_1__.exec('cmake',args,options)
 }
