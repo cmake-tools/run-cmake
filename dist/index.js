@@ -3195,6 +3195,229 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
+/***/ 3455:
+/***/ (function(module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getInput = void 0;
+var dotenv_1 = __importDefault(__nccwpck_require__(8603));
+dotenv_1.default.config();
+var VALID_TYPES = ['string', 'array', 'boolean', 'number'];
+var DEFAULT_OPTIONS = {
+    required: false,
+    type: 'string',
+    disableable: false
+};
+var getEnvVar = function (key) {
+    var parsed = process.env["INPUT_".concat(key.replace(/ /g, '_').toUpperCase())];
+    var raw = process.env[key];
+    return parsed || raw || undefined;
+};
+var parseArray = function (val) {
+    var array = val.split('\n').join(',').split(',');
+    var filtered = array.filter(function (n) { return n; });
+    return filtered.map(function (n) { return n.trim(); });
+};
+var parseBoolean = function (val) {
+    var trueValue = ['true', 'True', 'TRUE'];
+    var falseValue = ['false', 'False', 'FALSE'];
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new Error('boolean input has to be one of \`true | True | TRUE | false | False | FALSE\`');
+};
+var parseNumber = function (val) {
+    var parsed = Number(val);
+    if (isNaN(parsed))
+        throw new Error('input has to be a valid number');
+    return parsed;
+};
+var parseValue = function (val, type) {
+    if (type === 'array') {
+        return parseArray(val);
+    }
+    if (type === 'boolean') {
+        return parseBoolean(val);
+    }
+    if (type === 'number') {
+        return parseNumber(val);
+    }
+    return val.trim();
+};
+var getInput = function (key, opts) {
+    var parsedOptions;
+    if (typeof key === 'string' || Array.isArray(key)) {
+        parsedOptions = __assign({ key: key }, opts);
+    }
+    else if (typeof key === 'object') {
+        parsedOptions = key;
+    }
+    else {
+        throw new Error('No key for input specified');
+    }
+    if (!parsedOptions.key)
+        throw new Error('No key for input specified');
+    var options = Object.assign({}, DEFAULT_OPTIONS, parsedOptions);
+    if (VALID_TYPES.includes(options.type) === false)
+        throw new Error('option type has to be one of `string | array | boolean | number`');
+    var val = typeof options.key === 'string' ? getEnvVar(options.key) : options.key.map(function (key) { return getEnvVar(key); }).filter(function (item) { return item; })[0];
+    if (options.disableable && val === 'false')
+        return undefined;
+    var parsed = val !== undefined ? parseValue(val, options.type) : undefined;
+    if (parsed === undefined) {
+        if (options.required)
+            throw new Error("Input `".concat(options.key, "` is required but was not provided."));
+        if (options.default !== undefined)
+            return options.default;
+        return undefined;
+    }
+    if (options.modifier)
+        return options.modifier(parsed);
+    return parsed;
+};
+exports.getInput = getInput;
+module.exports.getInput = exports.getInput;
+
+
+/***/ }),
+
+/***/ 8603:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* @flow */
+/*::
+
+type DotenvParseOptions = {
+  debug?: boolean
+}
+
+// keys and values from src
+type DotenvParseOutput = { [string]: string }
+
+type DotenvConfigOptions = {
+  path?: string, // path to .env file
+  encoding?: string, // encoding of .env file
+  debug?: string // turn on logging for debugging purposes
+}
+
+type DotenvConfigOutput = {
+  parsed?: DotenvParseOutput,
+  error?: Error
+}
+
+*/
+
+const fs = __nccwpck_require__(7147)
+const path = __nccwpck_require__(1017)
+
+function log (message /*: string */) {
+  console.log(`[dotenv][DEBUG] ${message}`)
+}
+
+const NEWLINE = '\n'
+const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
+const RE_NEWLINES = /\\n/g
+const NEWLINES_MATCH = /\n|\r|\r\n/
+
+// Parses src into an Object
+function parse (src /*: string | Buffer */, options /*: ?DotenvParseOptions */) /*: DotenvParseOutput */ {
+  const debug = Boolean(options && options.debug)
+  const obj = {}
+
+  // convert Buffers before splitting into lines and processing
+  src.toString().split(NEWLINES_MATCH).forEach(function (line, idx) {
+    // matching "KEY' and 'VAL' in 'KEY=VAL'
+    const keyValueArr = line.match(RE_INI_KEY_VAL)
+    // matched?
+    if (keyValueArr != null) {
+      const key = keyValueArr[1]
+      // default undefined or missing values to empty string
+      let val = (keyValueArr[2] || '')
+      const end = val.length - 1
+      const isDoubleQuoted = val[0] === '"' && val[end] === '"'
+      const isSingleQuoted = val[0] === "'" && val[end] === "'"
+
+      // if single or double quoted, remove quotes
+      if (isSingleQuoted || isDoubleQuoted) {
+        val = val.substring(1, end)
+
+        // if double quoted, expand newlines
+        if (isDoubleQuoted) {
+          val = val.replace(RE_NEWLINES, NEWLINE)
+        }
+      } else {
+        // remove surrounding whitespace
+        val = val.trim()
+      }
+
+      obj[key] = val
+    } else if (debug) {
+      log(`did not match key and value when parsing line ${idx + 1}: ${line}`)
+    }
+  })
+
+  return obj
+}
+
+// Populates process.env from .env file
+function config (options /*: ?DotenvConfigOptions */) /*: DotenvConfigOutput */ {
+  let dotenvPath = path.resolve(process.cwd(), '.env')
+  let encoding /*: string */ = 'utf8'
+  let debug = false
+
+  if (options) {
+    if (options.path != null) {
+      dotenvPath = options.path
+    }
+    if (options.encoding != null) {
+      encoding = options.encoding
+    }
+    if (options.debug != null) {
+      debug = true
+    }
+  }
+
+  try {
+    // specifying an encoding returns a string instead of a buffer
+    const parsed = parse(fs.readFileSync(dotenvPath, { encoding }), { debug })
+
+    Object.keys(parsed).forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+        process.env[key] = parsed[key]
+      } else if (debug) {
+        log(`"${key}" is already defined in \`process.env\` and will not be overwritten`)
+      }
+    })
+
+    return { parsed }
+  } catch (e) {
+    return { error: e }
+  }
+}
+
+module.exports.config = config
+module.exports.parse = parse
+
+
+/***/ }),
+
 /***/ 7582:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -27603,14 +27826,19 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1372);
 /* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_exec__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var action_input_parser__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3455);
+/* harmony import */ var action_input_parser__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(action_input_parser__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _actions_io__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(3853);
+/* harmony import */ var _actions_io__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__nccwpck_require__.n(_actions_io__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(1017);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__nccwpck_require__.n(path__WEBPACK_IMPORTED_MODULE_4__);
 
 
-/*const exec = require('@actions/exec');
-const which = require('which')
-const compare_version = require('compare-versions')
-const io = require('@actions/io');
-const path = require('path')
-const parser = require('action-input-parser')
+
+
+
+
+/*const which = require('which')
 const semver = require('semver')
 const os = require("node:os");
 const artifact = require('@actions/artifact')*/
@@ -27841,10 +28069,14 @@ class GenerateProjectBuildsystem
       }
     )
   }
-  #binary_dir()
+  async #binary_dir()
   {
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
-    else return Array()
+    else
+    {
+      await io.mkdirP(this.binary_dir)
+      return Array()
+    }
   }
   #source_dir()
   {
@@ -28563,7 +28795,7 @@ By default CMake is in configure mode.
 */
 function getMode()
 {
-  const mode = parser.getInput('mode', {type: 'string',default:'configure'})
+  const mode = action_input_parser__WEBPACK_IMPORTED_MODULE_2__.getInput('mode', {type: 'string',default:'configure'})
   if(mode!='configure' && mode!='build' && mode!='install' && mode!='all') throw String('mode should be configure, build, install or all')
   return mode;
 }

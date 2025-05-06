@@ -1,11 +1,10 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
-/*const exec = require('@actions/exec');
-const which = require('which')
-const compare_version = require('compare-versions')
-const io = require('@actions/io');
-const path = require('path')
-const parser = require('action-input-parser')
+import * as parser from 'action-input-parser'
+import * as compare_version from 'compare-versions'
+import * as io from '@actions/io'
+import * as path from 'path'
+/*const which = require('which')
 const semver = require('semver')
 const os = require("node:os");
 const artifact = require('@actions/artifact')*/
@@ -236,10 +235,14 @@ class GenerateProjectBuildsystem
       }
     )
   }
-  #binary_dir()
+  async #binary_dir()
   {
     if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
-    else return Array()
+    else
+    {
+      await io.mkdirP(this.binary_dir)
+      return Array()
+    }
   }
   #source_dir()
   {
