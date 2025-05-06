@@ -49,6 +49,8 @@ async function run(cmd,args, opts)
 {
   if(global.is_msys2)
   {
+    let out = JSON.parse(process.env.GITHUB_OUTPUT)
+    console.log(JSON.stringify(out))
     const tmp_dir = process.env['RUNNER_TEMP'];
     if(!tmp_dir)
     {
