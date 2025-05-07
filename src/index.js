@@ -247,7 +247,7 @@ async function parseListGenerator()
       else generators=generators.concat(gen)
     }
   }
-  console.log(generators)
+  //console.log(generators)
   return generators;
 }
 
@@ -326,7 +326,7 @@ class CommandLineMaker
     return ret;
   }
 
-  #generator()
+  async #generator()
   {
     this.generator = core.getInput('generator', { required: false });
     if(this.generator=='')
@@ -336,7 +336,7 @@ class CommandLineMaker
     }
     else
     {
-      let generators = parseListGenerator()
+      let generators = await parseListGenerator()
       if(!generators.includes(this.generator))
       {
         let gen = '['+generators.toString()+']'
