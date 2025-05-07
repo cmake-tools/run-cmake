@@ -349,7 +349,7 @@ class CommandLineMaker
               throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
             }
           }
-        ).catch((error)=>{ this.m_error=true; kill(error)})
+        ).catch((error)=>{ this.m_error=true/*; kill(error)*/})
       }
       if(!CMakeVersionGreaterEqual('3.1.0'))
       {
