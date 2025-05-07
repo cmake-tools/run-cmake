@@ -213,6 +213,41 @@ async function installGraphviz()
   return true
 }
 
+
+async function parseListGenerator()
+{
+  let cout ='';
+  let cerr='';
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      cout = data.toString();
+    },
+    stderr: (data) => {
+      cerr = data.toString();
+    }
+  }
+  options.silent = true
+  let ret = await run('cmake','-G', options)
+  cout=cout.replace("*", " ");
+  cout=cout.replace("\r", " ");
+  cout=cout.substring(cout.indexOf("\n") + 1);
+  cout=cout.split("\n");
+  let generators = Array()
+  for(var i = 0; i < cout.length; i++)
+  {
+    if(cout[i].includes('='))
+    {
+      let toto=cout[i].split("=");
+      toto=toto[0].trim()
+      if(toto==''||toto.includes('CodeBlocks')||toto.includes('CodeLite')||toto.includes('Eclipse')||toto.includes('Kate')||toto.includes('Sublime Text')) {}
+      else generators=generators.concat(toto)
+    }
+  }
+  console.log(generators)
+}
+
+
 class CommandLineMaker
 {
   constructor()
@@ -974,6 +1009,7 @@ async function main()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     getCapabilities()
+    parseListGenerator()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
