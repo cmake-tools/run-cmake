@@ -34231,7 +34231,7 @@ async function parseListGenerator()
   options.silent = true
   let ret = await run('cmake',['--help'], options)
   console.log(`cout =${cout}`)
-  cout=cout.replace("*", " ");
+  /*cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
   cout=cout.substring(cout.indexOf("\n") + 1);
   cout=cout.split("\n");
@@ -34246,7 +34246,7 @@ async function parseListGenerator()
       else generators=generators.concat(toto)
     }
   }
-  console.log(generators)
+  console.log(generators)*/
   return true;
 }
 
@@ -35012,7 +35012,7 @@ async function main()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     getCapabilities()
-    ret =await parseListGenerator()
+
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
@@ -35036,6 +35036,7 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
+      await parseListGenerator()
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
       await configure(command_line_maker)
     }
