@@ -232,6 +232,7 @@ async function parseListGenerator()
   let ret
   if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
   else ret = await run('cmake',['--help'], options)
+  cout = cout.substring(str.indexOf("Generators") + 10);
   console.log(`cout =${cout}`)
   /*cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
