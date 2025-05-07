@@ -34330,6 +34330,8 @@ class CommandLineMaker
 
   #generator()
   {
+    try
+    {
       this.generator = core.getInput('generator', { required: false });
       if(this.generator=='')
       {
@@ -34346,7 +34348,7 @@ class CommandLineMaker
               throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
             }
           }
-        ).catch((error) => { core.setFailed(error);core.error(error);process.exit(1)})
+        ).catch((error) => { throw error; })
       }
       if(!CMakeVersionGreaterEqual('3.1.0'))
       {
@@ -34354,6 +34356,11 @@ class CommandLineMaker
         if(this.platform!='')this.generator=this.generator+' '+this.platform
       }
       return Array('-G',this.generator)
+    }
+    catch(error)
+    {
+      core.error(error);process.exit(1)
+    }
   }
 
   #toolset()
