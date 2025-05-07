@@ -34222,10 +34222,10 @@ async function parseListGenerator()
   const options = {};
   options.listeners = {
     stdout: (data) => {
-      cout = data.toString();
+      cout += data.toString();
     },
     stderr: (data) => {
-      cerr = data.toString();
+      cerr += data.toString();
     }
   }
   options.silent = true
