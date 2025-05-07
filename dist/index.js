@@ -34338,11 +34338,11 @@ class CommandLineMaker
     }
     else
     {
-      this.#parseListGenerator().then((generator) =>
+      this.#parseListGenerator().then((gens) =>
         {
-          if(!generators.includes(this.generator))
+          if(!gens.includes(this.generator))
           {
-            let gen = '['+generators.toString()+']'
+            let gen = '['+gens.toString()+']'
             throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
           }
         }
