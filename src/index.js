@@ -246,6 +246,7 @@ async function parseListGenerator()
     }
   }
   console.log(generators)
+  return true;
 }
 
 
@@ -1010,7 +1011,7 @@ async function main()
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
     getCapabilities()
-    parseListGenerator()
+    ret =await parseListGenerator()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
