@@ -223,6 +223,7 @@ class CommandLineMaker
 {
   constructor()
   {
+    this.m_error=false;
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
     this.actual_path=path.resolve('./')
