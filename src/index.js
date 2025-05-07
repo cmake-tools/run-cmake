@@ -911,7 +911,6 @@ async function main()
     //if(!found) throw String('not found: CMake')
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
-    if(command_line_maker.error()) return core.ExitCode.Failure;
     let mode = getMode()
     if(mode==='configure')
     {
