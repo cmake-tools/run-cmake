@@ -914,8 +914,9 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      //let toto = command_line_maker.buildCommandParameters();
-      //if(!command_line_maker.error()) await configure(command_line_maker)
+      let toto = command_line_maker.configureCommandParameters();
+
+      if(!command_line_maker.error()) await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
 
     }
