@@ -34216,6 +34216,7 @@ async function installGraphviz()
 function kill(error)
 {
    core.setFailed(error)
+   process.exit(core.ExitCode.Failure)
 }
 
 class CommandLineMaker
@@ -34518,7 +34519,7 @@ class CommandLineMaker
     }
     options=options.concat(this.#remove_variables())
     options=options.concat(this.#variables())
-    if(this.#generator().then((ret)=>{ options.concat(ret); return false }).catch((error)=>{ kill(error); return true;})) process.exit(core.ExitCode.Failure);
+    this.#generator().then((ret)=>{ options.concat(ret) }).catch((error)=>{ kill(error) });
     options=options.concat(this.#generator())
     options=options.concat(this.#toolset())
     options=options.concat(this.#platform())
