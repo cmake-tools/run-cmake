@@ -34218,22 +34218,22 @@ async function installGraphviz()
 async function parseListGenerator()
 {
   let cout ='';
-  let cerr='';
   const options = {};
   options.listeners = {
     stdout: (data) => {
       cout += data.toString();
     },
     stderr: (data) => {
-      cerr += data.toString();
+      cout += data.toString();
     }
   }
   options.silent = true
   options.failOnStdErr = false
   options.ignoreReturnCode = true
-  let ret = await run('cmake',['-G'], options)
+  let ret
+  if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
+  else ret = await run('cmake',['--help'], options)
   console.log(`cout =${cout}`)
-  console.log(`cerr =${cerr}`)
   /*cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
   cout=cout.substring(cout.indexOf("\n") + 1);
