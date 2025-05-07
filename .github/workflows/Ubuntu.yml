@@ -113,7 +113,7 @@ jobs:
         id: configure
         with:
           mode: configure
-          generator: ${{ matrix.generator }}
+          generator: '${{ matrix.generator }}'
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
           graphviz: ./dots/dependencies.dot
