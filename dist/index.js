@@ -34233,6 +34233,7 @@ async function parseListGenerator()
   options.ignoreReturnCode = true
   let ret = await run('cmake',['-G'], options)
   console.log(`cout =${cout}`)
+  console.log(`cerr =${cerr}`)
   /*cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
   cout=cout.substring(cout.indexOf("\n") + 1);
