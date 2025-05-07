@@ -34520,7 +34520,7 @@ class CommandLineMaker
     options=options.concat(this.#remove_variables())
     options=options.concat(this.#variables())
     this.#generator().then((ret)=>{ options.concat(ret) }).catch((error)=>{ kill(error) });
-    options=options.concat(this.#generator())
+    //options=options.concat(this.#generator())
     options=options.concat(this.#toolset())
     options=options.concat(this.#platform())
     options=options.concat(this.#toolchain())
