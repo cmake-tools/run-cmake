@@ -34213,7 +34213,10 @@ async function installGraphviz()
   return true
 }
 
-
+function kill(error)
+{
+   core.setFailed(error)
+}
 
 class CommandLineMaker
 {
@@ -34503,6 +34506,7 @@ class CommandLineMaker
 
    configureCommandParameters()
   {
+    let ret = true
     let options=[]
 
     options=options.concat(this.#binary_dir())
@@ -34514,7 +34518,7 @@ class CommandLineMaker
     }
     options=options.concat(this.#remove_variables())
     options=options.concat(this.#variables())
-    this.#generator().then((ret)=>{ options.concat(ret)}).catch((error)=>{ throw error;})
+    if(this.#generator().then((ret)=>{ options.concat(ret); return false }).catch((error)=>{ kill(error); return true;})) process.exit(core.ExitCode.Failure);
     options=options.concat(this.#generator())
     options=options.concat(this.#toolset())
     options=options.concat(this.#platform())
