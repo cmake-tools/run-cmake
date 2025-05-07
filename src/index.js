@@ -327,7 +327,10 @@ class CommandLineMaker
     }
     return ret;
   }
-
+  error()
+  {
+    return this.error;
+  }
   #generator()
   {
       this.generator = core.getInput('generator', { required: false });
@@ -346,7 +349,7 @@ class CommandLineMaker
               throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
             }
           }
-        ).catch((error)=>{kill(error)})
+        ).catch((error)=>{ this.error=true; kill(error)})
       }
       if(!CMakeVersionGreaterEqual('3.1.0'))
       {
@@ -908,12 +911,12 @@ async function main()
     //if(!found) throw String('not found: CMake')
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
-    if(global.kill) process.exit(core.ExitCode.Failure)
     let mode = getMode()
     if(mode==='configure')
     {
+      if(!command_line_maker.error()) await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
-      await configure(command_line_maker)
+
     }
     else if(mode==='build')
     {
