@@ -1,23 +1,19 @@
-import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import * as parser from 'action-input-parser'
-import * as compare_version from 'compare-versions'
-import * as io from '@actions/io'
-import * as path from 'path'
-/*const which = require('which')
+const core = require('@actions/core');
+const exec = require('@actions/exec');
+const which = require('which')
+const compare_version = require('compare-versions')
+const io = require('@actions/io');
+const path = require('path')
+const parser = require('action-input-parser')
 const semver = require('semver')
 const os = require("node:os");
-const artifact = require('@actions/artifact')*/
+const artifact = require('@actions/artifact')
 
-function os_is()
+async function os_is()
 {
-  if (process.env.MSYSTEM !== undefined ) return String(process.env.MSYSTEM).toLowerCase()
+  if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
+  else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
   else return process.platform
-}
-
-function is_msys2()
-{
-  return !(process.env.MSYSTEM === undefined)
 }
 
 async function fixCMake()
@@ -27,7 +23,7 @@ async function fixCMake()
     let ret;
     const options = {};
     options.silent = true
-    if(os_is() === "linux")
+    if( await os_is() === "linux")
     {
       ret = await exec.exec('sudo apt-get update', [], options)
       if(ret!=0) return ret;
@@ -41,7 +37,27 @@ async function fixCMake()
   return 0;
 }
 
-
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ */
+async function run(cmd,args, opts)
+{
+  if(global.is_msys2)
+  {
+    const tmp_dir = process.env['RUNNER_TEMP'];
+    if(!tmp_dir)
+    {
+      core.setFailed('environment variable RUNNER_TEMP is undefined');
+      return;
+    }
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
+    let quotedArgs = [cmd].concat(args)
+    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
+  }
+  else return await exec.exec(cmd,args,opts)
+}
 
 async function getCMakeVersion()
 {
@@ -63,12 +79,12 @@ async function getCMakeVersion()
     /* First time it can fail due to this fucking shitty Ubuntu ! */
     try
     {
-      ret = await exec.exec('cmake',['--version'],options)
+      ret = await run('cmake',['--version'],options)
     }
     catch(error)
     {
       ret = await fixCMake()
-      ret = await exec.exec('cmake',['--version'],options)
+      ret = await run('cmake',['--version'],options)
     }
     if(ret!=0) throw cerr.toString()
     let version_number = cout.match(/\d\.\d[\\.\d]+/)
@@ -78,7 +94,7 @@ async function getCMakeVersion()
   return process.env.cmake_version
 }
 
-/*async function getCapabilities()
+async function getCapabilities()
 {
   if(CMakeVersionGreaterEqual('3.7'))
   {
@@ -99,7 +115,7 @@ async function getCMakeVersion()
     return JSON.parse(cout);
   }
   else return '{}'
-}*/
+}
 
 
 function CMakeVersionGreaterEqual(version)
@@ -107,7 +123,7 @@ function CMakeVersionGreaterEqual(version)
   return compare_version.compare(global.cmake_version, version, '>=')
 }
 
-/*async function runGraphviz()
+async function runGraphviz()
 {
   let command
   if(process.platform === "win32") command = 'dot.exe'
@@ -140,9 +156,9 @@ function CMakeVersionGreaterEqual(version)
   )
   core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
   core.summary.write()
-}*/
+}
 
-/*async function installGraphviz()
+async function installGraphviz()
 {
   let found_graphviz = false
   if(process.platform === "win32")
@@ -170,7 +186,7 @@ function CMakeVersionGreaterEqual(version)
     let params = []
     let command
     let os = await os_is()
-    // cygwin doesn't have graphviz so install the windows one
+    /* cygwin doesn't have graphviz so install the windows one */
     if( os == "win32" || os == "cygwin" )
     {
       params = ['install', 'graphviz']
@@ -195,96 +211,9 @@ function CMakeVersionGreaterEqual(version)
     await run(command,params, options)
   }
   return true
-}*/
-
-// https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem
-class GenerateProjectBuildsystem
-{
-  constructor()
-  {
-    this.pwd = path.resolve(__dirname)
-    this.binary_dir = this.#parse_binary_dir()
-    core.exportVariable('binary_dir', this.binary_dir);
-  }
-  // binary_dir is a bit special so parse it first and make it a member variable/ environment variable
-  #parse_binary_dir()
-  {
-    return parser.getInput(
-      {
-        key:'binary_dir',
-        type:'string',
-        required: false,
-        default: '../build',
-        modifier: (val) => { return path.resolve(val)}
-      }
-    )
-  }
-  #binary_dir()
-  {
-    if(CMakeVersionGreaterEqual('3.13.0')) return Array('-B',this.binary_dir)
-    else
-    {
-      io.mkdirP(this.binary_dir).then( (ret)=> {} )
-      return Array();
-    }
-  }
-  #source_dir()
-  {
-    let source_dir = parser.getInput(
-      {
-        key:'source_dir',
-        type:'string',
-        required: false,
-        default: process.env.GITHUB_WORKSPACE === undefined ? this.pwd : process.env.GITHUB_WORKSPACE,
-        modifier: (val) => { return path.resolve(val)}
-      }
-    )
-    if(CMakeVersionGreaterEqual('3.13.0')) return Array('-S',source_dir)
-    else return Array(source_dir)
-  }
-
-  #generator()
-  {
-    let generator_default =''
-    switch(os_is())
-    {
-      case "linux":
-      {
-        generator_default = "Unix Makefiles"
-        break
-      }
-      case "msys":
-      {
-        generator_default = "Unix Makefiles"
-        break
-      }
-      case "mingw64":
-      case "mingw32":
-      {
-        generator_default = "MinGW Makefiles"
-        break
-      }
-    }
-    if(generator_default != '') return Array('-G',generator_default)
-    else return Array()
-  }
-
-  args()
-  {
-    let command = []
-    command=command.concat(this.#generator())
-    command=command.concat(this.#binary_dir())
-    command=command.concat(this.#source_dir()) // Should be the last
-    return command
-  }
-  cwd()
-  {
-    if(CMakeVersionGreaterEqual('3.13.0')) return this.pwd;
-    else return this.binary_dir;
-  }
 }
 
-/*class CommandLineMaker
+class CommandLineMaker
 {
   constructor()
   {
@@ -295,11 +224,11 @@ class GenerateProjectBuildsystem
     //this.need_to_install_graphviz=this.#graphviz()
   }
 
-  // Configure
+  /* Configure */
 
    #source_dir()
   {
-    let source_dir = core.getInput('source_dir', { required: false, default: process.env.GITHUB_WORKSPACE === undefined ? process.cwd() : process.env.GITHUB_WORKSPACE });
+    let source_dir = core.getInput('source_dir', { required: false, default: '' });
     if(source_dir=='')
     {
       source_dir = process.env.GITHUB_WORKSPACE;
@@ -380,7 +309,7 @@ class GenerateProjectBuildsystem
     }
     if(!CMakeVersionGreaterEqual('3.1.0'))
     {
-      this.#platform() // TODO fix this mess dude
+      this.#platform() /** TODO fix this mess dude */
       if(this.platform!='')this.generator=this.generator+' '+this.platform
     }
     return Array('-G',this.generator)
@@ -393,11 +322,11 @@ class GenerateProjectBuildsystem
     else return Array()
   }
 
-  // Must be called before generator to allow to add the toolset to the generator string !!!
+  /* Must be called before generator to allow to add the toolset to the generator string !!!*/
    #platform()
   {
     this.platform = core.getInput('platform', { required: false })
-    /// CMake 3.0 only allow platform to be addind to the generator string
+    /* CMake 3.0 only allow platform to be addind to the generator string */
     if(! CMakeVersionGreaterEqual('3.1.0')) return Array()
     if(this.platform!='') return Array('-A',this.platform)
     else return Array()
@@ -586,7 +515,7 @@ class GenerateProjectBuildsystem
     return Array('--parallel',String(value))
   }
 
-   #build_targets() // FIXME for CMAKE<3.15
+   #build_targets() /* FIXME for CMAKE<3.15 */
   {
     const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
     let targets= []
@@ -712,7 +641,7 @@ class GenerateProjectBuildsystem
     return commands
   }
 
-  // install step
+  /** install step */
    #install_config()
   {
     let config
@@ -841,8 +770,7 @@ class GenerateProjectBuildsystem
         ['3.0', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Watcom WMake']],
         ['3.1', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.2', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        //Maybe add some
-        ['3.3', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
+        /*Maybe add some */['3.3', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.4', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.5', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
         ['3.6', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
@@ -962,7 +890,7 @@ class GenerateProjectBuildsystem
   {
     return this.need_to_install_graphviz
   }
-}*/
+}
 
 /* Detect which mode the user wants :
 - configure: CMake configure the project only.
@@ -978,7 +906,7 @@ function getMode()
   return mode;
 }
 
-/*async function configure(command_line_maker)
+async function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
   let cout ='';
@@ -997,9 +925,9 @@ function getMode()
   await run('cmake',params, options)
   //if(command_line_maker.InstallGraphvizNeeded()) await runGraphviz()
   return true;
-}*/
+}
 
-/*async function build(command_line_maker)
+async function build(command_line_maker)
 {
   let cout ='';
   let cerr='';
@@ -1018,9 +946,9 @@ function getMode()
   {
     await run('cmake',commands[i], options)
   }
-}*/
+}
 
-/*async function install(command_line_maker)
+async function install(command_line_maker)
 {
   let cout ='';
   let cerr='';
@@ -1035,80 +963,17 @@ function getMode()
   }
   options.silent = false
   await run('cmake',command_line_maker.installCommandParameters(), options)
-}*/
-
-
-/**
- * @param {string[]} args
- * @param {object} opts
- */
-/*async function run(cmd,args, opts)
-{
-  if(global.is_msys2)
-  {
-    let out = JSON.parse(process.env.GITHUB_OUTPUT)
-    console.log(JSON.stringify(out))
-    const tmp_dir = process.env['RUNNER_TEMP'];
-    if(!tmp_dir)
-    {
-      core.setFailed('environment variable RUNNER_TEMP is undefined');
-      return;
-    }
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs = [cmd].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c', quotedArgs.join(' ')], opts)
-  }
-  else return await exec.exec(cmd,args,opts)
-}*/
-
-async function runCMake(args,options)
-{
-  if(is_msys2())
-  {
-    const tmp_dir = process.env['RUNNER_TEMP'];
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs = ['cmake'].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await exec.exec('cmd', ['/D', '/S', '/C', msys, '-c',quotedArgs.join(' ')], options)
-  }
-  else return await exec.exec('cmake',args,options)
 }
 
 async function main()
 {
   try
   {
+    console.log(`Location ${process.env.MSYS2_LOCATION}`)
+    let ret;
     global.cmake_version = await getCMakeVersion()
-    const options = {};
-    switch(getMode())
-    {
-      case "configure":
-      {
-        console.log(`Running CMake v${global.cmake_version} in configure mode`)
-        let args = new GenerateProjectBuildsystem();
-        console.log(args.args().toString())
-        options.cwd = args.cwd();
-        let ret= runCMake(args.args(),options)
-        break;
-      }
-      case "build":
-      {
-        console.log(`Running CMake v${global.cmake_version} in build mode`)
-        break;
-      }
-      case "install":
-      {
-        console.log(`Running CMake v${global.cmake_version} in install mode`)
-        break;
-      }
-      case "all":
-      {
-        console.log(`Running CMake v${global.cmake_version} in configure mode`)
-        break;
-      }
-    }
-    /*getCapabilities()
+    console.log(`Running CMake v${global.cmake_version}`)
+    getCapabilities()
     let toto = await os_is()
     console.log(`OS ${toto}!`)
     if(process.env.MSYSTEM !== undefined)
@@ -1148,7 +1013,7 @@ async function main()
       await configure(command_line_maker)
       await build(command_line_maker)
       await install(command_line_maker)
-    }*/
+    }
   }
   catch (error)
   {
