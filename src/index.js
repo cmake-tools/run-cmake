@@ -237,18 +237,18 @@ async function parseListGenerator()
   cout=cout.replace("\r", " ");
   cout=cout.split("\n");
   let generators = Array()
-  for(var i = 0; i < cout.length; i++)
+  for(const element of cout)
   {
-    if(cout[i].includes('='))
+    if(element.includes('='))
     {
-      let toto=cout[i].split("=");
-      toto=toto[0].trim()
-      if(toto==''||toto.includes('CodeBlocks')||toto.includes('CodeLite')||toto.includes('Eclipse')||toto.includes('Kate')||toto.includes('Sublime Text')) {}
+      let gen=element.split("=");
+      gen=gen[0].trim()
+      if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { /* empty */ }
       else generators=generators.concat(toto)
     }
   }
   console.log(generators)
-  return true;
+  return generators;
 }
 
 
