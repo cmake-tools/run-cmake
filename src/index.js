@@ -233,10 +233,8 @@ async function parseListGenerator()
   if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
   else ret = await run('cmake',['--help'], options)
   cout = cout.substring(cout.indexOf("Generators") + 10);
-  console.log(`cout =${cout}`)
-  /*cout=cout.replace("*", " ");
+  cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
-  cout=cout.substring(cout.indexOf("\n") + 1);
   cout=cout.split("\n");
   let generators = Array()
   for(var i = 0; i < cout.length; i++)
@@ -249,7 +247,7 @@ async function parseListGenerator()
       else generators=generators.concat(toto)
     }
   }
-  console.log(generators)*/
+  console.log(generators)
   return true;
 }
 
