@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,11 +80,11 @@ jobs:
       matrix:
         system: [ msys, mingw64, ucrt64, clang64 ]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
-        #exclude:
-          #- system: msys
-          #  generator: 'MSYS Makefiles'
-          #- system: msys
-          #  generator: 'MinGW Makefiles'
+        exclude:
+          - system: msys
+            generator: 'MSYS Makefiles'
+          - system: msys
+            generator: 'MinGW Makefiles'
 
     steps:
       - name: Checkout
