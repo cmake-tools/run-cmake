@@ -34216,7 +34216,6 @@ async function installGraphviz()
 function kill(error)
 {
    core.setFailed(error)
-   global.kill = true;
    process.exit(core.ExitCode.Failure)
 }
 
