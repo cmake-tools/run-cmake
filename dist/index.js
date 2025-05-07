@@ -34229,7 +34229,7 @@ async function parseListGenerator()
     }
   }
   options.silent = true
-  let ret = await run('cmake','-G', options)
+  let ret = await run('cmake',['-G'], options)
   console.log(`cout =${cout}`)
   cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
