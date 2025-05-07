@@ -34328,32 +34328,32 @@ class CommandLineMaker
     return ret;
   }
 
-  #generator()
+  async #generator()
   {
-    this.generator = core.getInput('generator', { required: false });
-    if(this.generator=='')
-    {
-      if(process.platform === "win32") this.generator="NMake Makefiles"
-      else this.generator="Unix Makefiles"
-    }
-    else
-    {
-      this.#parseListGenerator().then((gens) =>
-        {
-          if(!gens.includes(this.generator))
+      this.generator = core.getInput('generator', { required: false });
+      if(this.generator=='')
+      {
+        if(process.platform === "win32") this.generator="NMake Makefiles"
+        else this.generator="Unix Makefiles"
+      }
+      else
+      {
+        this.#parseListGenerator().then((gens) =>
           {
-            let gen = '['+gens.toString()+']'
-            throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
+            if(!gens.includes(this.generator))
+            {
+              let gen = '['+gens.toString()+']'
+              throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
+            }
           }
-        }
-      ).catch((error) => { throw error;})
-    }
-    if(!CMakeVersionGreaterEqual('3.1.0'))
-    {
-      this.#platform() /** TODO fix this mess dude */
-      if(this.platform!='')this.generator=this.generator+' '+this.platform
-    }
-    return Array('-G',this.generator)
+        ).catch((error) => { throw error;})
+      }
+      if(!CMakeVersionGreaterEqual('3.1.0'))
+      {
+        this.#platform() /** TODO fix this mess dude */
+        if(this.platform!='')this.generator=this.generator+' '+this.platform
+      }
+      return Array('-G',this.generator)
   }
 
   #toolset()
