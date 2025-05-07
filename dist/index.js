@@ -34345,14 +34345,13 @@ class CommandLineMaker
     return []
   }
 
-  async #install_prefix()
+  #install_prefix()
   {
     delete process.env.CMAKE_INSTALL_PREFIX;
     this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
     if(this.install_prefix!='')
     {
-      let os = await os_is()
-      if(os=='cygwin')this.install_prefix='/usr/local'
+      if(process.env.MSYS2_LOCATION)this.install_prefix=path.resolve('/usr/local/',this.install_prefix)
       else this.install_prefix=path.resolve(this.install_prefix)
       if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
