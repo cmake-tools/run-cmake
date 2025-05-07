@@ -34215,43 +34215,6 @@ async function installGraphviz()
 }
 
 
-async function parseListGenerator()
-{
-  let cout ='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout += data.toString();
-    },
-    stderr: (data) => {
-      cout += data.toString();
-    }
-  }
-  options.silent = true
-  options.failOnStdErr = false
-  options.ignoreReturnCode = true
-  let ret
-  if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
-  else ret = await run('cmake',['--help'], options)
-  cout = cout.substring(cout.indexOf("Generators") + 10);
-  cout=cout.replace("*", " ");
-  cout=cout.replace("\r", " ");
-  cout=cout.split("\n");
-  let generators = Array()
-  for(const element of cout)
-  {
-    if(element.includes('='))
-    {
-      let gen=element.split("=");
-      gen=gen[0].trim()
-      if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { /* empty */ }
-      else generators=generators.concat(gen)
-    }
-  }
-  //console.log(generators)
-  return generators;
-}
-
 
 class CommandLineMaker
 {
@@ -34265,6 +34228,44 @@ class CommandLineMaker
   }
 
   /* Configure */
+
+  async #parseListGenerator()
+  {
+    let cout ='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout += data.toString();
+      },
+      stderr: (data) => {
+        cout += data.toString();
+      }
+    }
+    options.silent = true
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    let ret
+    if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
+    else ret = await run('cmake',['--help'], options)
+    cout = cout.substring(cout.indexOf("Generators") + 10);
+    cout=cout.replace("*", " ");
+    cout=cout.replace("\r", " ");
+    cout=cout.split("\n");
+    let generators = Array()
+    for(const element of cout)
+    {
+      if(element.includes('='))
+      {
+        let gen=element.split("=");
+        gen=gen[0].trim()
+        if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { /* empty */ }
+        else generators=generators.concat(gen)
+      }
+    }
+    //console.log(generators)
+    return generators;
+  }
+
 
    #source_dir()
   {
@@ -34337,7 +34338,7 @@ class CommandLineMaker
     }
     else
     {
-      let generators = await parseListGenerator()
+      let generators = await this.#parseListGenerator()
       if(!generators.includes(this.generator))
       {
         let gen = '['+generators.toString()+']'
