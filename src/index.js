@@ -215,6 +215,7 @@ async function installGraphviz()
 function kill(error)
 {
    core.setFailed(error)
+   global.kill = true;
    process.exit(core.ExitCode.Failure)
 }
 
@@ -907,6 +908,7 @@ async function main()
     //if(!found) throw String('not found: CMake')
     //global.capabilities = await getCapabilities()
     const command_line_maker = new CommandLineMaker()
+    if(global.kill) process.exit(core.ExitCode.Failure)
     let mode = getMode()
     if(mode==='configure')
     {
