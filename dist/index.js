@@ -34112,7 +34112,6 @@ async function getCapabilities()
     }
     options.silent = true
     await run('cmake',['-E','capabilities'], options)
-    console.log(JSON.parse(cout))
     return JSON.parse(cout);
   }
   else return '{}'
@@ -34262,7 +34261,6 @@ class CommandLineMaker
         else generators=generators.concat(gen)
       }
     }
-    //console.log(generators)
     return generators;
   }
 
@@ -34284,9 +34282,7 @@ class CommandLineMaker
   {
     this.binary_dir = core.getInput('binary_dir', { required: false, default: '../build' });
     this.binary_dir=path.resolve(this.binary_dir)
-    console.log(`set binary_dir ${this.binary_dir}!`);
     core.exportVariable('binary_dir', this.binary_dir);
-    console.log(`now env : ${process.env.binary_dir}!`);
     if(!this.old_style) return Array('-B',this.binary_dir)
     else
     {
@@ -34330,8 +34326,6 @@ class CommandLineMaker
 
   #generator()
   {
-    try
-    {
       this.generator = core.getInput('generator', { required: false });
       if(this.generator=='')
       {
@@ -34348,7 +34342,7 @@ class CommandLineMaker
               throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
             }
           }
-        ).catch((error) => { throw error; })
+        ).catch((error) => { core.error(error);process.exit(1) })
       }
       if(!CMakeVersionGreaterEqual('3.1.0'))
       {
@@ -34356,11 +34350,6 @@ class CommandLineMaker
         if(this.platform!='')this.generator=this.generator+' '+this.platform
       }
       return Array('-G',this.generator)
-    }
-    catch(error)
-    {
-      core.error(error);process.exit(1)
-    }
   }
 
   #toolset()
@@ -34545,12 +34534,9 @@ class CommandLineMaker
 
    #binary_build_dir()
   {
-    console.log(`this.binary_dir ${process.env.binary_dir}!`);
     this.binary_dir = process.env.binary_dir;
-    console.log(`this.binary_dir2 ${this.binary_dir}!`);
     if(this.binary_dir=='') this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
     this.binary_dir=path.resolve(this.binary_dir)
-    console.log(`this.binary_dir3 ${this.binary_dir}!`);
     return Array(this.binary_dir)
   }
 
@@ -34800,12 +34786,10 @@ class CommandLineMaker
   {
     if(this.old_style==true)
     {
-      console.log(`using ${process.env.binary_dir}`)
         return process.env.binary_dir
     }
     else
     {
-      console.log(`using ${this.actual_path}`)
       return this.actual_path
     }
   }
@@ -34893,7 +34877,6 @@ async function main()
 {
   try
   {
-    console.log(`Location ${process.env.MSYS2_LOCATION}`)
     let ret;
     global.cmake_version = await getCMakeVersion()
     console.log(`Running CMake v${global.cmake_version}`)
