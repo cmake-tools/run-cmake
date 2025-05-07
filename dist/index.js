@@ -34911,7 +34911,6 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      await parseListGenerator()
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
       await configure(command_line_maker)
     }
