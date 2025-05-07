@@ -34229,6 +34229,8 @@ async function parseListGenerator()
     }
   }
   options.silent = true
+  options.failOnStdErr = false
+  options.ignoreReturnCode = true
   let ret = await run('cmake',['-G'], options)
   console.log(`cout =${cout}`)
   /*cout=cout.replace("*", " ");
