@@ -34245,7 +34245,7 @@ async function parseListGenerator()
       let gen=element.split("=");
       gen=gen[0].trim()
       if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { /* empty */ }
-      else generators=generators.concat(toto)
+      else generators=generators.concat(gen)
     }
   }
   console.log(generators)
@@ -34337,13 +34337,10 @@ class CommandLineMaker
     }
     else
     {
-      let generators = this.#getGeneratorList()
+      let generators = parseListGenerator()
       if(!generators.includes(this.generator))
       {
-        let gen = String('[')
-        for(const i in generators) { gen+=generators[i]+',' }
-        gen = gen.substring(0, gen.length - 1);
-        gen+=']'
+        let gen = '['+generators.toString()+']'
         throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
       }
     }
@@ -34799,130 +34796,6 @@ class CommandLineMaker
     {
       console.log(`using ${this.actual_path}`)
       return this.actual_path
-    }
-  }
-
-   #getGeneratorList()
-  {
-    if(process.platform === "win32")
-    {
-      const myMap = new Map([
-        ['3.0', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Watcom WMake']],
-        ['3.1', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        ['3.2', ['Borland Makefiles','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        /*Maybe add some */['3.3', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        ['3.4', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        ['3.5', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 6','Visual Studio 7','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        ['3.6', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Watcom WMake']],
-        ['3.7', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.8', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 7 .NET 2003','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.9', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.10', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.11', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 8 2005','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.12', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.13', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Watcom WMake']],
-        ['3.14', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.15', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.16', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.17', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.18', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.19', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.20', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Watcom WMake']],
-        ['3.21', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.22', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.23', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.24', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 10 2010','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.25', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.26', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.27', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 11 2012','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.28', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.29', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 9 2008','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.30', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 12 2013','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['3.31', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-        ['4.0', ['Borland Makefiles','Green Hills MULTI','MinGW Makefiles','MSYS Makefiles','Ninja','Ninja Multi-Config','NMake Makefiles','NMake Makefiles JOM','Unix Makefiles','Visual Studio 14 2015','Visual Studio 15 2017','Visual Studio 16 2019','Visual Studio 17 2022','Watcom WMake']],
-      ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
-      return myMap.get(version.toString());
-    }
-    else if(process.platform === "linux")
-    {
-      const myMap = new Map([
-        ['3.0', ['Ninja','Unix Makefiles']],
-        ['3.1', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.2', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.3', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.4', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.5', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.6', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.7', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.8', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.9', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.10', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.11', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.12', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.13', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.14', ['Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.15', ['Green Hills MULTI','Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.16', ['Green Hills MULTI','Ninja','Unix Makefiles','Watcom WMake']],
-        ['3.17', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.18', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.19', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.20', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.21', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.22', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.23', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.24', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.25', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.26', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.27', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.28', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.29', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.30', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['3.31', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-        ['4.0', ['Green Hills MULTI','Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake']],
-      ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
-      return myMap.get(version.toString());
-    }
-    else
-    {
-      const myMap = new Map([
-        ['3.0', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.1', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.2', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.3', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.4', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.5', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.6', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.7', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.8', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.9', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.10', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.11', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.12', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.13', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.14', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.15', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.16', ['Ninja','Unix Makefiles','Xcode']],
-        ['3.17', ['Ninja','Ninja Multi-Config','Unix Makefiles','Xcode']],
-        ['3.18', ['Ninja','Ninja Multi-Config','Unix Makefiles','Xcode']],
-        ['3.19', ['Ninja','Ninja Multi-Config','Unix Makefiles','Xcode']],
-        ['3.20', ['Ninja','Ninja Multi-Config','Unix Makefiles','Xcode']],
-        ['3.21', ['Ninja','Ninja Multi-Config','Unix Makefiles','Xcode']],
-        ['3.22', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.23', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.24', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.25', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.26', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.27', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.28', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.29', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.30', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['3.31', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-        ['4.0', ['Ninja','Ninja Multi-Config','Unix Makefiles','Watcom WMake','Xcode']],
-      ]);
-      let version=semver.major(global.cmake_version)+'.'+semver.minor(global.cmake_version)
-      return myMap.get(version.toString());
     }
   }
 

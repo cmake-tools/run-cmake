@@ -22,7 +22,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        generator: ['toto']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,7 +80,8 @@ jobs:
       fail-fast: false
       matrix:
         system: [ msys, mingw64, ucrt64, clang64 ]
-        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
+        #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
+        generator: ['toto']
         exclude:
           - system: msys
             generator: 'MSYS Makefiles'

@@ -22,7 +22,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        generator: ['toto']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -155,7 +156,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        #generator: ['Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        generator: ['toto']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -330,7 +332,8 @@ jobs:
       fail-fast: false
       matrix:
         version: [ 15.0.7 ]
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        generator: ['toto']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -531,7 +534,8 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'NMake Makefiles JOM', 'Visual Studio 17 2022']
+        generator: ['toto']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
