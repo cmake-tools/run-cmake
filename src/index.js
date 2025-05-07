@@ -227,7 +227,7 @@ async function parseListGenerator()
       cerr = data.toString();
     }
   }
-  options.silent = true
+  options.silent = false
   let ret = await run('cmake','-G', options)
   cout=cout.replace("*", " ");
   cout=cout.replace("\r", " ");
