@@ -53,7 +53,7 @@ async function run(cmd,args, opts)
     }
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     let quotedArgs = [cmd].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
