@@ -915,23 +915,23 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      await configure(command_line_maker)
+      //await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
 
     }
     else if(mode==='build')
     {
-      await build(command_line_maker)
+      //await build(command_line_maker)
     }
     else if(mode==='install')
     {
-      await install(command_line_maker)
+      //await install(command_line_maker)
     }
     else if(mode==='all')
     {
-      await configure(command_line_maker)
-      await build(command_line_maker)
-      await install(command_line_maker)
+      //await configure(command_line_maker)
+      //await build(command_line_maker)
+      //await install(command_line_maker)
     }
   }
   catch (error)
