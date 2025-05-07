@@ -915,7 +915,7 @@ async function main()
     if(mode==='configure')
     {
       let toto = command_line_maker.configureCommandParameters();
-
+      console.log(`error ${command_line_maker.error()}`)
       if(!command_line_maker.error()) await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
 
