@@ -34916,8 +34916,7 @@ async function main()
     if(mode==='configure')
     {
       let toto = command_line_maker.buildCommandParameters();
-      if(command_line_maker.error()) return core.ExitCode.Failure;
-      //await configure(command_line_maker)
+      if(!command_line_maker.error()) await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
 
     }
