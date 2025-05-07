@@ -34054,7 +34054,7 @@ async function run(cmd,args, opts)
     }
     const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
     let quotedArgs = [cmd].concat(args)
-    quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
@@ -34351,8 +34351,8 @@ class CommandLineMaker
     this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
     if(this.install_prefix!='')
     {
-      if(process.env.MSYS2_LOCATION)this.install_prefix=path.resolve('/usr/local/',this.install_prefix)
-      else this.install_prefix=path.resolve(this.install_prefix)
+      //if(process.env.MSYS2_LOCATION)this.install_prefix=path.resolve('/usr/local/',this.install_prefix)
+      this.install_prefix=path.resolve(this.install_prefix)
       if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
     }
