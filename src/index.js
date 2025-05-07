@@ -327,7 +327,7 @@ class CommandLineMaker
     return ret;
   }
 
-  async #generator()
+  #generator()
   {
     this.generator = core.getInput('generator', { required: false });
     if(this.generator=='')
@@ -337,7 +337,7 @@ class CommandLineMaker
     }
     else
     {
-      let generators = await this.#parseListGenerator()
+      let generators = this.#parseListGenerator()
       if(!generators.includes(this.generator))
       {
         let gen = '['+generators.toString()+']'
