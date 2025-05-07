@@ -34915,7 +34915,7 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      command_line_maker.buildCommandParameters();
+      let toto = command_line_maker.buildCommandParameters();
       if(command_line_maker.error()) return core.ExitCode.Failure;
       await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
@@ -34923,17 +34923,17 @@ async function main()
     }
     else if(mode==='build')
     {
-      //await build(command_line_maker)
+      await build(command_line_maker)
     }
     else if(mode==='install')
     {
-      //await install(command_line_maker)
+      await install(command_line_maker)
     }
     else if(mode==='all')
     {
-      //await configure(command_line_maker)
-      //await build(command_line_maker)
-      //await install(command_line_maker)
+      await configure(command_line_maker)
+      await build(command_line_maker)
+      await install(command_line_maker)
     }
   }
   catch (error)
