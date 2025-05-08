@@ -138,6 +138,8 @@ jobs:
           - cmake_version: 3.21
             generator: 'Xcode'
     steps:
+      - name: kk
+        run: xcodebuild -sdk -version
       - name: Checkout
         uses: actions/checkout@v4
 
