@@ -113,6 +113,10 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
+        env:
+          CC: gcc
+          CXX: g++
+
         with:
           mode: configure
           generator: ${{ matrix.generator }}
@@ -294,6 +298,9 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
+        env:
+          CC: cl.exe
+          CXX: cl.exe
         with:
           mode: configure
           generator: ${{ matrix.generator }}
@@ -305,9 +312,6 @@ jobs:
           graphviz: './graph.dot'
           log_level: 'TRACE'
           log_context: true
-          variables: |
-            CMAKE_C_COMPILER=cl.exe
-            CMAKE_CXX_COMPILER=cl.exe
 
       - name: 🛠️ run-cmake (build)
         uses: ./
@@ -469,14 +473,14 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
+        env:
+          CC: C:/Program Files/LLVM/bin/clang.exe
+          CXX: C:/Program Files/LLVM/bin/clang++.exe
         with:
           mode: configure
           source_dir: './tests'
           install_prefix:  '../install'
           generator: ${{ matrix.generator }}
-          variables: |
-            CMAKE_C_COMPILER:PATH=C:/Program Files/LLVM/bin/clang.exe
-            CMAKE_CXX_COMPILER:PATH=C:/Program Files/LLVM/bin/clang++.exe
 
       - name: 🛠️ run-cmake (build)
         uses: ./
