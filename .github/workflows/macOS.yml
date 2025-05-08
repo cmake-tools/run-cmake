@@ -157,8 +157,7 @@ jobs:
         uses: ./
         id: configure
         env:
-          CC: '/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang'
-          CXX: '/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'
+          CMAKE_OSX_SYSROOT : /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk
         with:
           mode: configure
           generator: ${{ matrix.generator }}
