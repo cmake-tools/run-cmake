@@ -24,6 +24,7 @@ class CMake {
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
+    else this.#m_version=process.env.cmake_version
     console.log(this.#m_version)
     //await this.#parseVersion();
     //await this.#parseCapacities();
