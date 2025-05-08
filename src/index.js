@@ -110,7 +110,6 @@ class CMake
       cout = cout.substring(cout.indexOf("Generators") + 10);
       cout=cout.replace("*", " ");
       cout=cout.replace("\r", "");
-      console.log(cout)
       cout=cout.split("\n");
       for(const element of cout)
       {
@@ -119,7 +118,11 @@ class CMake
           let gen=element.split("=");
           gen=gen[0].trim()
           if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
-          else this.#m_generators=this.#m_generators.concat(gen)
+          else
+          {
+            console.log(gen)
+            this.#m_generators=this.#m_generators.concat(gen)
+          }
         }
       }
     }
