@@ -104,7 +104,7 @@ class CMake
         stdout: (data) => { cout += data.toString() },
         stderr: (data) => { cout += data.toString() }
       }
-      options.silent = true
+      options.silent = false
       options.failOnStdErr = false
       options.ignoreReturnCode = true
       await run('cmake',['--help'], options)
