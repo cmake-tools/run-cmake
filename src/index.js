@@ -67,7 +67,7 @@ class CMake {
       cerr =''
       await run('cmake',['-E','capabilities'], options)
     }
-    this.#parseVersion(cout)
+    this.#parseVersion(cerr)
   }
 
   static #parseVersion(string)
