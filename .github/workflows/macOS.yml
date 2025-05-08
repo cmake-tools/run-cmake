@@ -138,8 +138,6 @@ jobs:
           - cmake_version: 3.21
             generator: 'Xcode'
     steps:
-      - name: kk
-        run: xcodebuild -sdk -version
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -157,6 +155,8 @@ jobs:
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
+        env: 
+          CMAKE_OSX_SYSROOT: '/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/'
         id: configure
         with:
           mode: configure
