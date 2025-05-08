@@ -23,7 +23,7 @@ class CMake {
   static #m_generators = Array()
   static async init()
   {
-    await this.#parseCapacities()
+    await this.#infos()
     //await this.#parseVersion();
     //await this.#parseCapacities();
     //await this.#parseListGenerator();
@@ -38,7 +38,7 @@ class CMake {
   static version() { return this.#m_version }
   static generators() { return this.#m_generators }
 
-  static async #parseCapacities()
+  static async #infos()
   {
     let cout =''
     let cerr =''
@@ -52,11 +52,26 @@ class CMake {
     options.failOnStdErr = false
     options.ignoreReturnCode = true
     await run('cmake',['-E','capabilities'], options)
+    if(cout!='')
+    {
+      this.#m_capacities=JSON.parse(cout)
+    }
+    // if we are here and we don't have a CMake Error so CMake has lib problems ! Fix this fucking shitty Ubuntu
+    else if(!cerr.includes('CMake Error'))
+    {
+      await this.#fixCMake()
+      cout =''
+      cerr =''
+      await run('cmake',['-E','capabilities'], options)
+    }
+    console.log(`cout:\n ${cout}`)
+    console.log(`cerr:\n ${cerr}`)
+
     //if(this.is_greater_equal('3.7'))
     //{
 
-      console.log(`cout:\n ${cout}`)
-      console.log(`cerr:\n ${cerr}`)
+      //console.log(`cout:\n ${cout}`)
+      //console.log(`cerr:\n ${cerr}`)
 
       //this.#m_capacities=JSON.parse(cout)
     //}
