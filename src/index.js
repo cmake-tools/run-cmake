@@ -209,6 +209,16 @@ class CMake
     else return Array(source_dir)
   }
 
+  static async build()
+  {
+
+  }
+
+  static async install()
+  {
+
+  }
+
 }
 
 
