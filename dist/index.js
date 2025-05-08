@@ -31472,7 +31472,8 @@ class CMake {
   static #m_generators = Array()
   static async init()
   {
-    await this.#infos()
+    if(!process.env.cmake_version) await this.#infos()
+    console.log(this.#m_version)
     //await this.#parseVersion();
     //await this.#parseCapacities();
     //await this.#parseListGenerator();
@@ -31504,6 +31505,8 @@ class CMake {
     if(cout!='')
     {
       this.#m_capacities=JSON.parse(cout)
+      cout =''
+      cerr =''
     }
     // if we are here and we don't have a CMake Error so CMake has lib problems ! Fix this fucking shitty Ubuntu
     else if(!cerr.includes('CMake Error'))
@@ -31513,18 +31516,17 @@ class CMake {
       cerr =''
       await run('cmake',['-E','capabilities'], options)
     }
-    console.log(`cout:\n ${cout}`)
-    console.log(`cerr:\n ${cerr}`)
-
-    //if(this.is_greater_equal('3.7'))
-    //{
-
-      //console.log(`cout:\n ${cout}`)
-      //console.log(`cerr:\n ${cerr}`)
-
-      //this.#m_capacities=JSON.parse(cout)
-    //}
+    this.#parseVersion()
   }
+
+  static #parseVersion(string)
+  {
+    if(this.#m_capacities.hasOwnProperty('version')) this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0]
+    else this.#m_version=string.match(/\d\.\d[\\.\d]+/)[0]
+    core.exportVariable('cmake_version', this.#m_version);
+  }
+
+
 
   static async #parseListGenerator()
   {
@@ -31556,7 +31558,7 @@ class CMake {
       }
     }
   }
-  static async #parseVersion()
+  /*static async #parseVersion()
   {
   if(!process.env.cmake_version)
   {
@@ -31573,7 +31575,7 @@ class CMake {
       }
     }
     options.silent = true
-    /* First time it can fail due to this fucking shitty Ubuntu ! */
+    // First time it can fail due to this fucking shitty Ubuntu ! //
     try
     {
       ret = await run('cmake',['--version'],options)
@@ -31593,7 +31595,7 @@ class CMake {
     }
   }
   else this.#m_version=process.env.cmake_version
-}
+}*/
 
 static async #fixCMake()
 {
