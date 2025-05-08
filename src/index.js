@@ -106,7 +106,7 @@ class CMake
       options.silent = true
       options.failOnStdErr = false
       options.ignoreReturnCode = true
-      await run('cmake',command, options)
+      await run('cmake',['--help'], options)
       cout = cout.substring(cout.indexOf("Generators") + 10);
       cout=cout.replace("*", " ");
       cout=cout.replace("\r", "");
