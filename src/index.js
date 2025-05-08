@@ -120,7 +120,6 @@ class CMake
           if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
           else
           {
-            console.log(gen)
             this.#m_generators=this.#m_generators.concat(gen)
           }
         }
@@ -982,6 +981,7 @@ async function main()
       case 'configure':
       {
         cmake.configure()
+        console.log(cmake.generators())
         break
       }
       case 'build':
