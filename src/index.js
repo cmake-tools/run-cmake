@@ -12,14 +12,12 @@ const style = require('ansi-styles');
 require('dotenv').config();
 
 
-async function os_is()
+function os_is()
 {
   if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
   else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
   else return process.platform
 }
-
-
 
 class CMake
 {
@@ -27,10 +25,12 @@ class CMake
   static #m_capacities = JSON.parse('{}')
   static #m_generators = Array()
   static #m_mode
+  static #m_default_generator = ''
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
+    this.#determineDefaultGenerator()
     this.#parseMode()
     return this;
   }
@@ -166,6 +166,8 @@ class CMake
     let command = []
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir())
+    command=command.concat(this.#generator())
+    console.log(command)
     let cout = ''
     let cerr = ''
     const options = {};
@@ -211,6 +213,30 @@ class CMake
     source_dir=path.resolve(source_dir)
     if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
     else return Array(source_dir)
+  }
+
+  static async #determineDefaultGenerator()
+  {
+    console.log(os_is())
+    switch(os_is())
+    {
+      case "linux":
+      {
+        this.#m_default_generator = 'Unix Makefiles'
+        break
+      }
+      case "darwin":
+      {
+        this.#m_default_generator = 'Xcode'
+        break
+      }
+    }
+  }
+
+  static #generator()
+  {
+    if(this.#m_default_generator!='') return Array('-G',this.#m_default_generator)
+    else return Array()
   }
 
   static async build()
