@@ -8,6 +8,8 @@ const parser = require('action-input-parser')
 const os = require("node:os");
 const artifact = require('@actions/artifact');
 const { json } = require('node:stream/consumers');
+const style = require('ansi-styles');
+require('dotenv').config();
 
 
 async function os_is()
@@ -17,29 +19,32 @@ async function os_is()
   else return process.platform
 }
 
-class CMake {
+
+
+class CMake
+{
   static #m_version = '0';
   static #m_capacities = JSON.parse('{}')
   static #m_generators = Array()
+  static #m_mode
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
-    console.log(this.#m_version)
-    console.log(this.#m_generators)
-    //await this.#parseVersion();
-    //await this.#parseCapacities();
-    //await this.#parseListGenerator();
-    //console.log(this.#m_generators)
-    //console.log(this.#m_version)
+    this.#parseMode()
     return this;
   }
+
   static is_greater_equal(version)
   {
     return compare_version.compare(this.#m_version, version, '>=')
   }
+
   static version() { return this.#m_version }
+
   static generators() { return this.#m_generators }
+
+  static mode() { return this.#m_mode}
 
   static async #infos()
   {
@@ -137,8 +142,73 @@ class CMake {
         global.fix_done = true;
       }
     }
-  return 0;
+    return 0;
   }
+
+  /* Detect which mode the user wants :
+  - configure: CMake configure the project only.
+  - build: CMake build the project only.
+  - install: CMake install the project.
+  - all: CMake configure, build and install in a row.
+  By default CMake is in configure mode.
+  */
+  static #parseMode()
+  {
+    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
+    if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
+  }
+
+  static async configure()
+  {
+    let command = []
+    command=command.concat(this.#build_dir())
+    command=command.concat(this.#source_dir())
+    let cout = ''
+    let cerr = ''
+    const options = {};
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      stdline: (data) => { console.log(data)},
+      errline: (data) => { console.log(data)},
+    }
+    options.silent = true
+    options.cwd = this.#working_directory()
+    let ret = await run('cmake',command,options)
+  }
+
+  // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
+  static #working_directory()
+  {
+    if(this.is_greater_equal('3.13')) return path.resolve('./')
+    else return process.env.binary_dir
+  }
+
+  static #build_dir()
+  {
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: '../build', disableable: false })
+    binary_dir=path.resolve(binary_dir)
+    core.exportVariable('binary_dir', binary_dir);
+    if(this.is_greater_equal('3.13')) return Array('-B',binary_dir)
+    else
+    {
+      io.mkdirP(binary_dir)
+      return Array()
+    }
+  }
+
+  static #source_dir()
+  {
+    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE ? process.env.GITHUB_WORKSPACE : './' , disableable: false });
+    source_dir=path.resolve(source_dir)
+    if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
+    else return Array(source_dir)
+  }
+
 }
 
 
@@ -164,28 +234,6 @@ async function run(cmd,args, opts)
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
-}
-
-async function getCapabilities()
-{
-  if(CMakeVersionGreaterEqual('3.7'))
-  {
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    options.silent = true
-    await run('cmake',['-E','capabilities'], options)
-    return JSON.parse(cout);
-  }
-  else return '{}'
 }
 
 
@@ -849,20 +897,6 @@ class CommandLineMaker
   }
 }
 
-/* Detect which mode the user wants :
-- configure: CMake configure the project only.
-- build: CMake build the project only.
-- install: CMake install the project.
-- all: CMake configure, build and install in a row.
-By default CMake is in configure mode.
-*/
-function getMode()
-{
-  const mode = parser.getInput('mode', {type: 'string',default:'configure'})
-  if(mode!='configure' && mode!='build' && mode!='install' && mode!='all') throw String('mode should be configure, build, install or all')
-  return mode;
-}
-
 async function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
@@ -926,7 +960,33 @@ async function main()
 {
   try
   {
-    const cmake = await CMake.init();
+    let cmake = await CMake.init();
+    console.log(`Running CMake v${cmake.version()} in ${cmake.mode()} mode`)
+    switch(cmake.mode())
+    {
+      case 'configure':
+      {
+        cmake.configure()
+        break
+      }
+      case 'build':
+      {
+        cmake.build()
+        break
+      }
+      case 'install':
+      {
+        cmake.install()
+        break
+      }
+      case 'all':
+      {
+        cmake.configure()
+        cmake.build()
+        cmake.install()
+        break
+      }
+    }
     //console.log(cmake.version())
     //console.log(cmake.generators())
     //let ret;

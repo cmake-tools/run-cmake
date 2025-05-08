@@ -31404,6 +31404,245 @@ const checkPathExt = (path, options) => {
 const checkStat = (stat, path, options) => stat.isFile() && checkPathExt(path, options);
 //# sourceMappingURL=win32.js.map
 
+/***/ }),
+
+/***/ 8746:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "backgroundColorNames": () => (/* binding */ backgroundColorNames),
+/* harmony export */   "colorNames": () => (/* binding */ colorNames),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   "foregroundColorNames": () => (/* binding */ foregroundColorNames),
+/* harmony export */   "modifierNames": () => (/* binding */ modifierNames)
+/* harmony export */ });
+const ANSI_BACKGROUND_OFFSET = 10;
+
+const wrapAnsi16 = (offset = 0) => code => `\u001B[${code + offset}m`;
+
+const wrapAnsi256 = (offset = 0) => code => `\u001B[${38 + offset};5;${code}m`;
+
+const wrapAnsi16m = (offset = 0) => (red, green, blue) => `\u001B[${38 + offset};2;${red};${green};${blue}m`;
+
+const styles = {
+	modifier: {
+		reset: [0, 0],
+		// 21 isn't widely supported and 22 does the same thing
+		bold: [1, 22],
+		dim: [2, 22],
+		italic: [3, 23],
+		underline: [4, 24],
+		overline: [53, 55],
+		inverse: [7, 27],
+		hidden: [8, 28],
+		strikethrough: [9, 29],
+	},
+	color: {
+		black: [30, 39],
+		red: [31, 39],
+		green: [32, 39],
+		yellow: [33, 39],
+		blue: [34, 39],
+		magenta: [35, 39],
+		cyan: [36, 39],
+		white: [37, 39],
+
+		// Bright color
+		blackBright: [90, 39],
+		gray: [90, 39], // Alias of `blackBright`
+		grey: [90, 39], // Alias of `blackBright`
+		redBright: [91, 39],
+		greenBright: [92, 39],
+		yellowBright: [93, 39],
+		blueBright: [94, 39],
+		magentaBright: [95, 39],
+		cyanBright: [96, 39],
+		whiteBright: [97, 39],
+	},
+	bgColor: {
+		bgBlack: [40, 49],
+		bgRed: [41, 49],
+		bgGreen: [42, 49],
+		bgYellow: [43, 49],
+		bgBlue: [44, 49],
+		bgMagenta: [45, 49],
+		bgCyan: [46, 49],
+		bgWhite: [47, 49],
+
+		// Bright color
+		bgBlackBright: [100, 49],
+		bgGray: [100, 49], // Alias of `bgBlackBright`
+		bgGrey: [100, 49], // Alias of `bgBlackBright`
+		bgRedBright: [101, 49],
+		bgGreenBright: [102, 49],
+		bgYellowBright: [103, 49],
+		bgBlueBright: [104, 49],
+		bgMagentaBright: [105, 49],
+		bgCyanBright: [106, 49],
+		bgWhiteBright: [107, 49],
+	},
+};
+
+const modifierNames = Object.keys(styles.modifier);
+const foregroundColorNames = Object.keys(styles.color);
+const backgroundColorNames = Object.keys(styles.bgColor);
+const colorNames = [...foregroundColorNames, ...backgroundColorNames];
+
+function assembleStyles() {
+	const codes = new Map();
+
+	for (const [groupName, group] of Object.entries(styles)) {
+		for (const [styleName, style] of Object.entries(group)) {
+			styles[styleName] = {
+				open: `\u001B[${style[0]}m`,
+				close: `\u001B[${style[1]}m`,
+			};
+
+			group[styleName] = styles[styleName];
+
+			codes.set(style[0], style[1]);
+		}
+
+		Object.defineProperty(styles, groupName, {
+			value: group,
+			enumerable: false,
+		});
+	}
+
+	Object.defineProperty(styles, 'codes', {
+		value: codes,
+		enumerable: false,
+	});
+
+	styles.color.close = '\u001B[39m';
+	styles.bgColor.close = '\u001B[49m';
+
+	styles.color.ansi = wrapAnsi16();
+	styles.color.ansi256 = wrapAnsi256();
+	styles.color.ansi16m = wrapAnsi16m();
+	styles.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
+	styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+	styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+
+	// From https://github.com/Qix-/color-convert/blob/3f0e0d4e92e235796ccb17f6e85c72094a651f49/conversions.js
+	Object.defineProperties(styles, {
+		rgbToAnsi256: {
+			value: (red, green, blue) => {
+				// We use the extended greyscale palette here, with the exception of
+				// black and white. normal palette only has 4 greyscale shades.
+				if (red === green && green === blue) {
+					if (red < 8) {
+						return 16;
+					}
+
+					if (red > 248) {
+						return 231;
+					}
+
+					return Math.round(((red - 8) / 247) * 24) + 232;
+				}
+
+				return 16
+					+ (36 * Math.round(red / 255 * 5))
+					+ (6 * Math.round(green / 255 * 5))
+					+ Math.round(blue / 255 * 5);
+			},
+			enumerable: false,
+		},
+		hexToRgb: {
+			value: hex => {
+				const matches = /[a-f\d]{6}|[a-f\d]{3}/i.exec(hex.toString(16));
+				if (!matches) {
+					return [0, 0, 0];
+				}
+
+				let [colorString] = matches;
+
+				if (colorString.length === 3) {
+					colorString = [...colorString].map(character => character + character).join('');
+				}
+
+				const integer = Number.parseInt(colorString, 16);
+
+				return [
+					/* eslint-disable no-bitwise */
+					(integer >> 16) & 0xFF,
+					(integer >> 8) & 0xFF,
+					integer & 0xFF,
+					/* eslint-enable no-bitwise */
+				];
+			},
+			enumerable: false,
+		},
+		hexToAnsi256: {
+			value: hex => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
+			enumerable: false,
+		},
+		ansi256ToAnsi: {
+			value: code => {
+				if (code < 8) {
+					return 30 + code;
+				}
+
+				if (code < 16) {
+					return 90 + (code - 8);
+				}
+
+				let red;
+				let green;
+				let blue;
+
+				if (code >= 232) {
+					red = (((code - 232) * 10) + 8) / 255;
+					green = red;
+					blue = red;
+				} else {
+					code -= 16;
+
+					const remainder = code % 36;
+
+					red = Math.floor(code / 36) / 5;
+					green = Math.floor(remainder / 6) / 5;
+					blue = (remainder % 6) / 5;
+				}
+
+				const value = Math.max(red, green, blue) * 2;
+
+				if (value === 0) {
+					return 30;
+				}
+
+				// eslint-disable-next-line no-bitwise
+				let result = 30 + ((Math.round(blue) << 2) | (Math.round(green) << 1) | Math.round(red));
+
+				if (value === 2) {
+					result += 60;
+				}
+
+				return result;
+			},
+			enumerable: false,
+		},
+		rgbToAnsi: {
+			value: (red, green, blue) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red, green, blue)),
+			enumerable: false,
+		},
+		hexToAnsi: {
+			value: hex => styles.ansi256ToAnsi(styles.hexToAnsi256(hex)),
+			enumerable: false,
+		},
+	});
+
+	return styles;
+}
+
+const ansiStyles = assembleStyles();
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ansiStyles);
+
+
 /***/ })
 
 /******/ 	});
@@ -31439,6 +31678,34 @@ const checkStat = (stat, path, options) => stat.isFile() && checkPathExt(path, o
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -31457,6 +31724,8 @@ const parser = __nccwpck_require__(3455)
 const os = __nccwpck_require__(612);
 const artifact = __nccwpck_require__(5253);
 const { json } = __nccwpck_require__(6465);
+const style = __nccwpck_require__(8746);
+(__nccwpck_require__(8603).config)();
 
 
 async function os_is()
@@ -31466,29 +31735,32 @@ async function os_is()
   else return process.platform
 }
 
-class CMake {
+
+
+class CMake
+{
   static #m_version = '0';
   static #m_capacities = JSON.parse('{}')
   static #m_generators = Array()
+  static #m_mode
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
-    console.log(this.#m_version)
-    console.log(this.#m_generators)
-    //await this.#parseVersion();
-    //await this.#parseCapacities();
-    //await this.#parseListGenerator();
-    //console.log(this.#m_generators)
-    //console.log(this.#m_version)
+    this.#parseMode()
     return this;
   }
+
   static is_greater_equal(version)
   {
     return compare_version.compare(this.#m_version, version, '>=')
   }
+
   static version() { return this.#m_version }
+
   static generators() { return this.#m_generators }
+
+  static mode() { return this.#m_mode}
 
   static async #infos()
   {
@@ -31586,8 +31858,73 @@ class CMake {
         global.fix_done = true;
       }
     }
-  return 0;
+    return 0;
   }
+
+  /* Detect which mode the user wants :
+  - configure: CMake configure the project only.
+  - build: CMake build the project only.
+  - install: CMake install the project.
+  - all: CMake configure, build and install in a row.
+  By default CMake is in configure mode.
+  */
+  static #parseMode()
+  {
+    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
+    if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
+  }
+
+  static async configure()
+  {
+    let command = []
+    command=command.concat(this.#build_dir())
+    command=command.concat(this.#source_dir())
+    let cout = ''
+    let cerr = ''
+    const options = {};
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      stdline: (data) => { console.log(data)},
+      errline: (data) => { console.log(data)},
+    }
+    options.silent = true
+    options.cwd = this.#working_directory()
+    let ret = await run('cmake',command,options)
+  }
+
+  // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
+  static #working_directory()
+  {
+    if(this.is_greater_equal('3.13')) return path.resolve('./')
+    else return process.env.binary_dir
+  }
+
+  static #build_dir()
+  {
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: '../build', disableable: false })
+    binary_dir=path.resolve(binary_dir)
+    core.exportVariable('binary_dir', binary_dir);
+    if(this.is_greater_equal('3.13')) return Array('-B',binary_dir)
+    else
+    {
+      io.mkdirP(binary_dir)
+      return Array()
+    }
+  }
+
+  static #source_dir()
+  {
+    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE ? process.env.GITHUB_WORKSPACE : './' , disableable: false });
+    source_dir=path.resolve(source_dir)
+    if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
+    else return Array(source_dir)
+  }
+
 }
 
 
@@ -31613,28 +31950,6 @@ async function run(cmd,args, opts)
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
-}
-
-async function getCapabilities()
-{
-  if(CMakeVersionGreaterEqual('3.7'))
-  {
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    options.silent = true
-    await run('cmake',['-E','capabilities'], options)
-    return JSON.parse(cout);
-  }
-  else return '{}'
 }
 
 
@@ -32298,20 +32613,6 @@ class CommandLineMaker
   }
 }
 
-/* Detect which mode the user wants :
-- configure: CMake configure the project only.
-- build: CMake build the project only.
-- install: CMake install the project.
-- all: CMake configure, build and install in a row.
-By default CMake is in configure mode.
-*/
-function getMode()
-{
-  const mode = parser.getInput('mode', {type: 'string',default:'configure'})
-  if(mode!='configure' && mode!='build' && mode!='install' && mode!='all') throw String('mode should be configure, build, install or all')
-  return mode;
-}
-
 async function configure(command_line_maker)
 {
   let params=command_line_maker.configureCommandParameters()
@@ -32375,7 +32676,33 @@ async function main()
 {
   try
   {
-    const cmake = await CMake.init();
+    let cmake = await CMake.init();
+    console.log(`Running CMake v${cmake.version()} in ${cmake.mode()} mode`)
+    switch(cmake.mode())
+    {
+      case 'configure':
+      {
+        cmake.configure()
+        break
+      }
+      case 'build':
+      {
+        cmake.build()
+        break
+      }
+      case 'install':
+      {
+        cmake.install()
+        break
+      }
+      case 'all':
+      {
+        cmake.configure()
+        cmake.build()
+        cmake.install()
+        break
+      }
+    }
     //console.log(cmake.version())
     //console.log(cmake.generators())
     //let ret;
