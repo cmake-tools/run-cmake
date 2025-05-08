@@ -40,20 +40,24 @@ class CMake {
 
   static async #parseCapacities()
   {
-    let cout ='';
+    let cout =''
+    let cerr =''
     const options = {};
     options.listeners =
     {
       stdout: (data) => { cout += data.toString() },
-      stderr: (data) => { cout += data.toString() }
+      stderr: (data) => { cerr += data.toString() }
     }
     options.silent = true
     options.failOnStdErr = false
     options.ignoreReturnCode = true
+    await run('cmake',['-E','capabilities'], options)
     //if(this.is_greater_equal('3.7'))
     //{
-      await run('cmake',['-E','capabilities55'], options)
-      console.log(cout)
+
+      console.log(`cout:\n ${cout}`)
+      console.log(`cerr:\n ${cerr}`)
+
       //this.#m_capacities=JSON.parse(cout)
     //}
   }
