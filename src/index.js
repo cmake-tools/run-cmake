@@ -5,9 +5,10 @@ const compare_version = require('compare-versions')
 const io = require('@actions/io');
 const path = require('path')
 const parser = require('action-input-parser')
-const semver = require('semver')
 const os = require("node:os");
-const artifact = require('@actions/artifact')
+const artifact = require('@actions/artifact');
+const { json } = require('node:stream/consumers');
+
 
 async function os_is()
 {
@@ -16,51 +17,79 @@ async function os_is()
   else return process.platform
 }
 
-async function fixCMake()
-{
-  if(!global.fix_done)
+class CMake {
+  static #m_version = '0';
+  static #m_capacities = JSON.parse('{}')
+  static #m_generators = Array()
+  static async init()
   {
-    let ret;
+    await this.#parseCapacities()
+    //await this.#parseVersion();
+    //await this.#parseCapacities();
+    //await this.#parseListGenerator();
+    //console.log(this.#m_generators)
+    //console.log(this.#m_version)
+    return this;
+  }
+  static is_greater_equal(version)
+  {
+    return compare_version.compare(this.#m_version, version, '>=')
+  }
+  static version() { return this.#m_version }
+  static generators() { return this.#m_generators }
+
+  static async #parseCapacities()
+  {
+    let cout ='';
     const options = {};
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cout += data.toString() }
+    }
     options.silent = true
-    if( await os_is() === "linux")
-    {
-      ret = await exec.exec('sudo apt-get update', [], options)
-      if(ret!=0) return ret;
-      ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-      if(ret!=0) return ret;
-      ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-      if(ret!=0) return ret;
-      global.fix_done = true;
-    }
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    //if(this.is_greater_equal('3.7'))
+    //{
+      await run('cmake',['-E','capabilities55'], options)
+      console.log(cout)
+      //this.#m_capacities=JSON.parse(cout)
+    //}
   }
-  return 0;
-}
 
-/**
- * @param {string[]} args
- * @param {object} opts
- */
-async function run(cmd,args, opts)
-{
-  if(global.is_msys2)
+  static async #parseListGenerator()
   {
-    const tmp_dir = process.env['RUNNER_TEMP'];
-    if(!tmp_dir)
+    let cout ='';
+    const options = {};
+    options.listeners =
     {
-      core.setFailed('environment variable RUNNER_TEMP is undefined');
-      return;
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cout += data.toString() }
     }
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
-    let quotedArgs = [cmd].concat(args)
-    //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
-    return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
+    options.silent = true
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    let command = ['--help']
+    if(this.is_greater_equal('3.3')) command = ['-G']
+    await run('cmake',command, options)
+    cout = cout.substring(cout.indexOf("Generators") + 10);
+    cout=cout.replace("*", " ");
+    cout=cout.replace("\r", "");
+    cout=cout.split("\n");
+    for(const element of cout)
+    {
+      if(element.includes('='))
+      {
+        let gen=element.split("=");
+        gen=gen[0].trim()
+        if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
+        else this.#m_generators=this.#m_generators.concat(gen)
+      }
+    }
   }
-  else return await exec.exec(cmd,args,opts)
-}
-
-async function getCMakeVersion()
-{
+  static async #parseVersion()
+  {
   if(!process.env.cmake_version)
   {
     let ret
@@ -83,15 +112,67 @@ async function getCMakeVersion()
     }
     catch(error)
     {
-      ret = await fixCMake()
+      ret = await this.#fixCMake()
       ret = await run('cmake',['--version'],options)
     }
     if(ret!=0) throw cerr.toString()
-    let version_number = cout.match(/\d\.\d[\\.\d]+/)
-    if (version_number.length === 0 || version_number === null) throw String('Failing to parse CMake version')
-    else core.exportVariable('cmake_version', version_number[0]);
+    this.#m_version = cout.match(/\d\.\d[\\.\d]+/)
+    if (this.#m_version.length === 0) throw String('Failing to parse CMake version')
+    else
+    {
+      this.#m_version=this.#m_version[0]
+      core.exportVariable('cmake_version', this.#m_version);
+    }
   }
-  return process.env.cmake_version
+  else this.#m_version=process.env.cmake_version
+}
+
+static async #fixCMake()
+{
+  if(!global.fix_done)
+  {
+    let ret;
+    const options = {};
+    options.silent = true
+    if( await os_is() === "linux")
+    {
+      ret = await exec.exec('sudo apt-get update', [], options)
+      if(ret!=0) return ret;
+      ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+      if(ret!=0) return ret;
+      ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+      if(ret!=0) return ret;
+      global.fix_done = true;
+    }
+  }
+  return 0;
+}
+
+}
+
+
+
+
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ */
+async function run(cmd,args, opts)
+{
+  if(global.is_msys2)
+  {
+    const tmp_dir = process.env['RUNNER_TEMP'];
+    if(!tmp_dir)
+    {
+      core.setFailed('environment variable RUNNER_TEMP is undefined');
+      return;
+    }
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
+    let quotedArgs = [cmd].concat(args)
+    //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
+    return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
+  }
+  else return await exec.exec(cmd,args,opts)
 }
 
 async function getCapabilities()
@@ -231,44 +312,6 @@ class CommandLineMaker
   }
 
   /* Configure */
-
-  async #parseListGenerator()
-  {
-    let cout ='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout += data.toString();
-      },
-      stderr: (data) => {
-        cout += data.toString();
-      }
-    }
-    options.silent = true
-    options.failOnStdErr = false
-    options.ignoreReturnCode = true
-    let ret
-    if(CMakeVersionGreaterEqual('3.3')) ret = await run('cmake',['-G'], options)
-    else ret = await run('cmake',['--help'], options)
-    cout = cout.substring(cout.indexOf("Generators") + 10);
-    cout=cout.replace("*", " ");
-    cout=cout.replace("\r", " ");
-    cout=cout.split("\n");
-    let generators = Array()
-    for(const element of cout)
-    {
-      if(element.includes('='))
-      {
-        let gen=element.split("=");
-        gen=gen[0].trim()
-        if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { /* empty */ }
-        else generators=generators.concat(gen)
-      }
-    }
-    return generators;
-  }
-
-
    #source_dir()
   {
     let source_dir = core.getInput('source_dir', { required: false, default: '' });
@@ -333,30 +376,32 @@ class CommandLineMaker
   }
   #generator()
   {
-      this.generator = core.getInput('generator', { required: false });
-      if(this.generator=='')
+    //console.log("Here11")
+    this.generator = core.getInput('generator', { required: false });
+    //if(this.generator=='')
+    //{
+     //   if(process.platform === "win32") this.generator="NMake Makefiles"
+        /*else*/
+    //}
+    /*this.#parseListGenerator().then((gens)=>{
+      console.log(gens)
+      console.log(this.generator)
+      let generator="Unix Makefiles"
+      if(gens.includes(generator))
       {
-        if(process.platform === "win32") this.generator="NMake Makefiles"
-        else this.generator="Unix Makefiles"
+
+        let gen = '['+gens.toString()+']'
+        throw String('Generator '+generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
       }
-      else
-      {
-        this.#parseListGenerator().then((gens) =>
-          {
-            if(!gens.includes(this.generator))
-            {
-              let gen = '['+gens.toString()+']'
-              throw String('Generator '+this.generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
-            }
-          }
-        ).catch((error)=>{ this.m_error=true/*; kill(error)*/})
-      }
+    }).catch((error)=>{console.log(error)})*/
+
       if(!CMakeVersionGreaterEqual('3.1.0'))
       {
         this.#platform() /** TODO fix this mess dude */
         if(this.platform!='')this.generator=this.generator+' '+this.platform
       }
-      return Array('-G',this.generator)
+      this.generator = Array('-G',this.generator)
+      return false;
   }
 
   #toolset()
@@ -508,23 +553,26 @@ class CommandLineMaker
     return []
   }
 
-   configureCommandParameters()
+  configureCommandParameters()
   {
     let ret = true
     let options=[]
 
     options=options.concat(this.#binary_dir())
     // First check is initial_cache file exist
-    const initial_cache = this.#initial_cache()
+    /*const initial_cache = this.#initial_cache()
     if(Array.isArray(initial_cache) && initial_cache.length !== 0)
     {
       options=options.concat(initial_cache)
     }
     options=options.concat(this.#remove_variables())
-    options=options.concat(this.#variables())
-    options=options.concat(this.#generator())
-    //options=options.concat(this.#generator())
-    options=options.concat(this.#toolset())
+    options=options.concat(this.#variables())*/
+    //console.log("Here1")
+    this.#generator()
+    options=options.concat(this.generator)
+    //console.log(this.m_error)
+    //console.log("Here2")
+    /*options=options.concat(this.#toolset())
     options=options.concat(this.#platform())
     options=options.concat(this.#toolchain())
     options=options.concat(this.#install_prefix())
@@ -535,8 +583,9 @@ class CommandLineMaker
     options=options.concat(this.#graphviz())
     options=options.concat(this.#log_level())
     options=options.concat(this.#log_context())
-
+*/
     options=options.concat(this.#source_dir()) // Need to be the last
+    //console.log(options)
     return options
   }
 
@@ -886,9 +935,12 @@ async function main()
 {
   try
   {
-    let ret;
-    global.cmake_version = await getCMakeVersion()
-    console.log(`Running CMake v${global.cmake_version}`)
+    const cmake = await CMake.init();
+    //console.log(cmake.version())
+    //console.log(cmake.generators())
+    //let ret;
+    //global.cmake_version = await getCMakeVersion()
+    /*console.log(`Running CMake v${global.cmake_version}`)
     getCapabilities()
 
     let toto = await os_is()
@@ -914,9 +966,9 @@ async function main()
     let mode = getMode()
     if(mode==='configure')
     {
-      let toto = command_line_maker.configureCommandParameters();
-      console.log(`error ${command_line_maker.error()}`)
-      if(!command_line_maker.error()) await configure(command_line_maker)
+      command_line_maker.configureCommandParameters()
+      //console.log(`error ${command_line_maker.error()}`)
+      //if(!command_line_maker.error()) await configure(command_line_maker)
       //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
 
     }
@@ -933,7 +985,7 @@ async function main()
       await configure(command_line_maker)
       await build(command_line_maker)
       await install(command_line_maker)
-    }
+    }*/
   }
   catch (error)
   {
