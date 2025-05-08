@@ -156,6 +156,9 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
+        env:
+          CC: /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+          CXX: /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
         with:
           mode: configure
           generator: ${{ matrix.generator }}
