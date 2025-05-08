@@ -26,6 +26,7 @@ class CMake {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
     console.log(this.#m_version)
+    console.log(this.#m_generators)
     //await this.#parseVersion();
     //await this.#parseCapacities();
     //await this.#parseListGenerator();
@@ -69,6 +70,7 @@ class CMake {
       await run('cmake',['-E','capabilities'], options)
     }
     this.#parseVersion(cerr)
+    this.#parseGenerators()
   }
 
   static #parseVersion(string)
@@ -78,98 +80,65 @@ class CMake {
     core.exportVariable('cmake_version', this.#m_version);
   }
 
-
-
-  static async #parseListGenerator()
+  static async #parseGenerators()
   {
-    let cout ='';
-    const options = {};
-    options.listeners =
+    if(this.#m_capacities.hasOwnProperty('generators'))
     {
-      stdout: (data) => { cout += data.toString() },
-      stderr: (data) => { cout += data.toString() }
-    }
-    options.silent = true
-    options.failOnStdErr = false
-    options.ignoreReturnCode = true
-    let command = ['--help']
-    if(this.is_greater_equal('3.3')) command = ['-G']
-    await run('cmake',command, options)
-    cout = cout.substring(cout.indexOf("Generators") + 10);
-    cout=cout.replace("*", " ");
-    cout=cout.replace("\r", "");
-    cout=cout.split("\n");
-    for(const element of cout)
-    {
-      if(element.includes('='))
+      for(var i= 0 ; i!= this.#m_capacities.generators.length; ++i)
       {
-        let gen=element.split("=");
-        gen=gen[0].trim()
-        if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
-        else this.#m_generators=this.#m_generators.concat(gen)
+        this.#m_generators=this.#m_generators.concat(this.#m_capacities.generators[i].name)
       }
     }
-  }
-  /*static async #parseVersion()
-  {
-  if(!process.env.cmake_version)
-  {
-    let ret
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    options.silent = true
-    // First time it can fail due to this fucking shitty Ubuntu ! //
-    try
-    {
-      ret = await run('cmake',['--version'],options)
-    }
-    catch(error)
-    {
-      ret = await this.#fixCMake()
-      ret = await run('cmake',['--version'],options)
-    }
-    if(ret!=0) throw cerr.toString()
-    this.#m_version = cout.match(/\d\.\d[\\.\d]+/)
-    if (this.#m_version.length === 0) throw String('Failing to parse CMake version')
     else
     {
-      this.#m_version=this.#m_version[0]
-      core.exportVariable('cmake_version', this.#m_version);
+      let cout ='';
+      const options = {};
+      options.listeners =
+      {
+        stdout: (data) => { cout += data.toString() },
+        stderr: (data) => { cout += data.toString() }
+      }
+      options.silent = true
+      options.failOnStdErr = false
+      options.ignoreReturnCode = true
+      await run('cmake',command, options)
+      cout = cout.substring(cout.indexOf("Generators") + 10);
+      cout=cout.replace("*", " ");
+      cout=cout.replace("\r", "");
+      cout=cout.split("\n");
+      for(const element of cout)
+      {
+        if(element.includes('='))
+        {
+          let gen=element.split("=");
+          gen=gen[0].trim()
+          if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
+          else this.#m_generators=this.#m_generators.concat(gen)
+        }
+      }
     }
   }
-  else this.#m_version=process.env.cmake_version
-}*/
 
-static async #fixCMake()
-{
-  if(!global.fix_done)
+  static async #fixCMake()
   {
-    let ret;
-    const options = {};
-    options.silent = true
-    if( await os_is() === "linux")
+    if(!global.fix_done)
     {
-      ret = await exec.exec('sudo apt-get update', [], options)
-      if(ret!=0) return ret;
-      ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
-      if(ret!=0) return ret;
-      ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
-      if(ret!=0) return ret;
-      global.fix_done = true;
+      let ret;
+      const options = {};
+      options.silent = true
+      if( await os_is() === "linux")
+      {
+        ret = await exec.exec('sudo apt-get update', [], options)
+        if(ret!=0) return ret;
+        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
+        if(ret!=0) return ret;
+        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
+        if(ret!=0) return ret;
+        global.fix_done = true;
+      }
     }
-  }
   return 0;
-}
-
+  }
 }
 
 
