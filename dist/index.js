@@ -31748,6 +31748,7 @@ class CMake
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
     this.#parseMode()
+    console.log(this.#m_generators)
     return this;
   }
 
