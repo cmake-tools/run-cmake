@@ -174,11 +174,12 @@ class CMake
       stdout: (data) => { cout += data.toString() },
       stderr: (data) => { cerr += data.toString() },
       stdline: (data) => { console.log(data)},
-      errline: (data) => { console.log(data)},
+      errline: (data) => { },
     }
     options.silent = true
     options.cwd = this.#working_directory()
     let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
   }
 
   // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
