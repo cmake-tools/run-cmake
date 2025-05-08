@@ -31791,7 +31791,7 @@ class CMake
       await run('cmake',['-E','capabilities'], options)
     }
     this.#parseVersion(cerr)
-    this.#parseGenerators()
+    await this.#parseGenerators()
   }
 
   static #parseVersion(string)
