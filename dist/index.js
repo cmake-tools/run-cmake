@@ -31883,7 +31883,7 @@ class CMake
     command=command.concat(this.#build_dir())
     command=command.concat(this.#generator())
     console.log(`tototo ${process.env.SDKROOT}`)
-    command=command.concat(['-DCMAKE_C_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang','-DCMAKE_CXX_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'])
+    //command=command.concat(['-DCMAKE_C_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang','-DCMAKE_CXX_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'])
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
     let cout = ''
@@ -31946,6 +31946,8 @@ class CMake
       case "darwin":
       {
         this.#m_default_generator = 'Xcode'
+        await exec.exec('xcrun', ['--sdk','macosx','--show-sdk-path'])
+        //process.env. =SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
         break
       }
       case "win32":
