@@ -165,8 +165,9 @@ class CMake
   {
     let command = []
     command=command.concat(this.#build_dir())
-    command=command.concat(this.#source_dir())
     command=command.concat(this.#generator())
+    command=command.concat(['-DCMAKE_C_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang','-DCMAKE_CXX_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'])
+    command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
     let cout = ''
     let cerr = ''
@@ -228,6 +229,12 @@ class CMake
       case "darwin":
       {
         this.#m_default_generator = 'Xcode'
+        break
+      }
+      case "win32":
+      {
+        if(this.#generator.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
+        else this.#m_default_generator = 'NMake Makefiles'
         break
       }
     }
