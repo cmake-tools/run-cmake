@@ -1,0 +1,78 @@
+name: cygwin
+
+on:
+  push:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/cygwin.yml'
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/**'
+      - '!.github/workflows/cygwin.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  cygwin:
+    runs-on: windows-latest
+    name: cygwin (${{ matrix.generator }})
+    env:
+      CYGWIN: true
+    strategy:
+      fail-fast: false
+      matrix:
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        generator: ['toto']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: ./tests
+      - name: ⬇️ Setup Cygwin
+        uses: cygwin/cygwin-install-action@master
+        with:
+          packages: gcc cmake ninja
+
+
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: 'configure'
+        with:
+          mode: configure
+          generator: ${{matrix.generator}}
+          install_prefix: ../install
+          binary_dir: ../build
+          source_dir: ./tests
+          graphviz: ./dots/dependencies.dot
+      - uses: actions/upload-artifact@v4
+        name: 📤 Upload dot files
+        with:
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          path: ./dots/*
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
+          overwrite: true
+          include-hidden-files: false
+      - name: 🛠️ run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+          config: Debug
+          clean_first: true
+          build_verbose: true
+
+      - name: 📥 run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
+          install_verbose: true
