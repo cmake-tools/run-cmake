@@ -26,6 +26,7 @@ class CMake
   static #m_generators = Array()
   static #m_mode
   static #m_default_generator = ''
+  static #m_default_cc_cxx = []
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
@@ -164,6 +165,7 @@ class CMake
   static async configure()
   {
     let command = []
+    command=command.concat(this.#m_default_cc_cxx)
     command=command.concat(this.#build_dir())
     command=command.concat(this.#generator())
     console.log(`tototo ${process.env.SDKROOT}`)
@@ -245,6 +247,10 @@ class CMake
           options.silent = true
           await exec.exec('xcrun', ['--show-sdk-path'],options)
           process.env.SDKROOT=cout
+          cout = ''
+          cerr = ''
+          await exec.exec('xcrun', ['--find','clang'],options)
+          this.#m_default_cc_cxx=['-DCMAKE_C_COMPILER',cout,'-DCMAKE_CXX_COMPILER',cout+'++']
           console.log(process.env.SDKROOT)
         }
         break
