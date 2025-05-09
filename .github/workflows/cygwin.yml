@@ -55,7 +55,7 @@ jobs:
         with:
           packages: ${{ matrix.compiler }} cmake ninja
       - name: Print GCC version
-        run: gcc --version
+        run: ${{ env.CC }} --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
@@ -123,7 +123,7 @@ jobs:
         with:
           packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }} cmake ninja
       - name: Print clang version
-        run: clang --version
+        run: ${{ env.CC }} --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
