@@ -31962,7 +31962,7 @@ class CMake
           }
           options.silent = true
           await exec.exec('xcrun', ['--show-sdk-path'],options)
-          process.env.SDKROOT=cout
+          process.env.SDKROOT=cout.replace('\n','')
           cout = ''
           cerr = ''
           await exec.exec('xcrun', ['--find','clang'],options)
