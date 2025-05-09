@@ -31946,7 +31946,7 @@ class CMake
       case "darwin":
       {
         this.#m_default_generator = 'Xcode'
-        await exec.exec('xcrun', ['--sdk','macosx','--show-sdk-path'])
+        await exec.exec('xcrun', ['--show-sdk-path'])
         //process.env. =SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
         break
       }

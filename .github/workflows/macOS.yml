@@ -157,7 +157,6 @@ jobs:
           - '4.0'
         #generator: ['Unix Makefiles', 'Xcode', 'Ninja', 'Ninja Multi-Config']
         generator: ['toto']
-        xcode_version: ['15.0.1', '15.1', '15.2', '15.3', '15.4', '16.1','16.2']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
