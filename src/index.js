@@ -262,6 +262,15 @@ class CMake
       {
         if(this.#m_generators.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
         else this.#m_default_generator = 'NMake Makefiles'
+        /* Read CC CXX */
+        if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
+        {
+          this.#m_default_generator = 'Unix Makefiles'
+        }
+        if(process.env.CXX !== undefined && (process.env.CXX.includes('g++')||process.env.CXX.includes('clang++')))
+        {
+          this.#m_default_generator = 'Unix Makefiles'
+        }
         break
       }
     }
