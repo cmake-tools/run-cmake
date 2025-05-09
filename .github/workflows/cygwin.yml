@@ -96,21 +96,18 @@ jobs:
 
   cygwin-clang:
     runs-on: windows-latest
-    name: cygwin (${{ matrix.compiler}}${{ matrix.generator }})
+    name: cygwin (${{ matrix.compiler_type}}${{ matrix.compiler_version }},${{ matrix.generator }})
     env:
       CYGWIN: true
-      CC: clang
-      CXX: clang++
+      CC: ${{ matrix.compiler_type == 'clang' && 'x86_64-w64-mingw32-clang' }}
+      CXX: ${{ matrix.compiler_type == 'clang++' && 'x86_64-w64-mingw32-clang++' }}
     strategy:
       fail-fast: false
       matrix:
         #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         generator: ['toto']
-        compiler:
-          - clang=5.0.1-2
-          - clang=8.0.1-1
-          - mingw64-x86_64-clang=5.0.1-2
-          - mingw64-x86_64-clang=8.0.1-1
+        compiler_version: ['5.0.1-2','8.0.1-1']
+        compiler_type: ['clang', 'mingw64-x86_64-clang']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -124,7 +121,7 @@ jobs:
       - name: ⬇️ Setup Cygwin
         uses: cygwin/cygwin-install-action@master
         with:
-          packages: ${{ matrix.compiler }} cmake ninja
+          packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }} cmake ninja
       - name: Print clang version
         run: clang --version
       - name: ⚙️ run-cmake (configure)
