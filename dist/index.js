@@ -5888,6 +5888,220 @@ module.exports.parse = parse
 
 /***/ }),
 
+/***/ 6972:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var fs = __nccwpck_require__(7147)
+var path = __nccwpck_require__(1017)
+var os = __nccwpck_require__(2037)
+
+// Workaround to fix webpack's build warnings: 'the request of a dependency is an expression'
+var runtimeRequire =  true ? eval("require") : 0 // eslint-disable-line
+
+var vars = (process.config && process.config.variables) || {}
+var prebuildsOnly = !!process.env.PREBUILDS_ONLY
+var abi = process.versions.modules // TODO: support old node where this is undef
+var runtime = isElectron() ? 'electron' : (isNwjs() ? 'node-webkit' : 'node')
+
+var arch = process.env.npm_config_arch || os.arch()
+var platform = process.env.npm_config_platform || os.platform()
+var libc = process.env.LIBC || (isAlpine(platform) ? 'musl' : 'glibc')
+var armv = process.env.ARM_VERSION || (arch === 'arm64' ? '8' : vars.arm_version) || ''
+var uv = (process.versions.uv || '').split('.')[0]
+
+module.exports = load
+
+function load (dir) {
+  return runtimeRequire(load.resolve(dir))
+}
+
+load.resolve = load.path = function (dir) {
+  dir = path.resolve(dir || '.')
+
+  try {
+    var name = runtimeRequire(path.join(dir, 'package.json')).name.toUpperCase().replace(/-/g, '_')
+    if (process.env[name + '_PREBUILD']) dir = process.env[name + '_PREBUILD']
+  } catch (err) {}
+
+  if (!prebuildsOnly) {
+    var release = getFirst(path.join(dir, 'build/Release'), matchBuild)
+    if (release) return release
+
+    var debug = getFirst(path.join(dir, 'build/Debug'), matchBuild)
+    if (debug) return debug
+  }
+
+  var prebuild = resolve(dir)
+  if (prebuild) return prebuild
+
+  var nearby = resolve(path.dirname(process.execPath))
+  if (nearby) return nearby
+
+  var target = [
+    'platform=' + platform,
+    'arch=' + arch,
+    'runtime=' + runtime,
+    'abi=' + abi,
+    'uv=' + uv,
+    armv ? 'armv=' + armv : '',
+    'libc=' + libc,
+    'node=' + process.versions.node,
+    process.versions.electron ? 'electron=' + process.versions.electron : '',
+     true ? 'webpack=true' : 0 // eslint-disable-line
+  ].filter(Boolean).join(' ')
+
+  throw new Error('No native build was found for ' + target + '\n    loaded from: ' + dir + '\n')
+
+  function resolve (dir) {
+    // Find matching "prebuilds/<platform>-<arch>" directory
+    var tuples = readdirSync(path.join(dir, 'prebuilds')).map(parseTuple)
+    var tuple = tuples.filter(matchTuple(platform, arch)).sort(compareTuples)[0]
+    if (!tuple) return
+
+    // Find most specific flavor first
+    var prebuilds = path.join(dir, 'prebuilds', tuple.name)
+    var parsed = readdirSync(prebuilds).map(parseTags)
+    var candidates = parsed.filter(matchTags(runtime, abi))
+    var winner = candidates.sort(compareTags(runtime))[0]
+    if (winner) return path.join(prebuilds, winner.file)
+  }
+}
+
+function readdirSync (dir) {
+  try {
+    return fs.readdirSync(dir)
+  } catch (err) {
+    return []
+  }
+}
+
+function getFirst (dir, filter) {
+  var files = readdirSync(dir).filter(filter)
+  return files[0] && path.join(dir, files[0])
+}
+
+function matchBuild (name) {
+  return /\.node$/.test(name)
+}
+
+function parseTuple (name) {
+  // Example: darwin-x64+arm64
+  var arr = name.split('-')
+  if (arr.length !== 2) return
+
+  var platform = arr[0]
+  var architectures = arr[1].split('+')
+
+  if (!platform) return
+  if (!architectures.length) return
+  if (!architectures.every(Boolean)) return
+
+  return { name, platform, architectures }
+}
+
+function matchTuple (platform, arch) {
+  return function (tuple) {
+    if (tuple == null) return false
+    if (tuple.platform !== platform) return false
+    return tuple.architectures.includes(arch)
+  }
+}
+
+function compareTuples (a, b) {
+  // Prefer single-arch prebuilds over multi-arch
+  return a.architectures.length - b.architectures.length
+}
+
+function parseTags (file) {
+  var arr = file.split('.')
+  var extension = arr.pop()
+  var tags = { file: file, specificity: 0 }
+
+  if (extension !== 'node') return
+
+  for (var i = 0; i < arr.length; i++) {
+    var tag = arr[i]
+
+    if (tag === 'node' || tag === 'electron' || tag === 'node-webkit') {
+      tags.runtime = tag
+    } else if (tag === 'napi') {
+      tags.napi = true
+    } else if (tag.slice(0, 3) === 'abi') {
+      tags.abi = tag.slice(3)
+    } else if (tag.slice(0, 2) === 'uv') {
+      tags.uv = tag.slice(2)
+    } else if (tag.slice(0, 4) === 'armv') {
+      tags.armv = tag.slice(4)
+    } else if (tag === 'glibc' || tag === 'musl') {
+      tags.libc = tag
+    } else {
+      continue
+    }
+
+    tags.specificity++
+  }
+
+  return tags
+}
+
+function matchTags (runtime, abi) {
+  return function (tags) {
+    if (tags == null) return false
+    if (tags.runtime && tags.runtime !== runtime && !runtimeAgnostic(tags)) return false
+    if (tags.abi && tags.abi !== abi && !tags.napi) return false
+    if (tags.uv && tags.uv !== uv) return false
+    if (tags.armv && tags.armv !== armv) return false
+    if (tags.libc && tags.libc !== libc) return false
+
+    return true
+  }
+}
+
+function runtimeAgnostic (tags) {
+  return tags.runtime === 'node' && tags.napi
+}
+
+function compareTags (runtime) {
+  // Precedence: non-agnostic runtime, abi over napi, then by specificity.
+  return function (a, b) {
+    if (a.runtime !== b.runtime) {
+      return a.runtime === runtime ? -1 : 1
+    } else if (a.abi !== b.abi) {
+      return a.abi ? -1 : 1
+    } else if (a.specificity !== b.specificity) {
+      return a.specificity > b.specificity ? -1 : 1
+    } else {
+      return 0
+    }
+  }
+}
+
+function isNwjs () {
+  return !!(process.versions && process.versions.nw)
+}
+
+function isElectron () {
+  if (process.versions && process.versions.electron) return true
+  if (process.env.ELECTRON_RUN_AS_NODE) return true
+  return typeof window !== 'undefined' && window.process && window.process.type === 'renderer'
+}
+
+function isAlpine (platform) {
+  return platform === 'linux' && fs.existsSync('/etc/alpine-release')
+}
+
+// Exposed for unit tests
+// TODO: move to lib
+load.parseTags = parseTags
+load.matchTags = matchTags
+load.compareTags = compareTags
+load.parseTuple = parseTuple
+load.matchTuple = matchTuple
+load.compareTuples = compareTuples
+
+
+/***/ }),
+
 /***/ 2751:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -31712,8 +31926,38 @@ const ansiStyles = assembleStyles();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: external "node:events"
+var external_node_events_ = __nccwpck_require__(5673);
+;// CONCATENATED MODULE: external "node:path"
+const external_node_path_namespaceObject = require("node:path");
+;// CONCATENATED MODULE: external "node:url"
+const external_node_url_namespaceObject = require("node:url");
+// EXTERNAL MODULE: ./node_modules/node-gyp-build/node-gyp-build.js
+var node_gyp_build = __nccwpck_require__(6972);
+// EXTERNAL MODULE: external "node:util"
+var external_node_util_ = __nccwpck_require__(7261);
+;// CONCATENATED MODULE: ./node_modules/snooplogg/dist/index.js
+const d=10,w=(o=0)=>e=>`\x1B[${e+o}m`,$=(o=0)=>e=>`\x1B[${38+o};5;${e}m`,_=(o=0)=>(e,t,r)=>`\x1B[${38+o};2;${e};${t};${r}m`,s={modifier:{reset:[0,0],bold:[1,22],dim:[2,22],italic:[3,23],underline:[4,24],overline:[53,55],inverse:[7,27],hidden:[8,28],strikethrough:[9,29]},color:{black:[30,39],red:[31,39],green:[32,39],yellow:[33,39],blue:[34,39],magenta:[35,39],cyan:[36,39],white:[37,39],blackBright:[90,39],gray:[90,39],grey:[90,39],redBright:[91,39],greenBright:[92,39],yellowBright:[93,39],blueBright:[94,39],magentaBright:[95,39],cyanBright:[96,39],whiteBright:[97,39]},bgColor:{bgBlack:[40,49],bgRed:[41,49],bgGreen:[42,49],bgYellow:[43,49],bgBlue:[44,49],bgMagenta:[45,49],bgCyan:[46,49],bgWhite:[47,49],bgBlackBright:[100,49],bgGray:[100,49],bgGrey:[100,49],bgRedBright:[101,49],bgGreenBright:[102,49],bgYellowBright:[103,49],bgBlueBright:[104,49],bgMagentaBright:[105,49],bgCyanBright:[106,49],bgWhiteBright:[107,49]}};Object.keys(s.modifier);const v=Object.keys(s.color),R=Object.keys(s.bgColor);[...v,...R];function N(){const o=new Map;for(const[e,t]of Object.entries(s)){for(const[r,i]of Object.entries(t))s[r]={open:`\x1B[${i[0]}m`,close:`\x1B[${i[1]}m`},t[r]=s[r],o.set(i[0],i[1]);Object.defineProperty(s,e,{value:t,enumerable:!1})}return Object.defineProperty(s,"codes",{value:o,enumerable:!1}),s.color.close="\x1B[39m",s.bgColor.close="\x1B[49m",s.color.ansi=w(),s.color.ansi256=$(),s.color.ansi16m=_(),s.bgColor.ansi=w(d),s.bgColor.ansi256=$(d),s.bgColor.ansi16m=_(d),Object.defineProperties(s,{rgbToAnsi256:{value:(e,t,r)=>e===t&&t===r?e<8?16:e>248?231:Math.round((e-8)/247*24)+232:16+36*Math.round(e/255*5)+6*Math.round(t/255*5)+Math.round(r/255*5),enumerable:!1},hexToRgb:{value:e=>{const t=/[a-f\d]{6}|[a-f\d]{3}/i.exec(e.toString(16));if(!t)return[0,0,0];let[r]=t;r.length===3&&(r=[...r].map(a=>a+a).join(""));const i=Number.parseInt(r,16);return[i>>16&255,i>>8&255,i&255]},enumerable:!1},hexToAnsi256:{value:e=>s.rgbToAnsi256(...s.hexToRgb(e)),enumerable:!1},ansi256ToAnsi:{value:e=>{if(e<8)return 30+e;if(e<16)return 90+(e-8);let t,r,i;if(e>=232)t=((e-232)*10+8)/255,r=t,i=t;else{e-=16;const h=e%36;t=Math.floor(e/36)/5,r=Math.floor(h/6)/5,i=h%6/5}const a=Math.max(t,r,i)*2;if(a===0)return 30;let n=30+(Math.round(i)<<2|Math.round(r)<<1|Math.round(t));return a===2&&(n+=60),n},enumerable:!1},rgbToAnsi:{value:(e,t,r)=>s.ansi256ToAnsi(s.rgbToAnsi256(e,t,r)),enumerable:!1},hexToAnsi:{value:e=>s.ansi256ToAnsi(s.hexToAnsi256(e)),enumerable:!1}}),s}const x=N();function y(o){return o===null||typeof o!="object"?!1:Object.getPrototypeOf(o)?.constructor.name==="Object"}class m{buffer;_head=0;_maxSize;_size=0;constructor(e=0){if(typeof e!="number")throw new TypeError("Expected max size to be a number");if(Number.isNaN(e)||e<0)throw new RangeError("Expected max size to be zero or greater");this.buffer=Array(e|0),this._maxSize=e}get head(){return this._head}get maxSize(){return this._maxSize}set maxSize(e){if(typeof e!="number")throw new TypeError("Expected max size to be a number");if(Number.isNaN(e)||e<0)throw new RangeError("Expected max size to be zero or greater");if(e===this._maxSize)return;const t=new m(e);for(const r of this)r!==void 0&&t.push(r);this.buffer=t.buffer,this._head=t.head,this._maxSize=t._maxSize,this._size=t.size}get size(){return this._size}push(e){return this._maxSize>0&&(this._size>0&&this._head++,this._head>=this._maxSize&&(this._head=0),this._size=Math.min(this._size+1,this._maxSize),this.buffer[this._head]=e),this}clear(){return this.buffer=Array(this._maxSize),this._head=0,this._size=0,this}[Symbol.iterator](){let e=0;return{next:()=>{e=Math.min(e,this._maxSize);let t=this.head+e-(this._size-1);t<0&&(t+=this._maxSize);const r=e++>=this._size;return{value:r?void 0:this.buffer[t],done:r}}}}}function E(o){let e=3957909437,t=325035406;for(let l=0,u=o.length;l<u;l++){const f=o.charCodeAt(l);e=Math.imul(e^f,2654435761),t=Math.imul(t^f,1597334677)}e=Math.imul(e^e>>>16,2246822507),e^=Math.imul(t^t>>>13,3266489909),t=Math.imul(t^t>>>16,2246822507),t^=Math.imul(e^e>>>13,3266489909);const r=4294967296*(2097151&t)+(e>>>0),i=r%360,a=(r%50+50)/100,n=(r%60+30)/100,h=a*Math.min(n,1-n),c=(l,u=(l+i/30)%12)=>n-h*Math.max(Math.min(u-3,9-u,1),-1);return{r:Math.round(255*c(0)),g:Math.round(255*c(8)),b:Math.round(255*c(4))}}const k=/^\s*at (.* )?(\(?.+\)?)$/,b={error(o,e){const t=`${e.redBright.open}${o.toString()}${e.redBright.close}`;let r="";return o.stack&&(r=o.stack.split(`
+`).slice(1).map((i,a,n)=>{const h=i.match(k);let c=`${e.gray.open}${a+1<n.length?"\u251C":"\u2514"}\u2500 ${h?"":i.trim()}${e.gray.close}`;if(h){const[l,u,f]=h,j=u?`${e.whiteBright.open}${e.italic.open}${u}${e.italic.close}${e.whiteBright.close}`:"";c+=`${j}${e.white.open}${f}${e.white.close}`}return c}).join(`
+`)),r?`${t}
+${r}`:t},message(o,e,t){return e==="trace"?`${t.white.open}${o}${t.white.close}`:o},method(o,e){const t=o.toUpperCase().padEnd(5);switch(o){case"debug":return`${e.magenta.open}${t}${e.magenta.close}`;case"info":return`${e.green.open}${t}${e.green.close}`;case"warn":return`${e.yellow.open}${t}${e.yellow.close}`;case"error":return`${e.redBright.open}${t}${e.redBright.close}`;case"panic":return`${e.bgRed.open}${e.white.open}${t}${e.white.close}${e.bgRed.close}`;default:return`${e.gray.open}${t}${e.gray.close}`}},namespace(o,{color:e,nsToRgb:t,rgbToAnsi256:r}){const{r:i,g:a,b:n}=t(o);return`${e.ansi256(r(i,a,n))}${o}${e.close}`},timestamp(o,e){return`${e.gray.open}${o.toISOString().replace("T"," ").replace("Z","")}${e.gray.close}`},uptime(o,e){return`${e.gray.open}${o.toFixed(3).padStart(8)}s${e.gray.close}`}},C=["[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\\u0007)","(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"].join("|"),M=new RegExp(C,"g");class B extends Function{constructor(e){return super(),Object.setPrototypeOf(e,new.target.prototype)}}class p extends B{_log;_trace;_debug;_info;_warn;_error;_panic;ns;nsPath;root;subnamespaces={};constructor(e,t=null,r){if(super(i=>this.initChild(i)),this.nsPath=[],this.root=e,r!==void 0){if(!r||typeof r!="string")throw new TypeError("Expected namespace to be a string");if(/[\s,|]+/.test(r))throw new Error("Namespace cannot contain spaces, commas, or pipe characters");this.nsPath=t?[...t.nsPath,r]:[r]}this.ns=this.nsPath.join(":")}initChild(e){return this.subnamespaces[e]||(this.subnamespaces[e]=new p(this.root,this,e)),this.subnamespaces[e]}initMethod(e){return(...t)=>(this.root.dispatch({args:t,method:e,ns:this.ns,ts:new Date,uptime:process.uptime()}),this)}get log(){return this._log||(this._log=this.initMethod("log")),this._log}get trace(){return this._trace||(this._trace=this.initMethod("trace")),this._trace}get debug(){return this._debug||(this._debug=this.initMethod("debug")),this._debug}get info(){return this._info||(this._info=this.initMethod("info")),this._info}get warn(){return this._warn||(this._warn=this.initMethod("warn")),this._warn}get error(){return this._error||(this._error=this.initMethod("error")),this._error}get panic(){return this._panic||(this._panic=this.initMethod("panic")),this._panic}}class T extends B{allow=null;colors=!0;elements={};format;history=new m;id=Math.round(Math.random()*1e9);ignore=null;onSnoopMessage=null;logger;streams=new Map;constructor(e){super(t=>this.logger.initChild(t)),this.logger=new p(this),e&&this.config(e)}config(e={}){if(typeof e!="object")throw new TypeError("Expected logger options to be an object");if(e.colors!==void 0){if(typeof e.colors!="boolean")throw new TypeError("Expected colors to be a boolean");this.colors=e.colors}if(e.format&&typeof e.format!="function")throw new TypeError("Expected format to be a function");if(this.format=e.format,e.elements!==void 0){if(typeof e.elements!="object")throw new TypeError("Expected elements to be an object");if(e.elements){for(const[t,r]of Object.entries(e.elements))if(b[t]&&typeof r!="function")throw new TypeError(`Expected "${t}" elements to be a function`)}this.elements=e.elements}if(e.historySize!==void 0)try{this.history.maxSize=e.historySize}catch(t){throw t instanceof Error&&(t.message=`Invalid history size: ${t.message}`,t.stack=`${t.toString()}${t.stack?.substring(t.stack.indexOf(`
+`))||""}`),t}return this}dispatch({args:e,id:t=this.id,method:r,ns:i,ts:a,uptime:n}){const h={args:e,id:t,method:r,ns:i,ts:a,uptime:n};this.history.push(h),this.writeToStreams(h),t===this.id&&globalThis.snooplogg.emit("message",h)}enable(e=""){if(typeof e!="string"&&!(e instanceof RegExp))throw new TypeError("Expected pattern to be a string or regex");let t=null,r=null;if(e==="*"||e instanceof RegExp)t=e;else if(e&&typeof e=="string"){const i=[],a=[];for(let n of e.split(/[,|]+/))n=n.trim(),n&&(n=n.replaceAll("*",".*?"),n[0]==="-"?a.push(n.slice(1)):i.push(n));t=new RegExp(`^(${i.join("|")})(:.+|$)`),a.length&&(r=new RegExp(`^(${a.join("|")})$`))}return this.allow=t,this.ignore=r,this}isEnabled(e){const t=this.allow;return t===null?!1:!!(!e||t==="*"||t instanceof RegExp&&t.test(e)&&(!this.ignore||!this.ignore.test(e)))}pipe(e,t={}){if(!e||typeof e.write!="function")throw new TypeError("Invalid stream");if(this.streams.has(e))return this;const r=()=>this.streams.delete(e);if(this.streams.set(e,{colors:t.colors,elements:t.elements,format:t.format,onEnd:r}),e.on("end",r),t.flush)for(const i of this.history)i&&this.writeToStreams(i);return this}unpipe(e){if(!e||typeof e.write!="function")throw new TypeError("Invalid stream");const t=this.streams.get(e);return t?.onEnd&&(e.removeListener("end",t.onEnd),this.streams.delete(e)),this}snoop(e){if(e!==void 0&&typeof e!="string")throw new TypeError("Expected namespace prefix to be a string");return this.unsnoop(),this.onSnoopMessage=t=>{t&&typeof t=="object"&&t.id!==this.id&&this.dispatch(e?{...t,ns:`${e}${t.ns||""}`}:t)},globalThis.snooplogg.on("message",this.onSnoopMessage),this}unsnoop(){return this.onSnoopMessage&&(globalThis.snooplogg.off("message",this.onSnoopMessage),this.onSnoopMessage=null),this}writeToStreams(e){const{args:t,method:r,ns:i,ts:a,uptime:n}=e;if(this.isEnabled(i))for(const[h,c]of this.streams.entries()){if(h.writableObjectMode){h.write(e);continue}const l=c?.format||this.format||S,u=c.colors??(this.colors&&h.isTTY!==!1);let f=`${l({args:t,colors:u,method:r,ns:i,elements:{...b,...this.elements,...c?.elements},ts:a,uptime:n},Object.defineProperties({...x,nsToRgb:E},Object.getOwnPropertyDescriptors(x)))}
+`;u||(f=f.replace(M,"")),h.write(f)}}get log(){return this.logger.log}get trace(){return this.logger.trace}get debug(){return this.logger.debug}get info(){return this.logger.info}get warn(){return this.logger.warn}get error(){return this.logger.error}get panic(){return this.logger.panic}}function S({args:o,colors:e,elements:t,method:r,ns:i,uptime:a},n){const h=`${t.uptime(a,n)} ${i?`${t.namespace(i,n)} `:""}${r&&r!=="log"?`${t.method(r,n)} `:""}`,c=o.map(l=>y(l)?(0,external_node_util_.inspect)(l,{breakLength:0,colors:e,depth:4,showHidden:!1}):l);for(let l=0,u=c.length;l<u;l++){const f=c[l];f instanceof Error&&(c[l]=t.error(f,n))}return (0,external_node_util_.format)(...c).split(`
+`).map(l=>h+t.message(l,r,n)).join(`
+`)}Object.getOwnPropertyDescriptor(globalThis,"snooplogg")||Object.defineProperty(globalThis,"snooplogg",{value:new external_node_events_.EventEmitter});const g=new T().enable(process.env.SNOOPLOGG||process.env.DEBUG).pipe(process.stderr),F=g.log.bind(g),P=g.trace.bind(g),G=g.debug.bind(g),I=g.info.bind(g),D=g.warn.bind(g),L=g.error.bind(g),Z=g.panic.bind(g);
+//# sourceMappingURL=index.js.map
+
+;// CONCATENATED MODULE: ./node_modules/winreglib/dist/index.js
+const f=(0,external_node_path_namespaceObject.dirname)((0,external_node_path_namespaceObject.dirname)((0,external_node_url_namespaceObject.fileURLToPath)(import.meta.url))),r=node_gyp_build(f),n=g("winreglib");class dist_s extends external_node_events_.EventEmitter{key;stop;constructor(t){super(),this.key=t;const e=this.emit.bind(this);r.watch(t,e),this.stop=()=>r.unwatch(this.key,e)}}class dist_p extends external_node_events_.EventEmitter{nss={};constructor(){super(),r.init((t,e)=>{this.emit("log",e),t?(this.nss[t]||(this.nss[t]=n(t)),this.nss[t].log(e)):n.log(e)})}get(t,e){if(!t||typeof t!="string")throw new TypeError("Expected key to be a non-empty string");if(!e||typeof e!="string")throw new TypeError("Expected value name to be a non-empty string");return r.get(t,e)}list(t){if(!t||typeof t!="string")throw new TypeError("Expected key to be a non-empty string");return r.list(t)}watch(t){if(!t||typeof t!="string")throw new TypeError("Expected key to be a non-empty string");return new dist_s(t)}}var a=new dist_p;
+//# sourceMappingURL=index.js.map
+
+;// CONCATENATED MODULE: ./src/index.js
 const core = __nccwpck_require__(6519);
 const exec = __nccwpck_require__(1372);
 const which = __nccwpck_require__(6315)
@@ -31728,9 +31972,13 @@ const style = __nccwpck_require__(8746);
 (__nccwpck_require__(8603).config)();
 
 
+
+
+
 function os_is()
 {
   if(process.env.MSYSTEM !== undefined) return String(process.env.MSYSTEM).toLowerCase()
+  if(process.env.CYGWIN) return 'cygwin'
   else return process.platform
 }
 
@@ -31997,6 +32245,8 @@ class CMake
       case "mingw32":
       {
         this.#m_default_generator = "MSYS Makefiles"
+        console.log(`CC=====${process.env.CC}`)
+        console.log(`CXX=====${process.env.CXX}`)
         break
       }
       case "cygwin":

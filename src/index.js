@@ -15,6 +15,7 @@ require('dotenv').config();
 function os_is()
 {
   if(process.env.MSYSTEM !== undefined) return String(process.env.MSYSTEM).toLowerCase()
+  if(process.env.CYGWIN) return 'cygwin'
   else return process.platform
 }
 
@@ -281,6 +282,8 @@ class CMake
       case "mingw32":
       {
         this.#m_default_generator = "MSYS Makefiles"
+        console.log(`CC=====${process.env.CC}`)
+        console.log(`CXX=====${process.env.CXX}`)
         break
       }
       case "cygwin":

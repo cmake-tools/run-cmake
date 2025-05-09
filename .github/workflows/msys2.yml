@@ -19,6 +19,8 @@ jobs:
   cygwin:
     runs-on: windows-latest
     name: cygwin (${{ matrix.generator }})
+    env:
+      CYGWIN: true
     strategy:
       fail-fast: false
       matrix:
@@ -37,6 +39,7 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: gcc cmake ninja
+
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
