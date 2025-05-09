@@ -288,7 +288,7 @@ class CMake
       }
       case "cygwin":
       {
-        this.#m_default_generator = "MinGW Makefiles"
+        this.#m_default_generator = "Unix Makefiles"
         break
       }
 
