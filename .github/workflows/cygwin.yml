@@ -21,6 +21,9 @@ jobs:
     name: cygwin (${{ matrix.compiler}},${{ matrix.generator }})
     env:
       CYGWIN: true
+      CC: gcc
+      CXX: g++
+
     strategy:
       fail-fast: false
       matrix:
@@ -51,13 +54,11 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler }} cmake ninja
-
+      - name: Print GCC version
+        run: gcc --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
-        env:
-          CC: gcc
-          CXX: g++
         with:
           mode: configure
           generator: ${{matrix.generator}}
@@ -98,6 +99,8 @@ jobs:
     name: cygwin (${{ matrix.compiler}}${{ matrix.generator }})
     env:
       CYGWIN: true
+      CC: clang
+      CXX: clang++
     strategy:
       fail-fast: false
       matrix:
@@ -122,13 +125,11 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler }} cmake ninja
-
+      - name: Print clang version
+        run: clang --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
-        env:
-          CC: clang
-          CXX: clang++
         with:
           mode: configure
           generator: ${{matrix.generator}}
