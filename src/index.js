@@ -250,14 +250,17 @@ class CMake
           cout = ''
           cerr = ''
           await exec.exec('xcrun', ['--find','clang'],options)
-          this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${cout}`,`-DCMAKE_CXX_COMPILER:PATH=${cout}`+`++`]
+          cout=cout.replace('\n','')
+          let CC = cout
+          let CXX = String(cout + '++')
+          this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`]
           console.log(process.env.SDKROOT)
         }
         break
       }
       case "win32":
       {
-        if(this.#generator.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
+        if(this.#m_generators.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
         else this.#m_default_generator = 'NMake Makefiles'
         break
       }
