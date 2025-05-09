@@ -31966,7 +31966,7 @@ class CMake
           cout = ''
           cerr = ''
           await exec.exec('xcrun', ['--find','clang'],options)
-          this.#m_default_cc_cxx=['-DCMAKE_C_COMPILER',cout,'-DCMAKE_CXX_COMPILER',cout+'++']
+          this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${cout}`,`-DCMAKE_CXX_COMPILER:PATH=${cout}`+`++`]
           console.log(process.env.SDKROOT)
         }
         break
