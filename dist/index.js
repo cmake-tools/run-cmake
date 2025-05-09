@@ -31730,8 +31730,7 @@ const style = __nccwpck_require__(8746);
 
 function os_is()
 {
-  if(process.env.MSYSTEM === 'MSYS') return 'cygwin'
-  else if (process.env.MSYSTEM === 'UCRT64' || process.env.MSYSTEM === 'CLANG64' || process.env.MSYSTEM === 'CLANGARM64' || process.env.MSYSTEM === 'MINGW64') return 'msys2'
+  if(process.env.MSYSTEM !== undefined) return String(process.env.MSYSTEM).toLowerCase()
   else return process.platform
 }
 
@@ -31989,6 +31988,23 @@ class CMake
         }
         break
       }
+      case "msys":
+      case "ucrt64":
+      case "clang64":
+      case "clangarm64":
+      case "mingw64":
+      case "clang32":
+      case "mingw32":
+      {
+        this.#m_default_generator = "MSYS Makefiles"
+        break
+      }
+      case "cygwin":
+      {
+        this.#m_default_generator = "MinGW Makefiles"
+        break
+      }
+
     }
   }
 
