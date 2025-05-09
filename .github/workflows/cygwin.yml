@@ -16,9 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cygwin:
+  cygwin-gcc:
     runs-on: windows-latest
-    name: cygwin (${{ matrix.compiler}}${{ matrix.generator }})
+    name: cygwin (${{ matrix.compiler}},${{ matrix.generator }})
     env:
       CYGWIN: true
     strategy:
@@ -32,15 +32,11 @@ jobs:
           - gcc-g++=13.3.1+20250424-0.1
           - gcc-g++=14.2.1+20250425-0.1
           - gcc-g++=15.1.1+20250426-0.1
-          - mingw64-x86_64-gcc-g++=11.4.0
-          - mingw64-x86_64-gcc-g++=11.5.0
-          - mingw64-x86_64-gcc-g++=12.4.0
-          - mingw64-x86_64-gcc-g++=13.3.0
-          - mingw64-x86_64-gcc-g++=14.2.0
-          - clang=5.0.1
-          - clang=8.0.1
-          - mingw64-x86_64-clang=5.0.1
-          - mingw64-x86_64-clang=8.0.1
+          - mingw64-x86_64-gcc-g++=11.4.0-1
+          - mingw64-x86_64-gcc-g++=11.5.0-1
+          - mingw64-x86_64-gcc-g++=12.4.0-1
+          - mingw64-x86_64-gcc-g++=13.3.0-1
+          - mingw64-x86_64-gcc-g++=14.2.0-1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,6 +55,80 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
+        env:
+          CC: gcc
+          CXX: g++
+        with:
+          mode: configure
+          generator: ${{matrix.generator}}
+          install_prefix: ../install
+          binary_dir: ../build
+          source_dir: ./tests
+          graphviz: ./dots/dependencies.dot
+
+      - uses: actions/upload-artifact@v4
+        name: 📤 Upload dot files
+        with:
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          path: ./dots/*
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
+          overwrite: true
+          include-hidden-files: false
+
+      - name: 🛠️ run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+          config: Debug
+          clean_first: true
+          build_verbose: true
+
+      - name: 📥 run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
+          install_verbose: true
+
+  cygwin-clang:
+    runs-on: windows-latest
+    name: cygwin (${{ matrix.compiler}}${{ matrix.generator }})
+    env:
+      CYGWIN: true
+    strategy:
+      fail-fast: false
+      matrix:
+        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        generator: ['toto']
+        compiler:
+          - clang=5.0.1-2
+          - clang=8.0.1-1
+          - mingw64-x86_64-clang=5.0.1-2
+          - mingw64-x86_64-clang=8.0.1-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: ./tests
+
+      - name: ⬇️ Setup Cygwin
+        uses: cygwin/cygwin-install-action@master
+        with:
+          packages: ${{ matrix.compiler }} cmake ninja
+
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: 'configure'
+        env:
+          CC: clang
+          CXX: clang++
         with:
           mode: configure
           generator: ${{matrix.generator}}
