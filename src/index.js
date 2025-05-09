@@ -230,8 +230,23 @@ class CMake
       case "darwin":
       {
         this.#m_default_generator = 'Xcode'
-        await exec.exec('xcrun', ['--show-sdk-path'])
-        //process.env. =SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+        if(!this.is_greater_equal('3.22') && process.env.SDKROOT===undefined)
+        {
+          let cout = ''
+          let cerr = ''
+          const options = {};
+          options.failOnStdErr = false
+          options.ignoreReturnCode = true
+          options.listeners =
+          {
+            stdout: (data) => { cout += data.toString() },
+            stderr: (data) => { cerr += data.toString() },
+          }
+          options.silent = true
+          await exec.exec('xcrun', ['--show-sdk-path'],options)
+          process.env.SDKROOT=cout
+          console.log(process.env.SDKROOT)
+        }
         break
       }
       case "win32":
