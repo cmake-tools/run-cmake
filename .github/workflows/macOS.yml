@@ -18,7 +18,7 @@ concurrency:
 jobs:
   test:
     runs-on: macos-latest
-    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }}${{ matrix.xcode_version }})
     strategy:
       fail-fast: false
       matrix:
@@ -58,6 +58,7 @@ jobs:
           - '4.0'
         #generator: ['Unix Makefiles', 'Xcode', 'Ninja', 'Ninja Multi-Config']
         generator: ['toto']
+        xcode_version: ['15.0.1', '15.1', '15.2', '15.3', '15.4', '16.1','16.2']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
@@ -147,6 +148,11 @@ jobs:
           repository: cmake-tools/runs.test
           path: tests
 
+      - name: ⬇️ Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.cmake_version }}
+
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -155,7 +161,7 @@ jobs:
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
-        env: 
+        env:
           CMAKE_OSX_SYSROOT: '/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/'
         id: configure
         with:
