@@ -83,6 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         system: [ msys, mingw64, ucrt64, clang64 ]
+        compiler: [gcc,clang]
         #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
         generator: ['toto']
         exclude:
@@ -139,6 +140,9 @@ jobs:
       - name: 🛠️ run-cmake (build)
         uses: ./
         id: build
+        env:
+          CC: ${{ matrix.compiler }}
+          CXX: ${{ matrix.compiler }}++
         with:
           mode: build
           config: Debug
