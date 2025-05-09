@@ -27,20 +27,20 @@ jobs:
         #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         generator: ['toto']
         compiler:
-          - gcc-g++:11.5.0
-          - gcc-g++:12.4.0
-          - gcc-g++:13.3.1
-          - gcc-g++:14.2.1
-          - gcc-g++:15.1.1
-          - mingw64-x86_64-gcc-g++:11.4.0
-          - mingw64-x86_64-gcc-g++:11.5.0
-          - mingw64-x86_64-gcc-g++:12.4.0
-          - mingw64-x86_64-gcc-g++:13.3.0
-          - mingw64-x86_64-gcc-g++:14.2.0
-          - clang:5.0.1
-          - clang:8.0.1
-          - mingw64-x86_64-clang:5.0.1
-          - mingw64-x86_64-clang:8.0.1
+          - gcc-g++=11.5.0
+          - gcc-g++=12.4.0
+          - gcc-g++=13.3.1
+          - gcc-g++=14.2.1
+          - gcc-g++=15.1.1
+          - mingw64-x86_64-gcc-g++=11.4.0
+          - mingw64-x86_64-gcc-g++=11.5.0
+          - mingw64-x86_64-gcc-g++=12.4.0
+          - mingw64-x86_64-gcc-g++=13.3.0
+          - mingw64-x86_64-gcc-g++=14.2.0
+          - clang=5.0.1
+          - clang=8.0.1
+          - mingw64-x86_64-clang=5.0.1
+          - mingw64-x86_64-clang=8.0.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
