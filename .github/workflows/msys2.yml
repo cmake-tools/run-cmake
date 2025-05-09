@@ -25,15 +25,6 @@ jobs:
         compiler: [gcc,clang]
         #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
         generator: ['toto']
-        exclude:
-          - system: msys
-            generator: 'MSYS Makefiles'
-          - system: msys
-            generator: 'MinGW Makefiles'
-          - system: msys
-            generator: 'MVisual Studio 17 2022'
-          - system: msys
-            generator: 'NMake Makefiles'
 
     steps:
       - name: Checkout
@@ -103,15 +94,6 @@ jobs:
         compiler: [gcc,clang]
         #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
         generator: ['toto']
-        exclude:
-          - system: msys
-            generator: 'MSYS Makefiles'
-          - system: msys
-            generator: 'MinGW Makefiles'
-          - system: msys
-            generator: 'MVisual Studio 17 2022'
-          - system: msys
-            generator: 'NMake Makefiles'
 
     steps:
       - name: Checkout
@@ -181,15 +163,6 @@ jobs:
         compiler: [gcc,clang]
         #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
         generator: ['toto']
-        exclude:
-          - system: msys
-            generator: 'MSYS Makefiles'
-          - system: msys
-            generator: 'MinGW Makefiles'
-          - system: msys
-            generator: 'MVisual Studio 17 2022'
-          - system: msys
-            generator: 'NMake Makefiles'
 
     steps:
       - name: Checkout
@@ -260,15 +233,6 @@ jobs:
         compiler: [gcc,clang]
         #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
         generator: ['toto']
-        exclude:
-          - system: msys
-            generator: 'MSYS Makefiles'
-          - system: msys
-            generator: 'MinGW Makefiles'
-          - system: msys
-            generator: 'MVisual Studio 17 2022'
-          - system: msys
-            generator: 'NMake Makefiles'
 
     steps:
       - name: Checkout
