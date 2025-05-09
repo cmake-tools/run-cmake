@@ -166,6 +166,7 @@ class CMake
     let command = []
     command=command.concat(this.#build_dir())
     command=command.concat(this.#generator())
+    console.log(`tototo ${process.env.SDKROOT}`)
     command=command.concat(['-DCMAKE_C_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang','-DCMAKE_CXX_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'])
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
