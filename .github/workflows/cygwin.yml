@@ -54,8 +54,6 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler }} cmake ninja
-      - name: Print GCC version
-        run: ${{ env.CC }} --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
