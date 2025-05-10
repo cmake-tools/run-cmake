@@ -97,8 +97,8 @@ jobs:
     name: cygwin (${{ matrix.compiler_type}}${{ matrix.compiler_version }},${{ matrix.generator }})
     env:
       CYGWIN: true
-      CC: ${{ matrix.compiler_type == 'clang' && 'x86_64-w64-mingw32-clang' }}
-      CXX: ${{ matrix.compiler_type == 'clang++' && 'x86_64-w64-mingw32-clang++' }}
+      CC: clang-5.0
+      CXX: clang++-5.0
     strategy:
       fail-fast: false
       matrix:
