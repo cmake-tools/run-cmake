@@ -97,8 +97,8 @@ jobs:
     name: cygwin (${{ matrix.compiler_type}}${{ matrix.compiler_version }},${{ matrix.generator }})
     env:
       CYGWIN: true
-      CC: clang-5.0
-      CXX: clang++-5.0
+      CC: clang
+      CXX: clang++
     strategy:
       fail-fast: false
       matrix:
@@ -120,8 +120,6 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }} cmake ninja
-      - name: Print clang version
-        run: ${{ env.CC }} --version
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
