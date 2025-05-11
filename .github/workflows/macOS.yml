@@ -212,6 +212,8 @@ jobs:
         uses: ./
         env:
           CMAKE_OSX_SYSROOT: '/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/'
+          ARCHS: "armv7 armv7s"
+          ONLY_ACTIVE_ARCH: NO
         id: configure
         with:
           mode: configure
