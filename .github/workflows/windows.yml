@@ -327,7 +327,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 15.0.7 ]
+        version: [ 20.0.4 ]
         generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         cmake_version:
           - '3.0'
