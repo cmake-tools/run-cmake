@@ -31883,6 +31883,7 @@ class CMake
     let command = []
     command=command.concat(this.#m_default_cc_cxx)
     command=command.concat(this.#generator())
+    command=command.concat(this.#toolset())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
@@ -32015,6 +32016,13 @@ class CMake
   {
     let generator = parser.getInput({key: 'generator', type: 'string', required: false, default: '', disableable: false })
     if(generator!='') return Array('-G',generator)
+    else return Array()
+  }
+
+  static #toolset()
+  {
+    let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
+    if(toolset!='') return Array('-T',toolset)
     else return Array()
   }
 
