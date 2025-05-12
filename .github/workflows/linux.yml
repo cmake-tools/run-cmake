@@ -56,8 +56,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
-        #generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
-        generator: ['toto']
+        generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'

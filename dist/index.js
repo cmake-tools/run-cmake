@@ -31747,7 +31747,7 @@ class CMake
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
-    await this.#determineDefaultGenerator()
+    //await this.#determineDefaultGenerator()
     this.#parseMode()
     return this;
   }
@@ -31882,10 +31882,8 @@ class CMake
   {
     let command = []
     command=command.concat(this.#m_default_cc_cxx)
-    command=command.concat(this.#build_dir())
     command=command.concat(this.#generator())
-    console.log(`tototo ${process.env.SDKROOT}`)
-    //command=command.concat(['-DCMAKE_C_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang','-DCMAKE_CXX_COMPILER=/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++'])
+    command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
     let cout = ''
@@ -31935,7 +31933,7 @@ class CMake
     else return Array(source_dir)
   }
 
-  static async #determineDefaultGenerator()
+  /*static async #determineDefaultGenerator()
   {
     console.log(os_is())
     switch(os_is())
@@ -31982,7 +31980,7 @@ class CMake
       {
         if(this.#m_generators.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
         else this.#m_default_generator = 'NMake Makefiles'
-        /* Read CC CXX */
+        // Read CC CXX
         if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
         {
           this.#m_default_generator = 'Unix Makefiles'
@@ -32011,12 +32009,12 @@ class CMake
       }
 
     }
-  }
+  }*/
 
   static #generator()
   {
-    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: '../build', disableable: false })
-    if(this.#m_default_generator!='') return Array('-G',this.#m_default_generator)
+    let generator = parser.getInput({key: 'generator', type: 'string', required: false, default: '', disableable: false })
+    if(generator!='') return Array('-G',generator)
     else return Array()
   }
 

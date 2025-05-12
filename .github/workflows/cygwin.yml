@@ -27,8 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
-        generator: ['toto']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         compiler:
           - gcc-g++=11.5.0-1
           - gcc-g++=12.4.0-3
@@ -102,8 +101,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
-        generator: ['toto']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         compiler_version: ['5.0.1-2','8.0.1-1']
         compiler_type: ['clang', 'mingw64-x86_64-clang']
     steps:
