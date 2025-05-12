@@ -32109,14 +32109,14 @@ class CMake
     let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
     if(this.is_greater_equal('3.1'))
     {
-      if(platform!='' && has_platform== true) return Array('-A',platform)
-      else if(platform!='' && has_platform== false) core.warning('platform is not needed')
+      //if(platform!='' && has_platform== true) return Array('-A',platform)
+      //else if(platform!='' && has_platform== false) core.warning('platform is not needed')
       return Array()
     }
     else
     {
-      if(platform!='' && has_platform== true) return String(' '+platform)
-      else if(platform!='' && has_platform== false )core.warning('platform is not needed')
+      //if(platform!='' && has_platform== true) return String(' '+platform)
+      //else if(platform!='' && has_platform== false )core.warning('platform is not needed')
       return String('')
     }
   }
