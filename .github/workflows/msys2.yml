@@ -24,6 +24,9 @@ jobs:
       matrix:
         compiler: [gcc,clang]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        exclude:
+          - compiler: 'clang'
+            generator: 'MSYS Makefiles'
 
     steps:
       - name: Checkout
@@ -92,6 +95,9 @@ jobs:
       matrix:
         compiler: [gcc,clang]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        exclude:
+          - compiler: 'clang'
+            generator: 'MSYS Makefiles'
 
     steps:
       - name: Checkout
@@ -160,6 +166,9 @@ jobs:
       matrix:
         compiler: [gcc,clang]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        exclude:
+          - compiler: 'clang'
+            generator: 'MSYS Makefiles'
 
     steps:
       - name: Checkout
@@ -229,6 +238,9 @@ jobs:
       matrix:
         compiler: [gcc,clang]
         generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        exclude:
+          - compiler: 'clang'
+            generator: 'MSYS Makefiles'
 
     steps:
       - name: Checkout
