@@ -304,12 +304,6 @@ jobs:
           generator: ${{ matrix.generator }}
           source_dir: './tests'
           install_prefix: '../install'
-          configure_warnings: warning
-          configure_warnings_as_errors: ''
-          list_cache_variables: 'advanced_help'
-          graphviz: './graph.dot'
-          log_level: 'TRACE'
-          log_context: true
 
       - name: 🛠️ run-cmake (build)
         uses: ./

@@ -22,16 +22,16 @@ function os_is()
 class CMake
 {
   static #m_version = '0';
-  static #m_capacities = JSON.parse('{}')
+  static #m_capacities = null
   static #m_generators = Array()
-  static #m_mode
+  static #m_generator = ''
+  static #m_mode = ''
   static #m_default_generator = ''
   static #m_default_cc_cxx = []
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
-    //await this.#determineDefaultGenerator()
     this.#parseMode()
     return this;
   }
@@ -46,6 +46,8 @@ class CMake
   static generators() { return this.#m_generators }
 
   static mode() { return this.#m_mode}
+
+  static default_generator() { return this.#m_default_generator }
 
   static async #infos()
   {
@@ -81,18 +83,42 @@ class CMake
 
   static #parseVersion(string)
   {
-    if(this.#m_capacities.hasOwnProperty('version')) this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0]
+    if(this.#m_capacities!==null) this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0]
     else this.#m_version=string.match(/\d\.\d[\\.\d]+/)[0]
     core.exportVariable('cmake_version', this.#m_version);
   }
 
   static async #parseGenerators()
   {
-    if(this.#m_capacities.hasOwnProperty('generators'))
+    if(this.#m_capacities!==null)
     {
       for(var i= 0 ; i!= this.#m_capacities.generators.length; ++i)
       {
         this.#m_generators=this.#m_generators.concat(this.#m_capacities.generators[i].name)
+      }
+      let cout ='';
+      const options = {};
+      options.listeners =
+      {
+        stdout: (data) => { cout += data.toString() },
+        stderr: (data) => { cout += data.toString() }
+      }
+      options.silent = true
+      options.failOnStdErr = false
+      options.ignoreReturnCode = true
+      await run('cmake',['--help'], options)
+      cout = cout.substring(cout.indexOf("Generators") + 10);
+      cout=cout.replace("\r", "");
+      cout=cout.split("\n");
+      for(const element of cout)
+      {
+        if(element.includes('*') && element.includes('='))
+        {
+          let gen=element.split("=")
+          gen=gen[0].replace("*", "")
+          gen=gen.trim()
+          this.#m_default_generator=gen
+        }
       }
     }
     else
@@ -109,7 +135,6 @@ class CMake
       options.ignoreReturnCode = true
       await run('cmake',['--help'], options)
       cout = cout.substring(cout.indexOf("Generators") + 10);
-      cout=cout.replace("*", " ");
       cout=cout.replace("\r", "");
       cout=cout.split("\n");
       for(const element of cout)
@@ -117,6 +142,12 @@ class CMake
         if(element.includes('='))
         {
           let gen=element.split("=");
+          if(gen[0].includes("*"))
+          {
+            gen=gen[0].replace("*", "");
+            gen=gen.trim()
+            this.#m_default_generator=gen
+          }
           gen=gen[0].trim()
           if(gen==''||gen.includes('CodeBlocks')||gen.includes('CodeLite')||gen.includes('Eclipse')||gen.includes('Kate')||gen.includes('Sublime Text')||gen.includes('KDevelop3')) { }
           else
@@ -194,6 +225,7 @@ class CMake
       errline: (data) => {console.log(data) },
     }
     options.cwd = this.#working_directory()
+    console.log(`Running CMake v${this.version()} in ${this.mode()} mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
@@ -307,29 +339,67 @@ class CMake
   static #generator()
   {
     let generator = parser.getInput({key: 'generator', type: 'string', required: false, default: '', disableable: false })
-    if(generator!='') return Array('-G',generator)
-    else return Array()
+    if(generator!='')
+    {
+      this.#m_generator = generator
+      return Array('-G',this.#m_generator)
+    }
+    else
+    {
+      this.#m_generator = this.#m_default_generator
+      return Array()
+    }
   }
 
   static #toolset()
   {
+    let has_toolset = true
+    if(this.#m_capacities !== null)
+    {
+      for(let index in this.#m_capacities.generators)
+      {
+        let gen = this.#m_capacities.generators[index]
+        if(gen.name == this.#m_generator)
+        {
+          has_toolset=gen.toolsetSupport
+        }
+      }
+    }
     let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
-    if(toolset!='') return Array('-T',toolset)
-    else return Array()
+    if(toolset!='')
+    {
+      if(has_toolset==false) core.warning('toolset is not needed')
+      else return Array('-T',toolset)
+    }
+    return Array()
   }
 
   static #platform()
   {
+    let has_platform = false
+    if(this.#m_capacities !== null)
+    {
+      for(let index in this.#m_capacities.generators)
+      {
+        let gen = this.#m_capacities.generators[index]
+        if(gen.name == this.#m_generator)
+        {
+          has_platform=gen.platformSupport
+        }
+      }
+    }
     let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
     if(this.is_greater_equal('3.1'))
     {
-      if(platform!='') return Array('-A',platform)
-      else return Array()
+      if(platform!='' && has_platform== true) return Array('-A',platform)
+      else if(platform!='' && has_platform== false) core.warning('platform is not needed')
+      return Array()
     }
     else
     {
-      if(platform!='') return String(' '+platform)
-      else return String('')
+      if(platform!='' && has_platform== true) return String(' '+platform)
+      else if(platform!='' && has_platform== false )core.warning('platform is not needed')
+      return String('')
     }
   }
 
@@ -1095,13 +1165,11 @@ async function main()
   try
   {
     let cmake = await CMake.init();
-    console.log(`Running CMake v${cmake.version()} in ${cmake.mode()} mode`)
     switch(cmake.mode())
     {
       case 'configure':
       {
         cmake.configure()
-        console.log(cmake.generators())
         break
       }
       case 'build':
