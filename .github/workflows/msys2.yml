@@ -51,7 +51,7 @@ jobs:
         id: 'configure'
         env:
           CC: ${{ matrix.compiler }}
-          CXX: ${{ matrix.compiler }}++
+          CXX: ${{ matrix.compiler=='gcc' && 'g++' || 'clang++' }}
         with:
           mode: configure
           generator: ${{matrix.generator}}
@@ -120,7 +120,7 @@ jobs:
         id: 'configure'
         env:
           CC: ${{ matrix.compiler }}
-          CXX: ${{ matrix.compiler }}++
+          CXX: ${{ matrix.compiler=='gcc' && 'g++' || 'clang++' }}
         with:
           mode: configure
           generator: ${{matrix.generator}}
@@ -189,7 +189,7 @@ jobs:
         id: 'configure'
         env:
           CC: ${{ matrix.compiler }}
-          CXX: ${{ matrix.compiler }}++
+          CXX: ${{ matrix.compiler=='gcc' && 'g++' || 'clang++' }}
         with:
           mode: configure
           generator: ${{matrix.generator}}
@@ -259,7 +259,7 @@ jobs:
         id: 'configure'
         env:
           CC: ${{ matrix.compiler }}
-          CXX: ${{ matrix.compiler }}++
+          CXX: ${{ matrix.compiler=='gcc' && 'g++' || 'clang++' }}
         with:
           mode: configure
           generator: ${{matrix.generator}}

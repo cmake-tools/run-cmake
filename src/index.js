@@ -286,8 +286,6 @@ class CMake
       case "mingw32":
       {
         this.#m_default_generator = "MSYS Makefiles"
-        console.log(`CC=====${process.env.CC}`)
-        console.log(`CXX=====${process.env.CXX}`)
         break
       }
       case "cygwin":
