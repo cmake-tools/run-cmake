@@ -31898,9 +31898,8 @@ class CMake
       stdout: (data) => { cout += data.toString() },
       stderr: (data) => { cerr += data.toString() },
       stdline: (data) => { console.log(data)},
-      errline: (data) => { },
+      errline: (data) => {console.log(data) },
     }
-    options.silent = true
     options.cwd = this.#working_directory()
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
