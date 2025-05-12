@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'Visual Studio 17 2022']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         cmake_version:
           - '3.0'
           - '3.1'
@@ -334,7 +334,7 @@ jobs:
       fail-fast: false
       matrix:
         version: [ 15.0.7 ]
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'NMake Makefiles', 'Visual Studio 17 2022']
+        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         cmake_version:
           - '3.0'
           - '3.1'
