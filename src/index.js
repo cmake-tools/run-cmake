@@ -285,7 +285,7 @@ class CMake
       case "clang32":
       case "mingw32":
       {
-        this.#m_default_generator = "MSYS Makefiles"
+        this.#m_default_generator = "Unix Makefiles"
         break
       }
       case "cygwin":
