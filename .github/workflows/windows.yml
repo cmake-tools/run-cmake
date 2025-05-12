@@ -552,7 +552,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
-        generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config', 'Visual Studio 17 2022']
+        generator: ['Ninja', 'Ninja Multi-Config', 'Visual Studio 17 2022']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
