@@ -23,8 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [gcc,clang]
-        #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
-        generator: ['toto']
+        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
 
     steps:
       - name: Checkout
@@ -92,8 +91,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [gcc,clang]
-        #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
-        generator: ['toto']
+        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
 
     steps:
       - name: Checkout
@@ -161,8 +159,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [gcc,clang]
-        #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
-        generator: ['toto']
+        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
 
     steps:
       - name: Checkout
@@ -231,8 +228,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [gcc,clang]
-        #generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
-        generator: ['toto']
+        generator: ['MSYS Makefiles','MinGW Makefiles','Unix Makefiles','Ninja', 'Ninja Multi-Config','Visual Studio 17 2022','NMake Makefiles']
 
     steps:
       - name: Checkout
