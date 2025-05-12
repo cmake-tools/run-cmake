@@ -320,7 +320,7 @@ class CMake
     }
     else
     {
-      if(platform!='') return ' '+platform
+      if(platform!='') return String(' '+platform)
       else return String('')
     }
   }
