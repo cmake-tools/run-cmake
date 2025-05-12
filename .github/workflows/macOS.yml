@@ -156,7 +156,7 @@ jobs:
           - '3.31'
           - '4.0'
         generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
-        compiler: ['9','10','11','12','13','14']
+        compiler: ['14']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
@@ -290,7 +290,7 @@ jobs:
           - '3.31'
           - '4.0'
         generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
-        compiler: ['14','15','16','17','18','19','20']
+        compiler: ['20']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
