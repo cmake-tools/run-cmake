@@ -327,7 +327,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 20.0.4 ]
+        version: [ 20.1.4 ]
         generator: ['Unix Makefiles','Ninja', 'Ninja Multi-Config']
         cmake_version:
           - '3.0'
@@ -588,6 +588,9 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
+        env:
+          CC: clang-cl
+          CXX: clang-cl
         with:
           mode: configure
           source_dir: './tests'
