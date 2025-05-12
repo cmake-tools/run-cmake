@@ -31882,7 +31882,15 @@ class CMake
   {
     let command = []
     command=command.concat(this.#m_default_cc_cxx)
-    if(!this.is_greater_equal('3.1')) command=command.concat(this.#generator()+this.#platform())
+    if(!this.is_greater_equal('3.1'))
+    {
+      let gen = this.#generator()
+      if(gen.length>0)
+      {
+        command=command.concat(this.#generator()[0])
+        command=command.concat(this.#generator()[1]+this.#platform())
+      }
+    }
     else command=command.concat(this.#generator())
     command=command.concat(this.#toolset())
     if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
