@@ -640,7 +640,7 @@ jobs:
           source_dir: './tests'
           install_prefix: '../install'
           generator: ${{ matrix.generator }}
-          toolset: ClangCL
+          toolset: ${{ matrix.generator == 'Visual Studio 17 2022' && 'ClangCL' || '' }}
           platform: ${{ matrix.architecture }}
 
       - name: 🛠️ run-cmake (build)
