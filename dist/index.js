@@ -31742,6 +31742,7 @@ class CMake
   static #m_generators = Array()
   static #m_generator = ''
   static #m_mode = ''
+  static #m_platforms = Array()
   static #m_default_generator = ''
   static #m_default_cc_cxx = []
   static async init()
@@ -32092,7 +32093,7 @@ class CMake
 
   static #platform()
   {
-    let has_platform = false
+    let has_platform = true
     if(this.#m_capacities !== null)
     {
       for(let index in this.#m_capacities.generators)
@@ -32101,6 +32102,7 @@ class CMake
         if(gen.name == this.#m_generator)
         {
           has_platform=gen.platformSupport
+          if(gen.supportedPlatforms!==null) this.#m_platforms=gen.supportedPlatforms
         }
       }
     }
