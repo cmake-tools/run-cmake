@@ -82,7 +82,6 @@ jobs:
         uses: ./
         env:
           CMAKE_OSX_SYSROOT: '/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/'
-          ONLY_ACTIVE_ARCH: NO
         id: configure
         with:
           mode: configure
@@ -116,9 +115,9 @@ jobs:
         with:
           mode: install
           install_verbose: false
-  others:
+  others-gcc:
     runs-on: macos-latest
-    name: CMake v${{ matrix.cmake_version }} (${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.compiler }},${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
@@ -157,6 +156,7 @@ jobs:
           - '3.31'
           - '4.0'
         generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
+        compiler: ['9','10','11','12','13','14']
         exclude:
           - cmake_version: 3.0
             generator: 'Ninja Multi-Config'
@@ -208,11 +208,146 @@ jobs:
           cmakeVersion: ~${{ matrix.cmake_version }}
           ninjaVersion: ^1
 
+      - name: ⬇️ Setup GCC v${{ matrix.compiler }}
+        run: brew install gcc@${{ matrix.compiler }}
+
       - name: ⚙️ run-cmake (configure)
         uses: ./
         env:
-          CMAKE_OSX_SYSROOT: '/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/'
-          ONLY_ACTIVE_ARCH: NO
+          CC: gcc-${{ matrix.compiler }}
+          CXX: g++-${{ matrix.compiler }}
+        id: configure
+        with:
+          mode: configure
+          generator: ${{ matrix.generator }}
+          source_dir: './tests'
+          install_prefix: './MyInstallPrefix'
+          graphviz: ./dots/dependencies.dot
+
+      - uses: actions/upload-artifact@v4
+        name: 📤 Upload dot files
+        with:
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          path: ./dots/*
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
+          overwrite: true
+          include-hidden-files: false
+
+      - name: 🛠️ run-cmake (build)
+        uses: ./
+        id: build
+        with:
+          mode: build
+          clean_first: true
+          build_verbose: true
+
+      - name: 📥 run-cmake (install)
+        uses: ./
+        id: install
+        with:
+          mode: install
+          install_verbose: false
+  others-clang:
+    runs-on: macos-latest
+    name: CMake v${{ matrix.cmake_version }} (${{ matrix.compiler }},${{ matrix.generator }})
+    strategy:
+      fail-fast: false
+      matrix:
+        cmake_version:
+          - '3.0'
+          - '3.1'
+          - '3.2'
+          - '3.3'
+          - '3.4'
+          - '3.5'
+          - '3.6'
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - '3.15'
+          - '3.16'
+          - '3.17'
+          - '3.18'
+          - '3.19'
+          - '3.20'
+          - '3.21'
+          - '3.22'
+          - '3.23'
+          - '3.24'
+          - '3.25'
+          - '3.26'
+          - '3.27'
+          - '3.28'
+          - '3.29'
+          - '3.30'
+          - '3.31'
+          - '4.0'
+        generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
+        compiler: ['14','15','16','17','18','19','20']
+        exclude:
+          - cmake_version: 3.0
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.1
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.2
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.3
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.4
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.5
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.6
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.7
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.8
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.9
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.10
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.11
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.12
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.13
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.14
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.15
+            generator: 'Ninja Multi-Config'
+          - cmake_version: 3.16
+            generator: 'Ninja Multi-Config'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: cmake-tools/runs.test
+          path: tests
+
+      - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ~${{ matrix.cmake_version }}
+          ninjaVersion: ^1
+      - name: ⬇️ Setup LLVM v${{ matrix.compiler }}
+        run: brew install llvm@${{ matrix.compiler }}
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        env:
+          CC: clang-${{ matrix.compiler }}
+          CXX: clang++-${{ matrix.compiler }}
         id: configure
         with:
           mode: configure
