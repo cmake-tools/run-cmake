@@ -449,7 +449,7 @@ jobs:
 
   clang-cl:
     runs-on: windows-latest
-    name: CMake v${{ matrix.cmake_version }} (windows-2022,clang-cl,${{ matrix.architecture }},${{ matrix.generator }})
+    name: CMake v${{ matrix.cmake_version }} (clang-cl,${{ matrix.architecture }},${{ matrix.generator }})
     strategy:
       fail-fast: false
       matrix:
