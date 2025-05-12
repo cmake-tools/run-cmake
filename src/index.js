@@ -166,8 +166,10 @@ class CMake
   {
     let command = []
     command=command.concat(this.#m_default_cc_cxx)
-    command=command.concat(this.#generator())
+    if(!this.is_greater_equal('3.1')) command=command.concat(this.#generator()+this.#platform())
+    else command=command.concat(this.#generator())
     command=command.concat(this.#toolset())
+    if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
@@ -181,7 +183,6 @@ class CMake
     {
       stdout: (data) => { cout += data.toString() },
       stderr: (data) => { cerr += data.toString() },
-      stdline: (data) => { console.log(data)},
       errline: (data) => {console.log(data) },
     }
     options.cwd = this.#working_directory()
@@ -307,6 +308,21 @@ class CMake
     let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
     if(toolset!='') return Array('-T',toolset)
     else return Array()
+  }
+
+  static #platform()
+  {
+    let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
+    if(this.is_greater_equal('3.1'))
+    {
+      if(platform!='') return Array('-A',platform)
+      else return Array()
+    }
+    else
+    {
+      if(platform!='') return ' '+platform
+      else return String('')
+    }
   }
 
   static async build()
