@@ -425,6 +425,7 @@ jobs:
         env:
           CC: C:/Program Files/LLVM/bin/clang.exe
           CXX: C:/Program Files/LLVM/bin/clang++.exe
+          RS: C:/Program Files/LLVM/bin/llvm-rc.exe
         with:
           mode: configure
           source_dir: './tests'
