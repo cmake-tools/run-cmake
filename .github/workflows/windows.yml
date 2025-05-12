@@ -566,6 +566,38 @@ jobs:
             generator: 'Visual Studio 17 2022'
           - cmake_version: 3.20
             generator: 'Visual Studio 17 2022'
+          - cmake_version: 3.0
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.1
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.2
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.3
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.4
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.5
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.6
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.7
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.8
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.9
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.10
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.11
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.12
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.13
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.14
+            generator: ['Unix Makefiles','Ninja']
+          - cmake_version: 3.15
+            generator: ['Unix Makefiles','Ninja']
 
     steps:
       - uses: ammaraskar/msvc-problem-matcher@master
