@@ -323,7 +323,7 @@ class CMake
       }
     }*/
     let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
-    console.log(platform)
+    console.log(`toto  kk ${platform}`)
     if(this.is_greater_equal('3.1'))
     {
       if(platform!='' && has_platform== true) return Array('-A',platform)
