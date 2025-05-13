@@ -32039,6 +32039,7 @@ class CMake
       }
     }*/
     let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
+    console.log(platform)
     if(this.is_greater_equal('3.1'))
     {
       if(platform!='' && has_platform== true) return Array('-A',platform)
@@ -32312,12 +32313,6 @@ async function run(cmd,args, opts)
   else return await exec.exec(cmd,args,opts)
 }
 
-
-function CMakeVersionGreaterEqual(version)
-{
-  return compare_version.compare(global.cmake_version, version, '>=')
-}
-
 async function runGraphviz()
 {
   let command
@@ -32406,12 +32401,6 @@ async function installGraphviz()
     await run(command,params, options)
   }
   return true
-}
-
-function kill(error)
-{
-   core.setFailed(error)
-   process.exit(core.ExitCode.Failure)
 }
 
 class CommandLineMaker
@@ -32531,39 +32520,6 @@ class CommandLineMaker
       else return []
     }
     return []
-  }
-
-  configureCommandParameters()
-  {
-    let ret = true
-    let options=[]
-
-    // First check is initial_cache file exist
-    /*const initial_cache = this.#initial_cache()
-    if(Array.isArray(initial_cache) && initial_cache.length !== 0)
-    {
-      options=options.concat(initial_cache)
-    }
-    options=options.concat(this.#remove_variables())
-    options=options.concat(this.#variables())*/
-    //console.log("Here1")
-    options=options.concat(this.generator)
-    //console.log(this.m_error)
-    //console.log("Here2")
-    /*options=options.concat(this.#toolset())
-    options=options.concat(this.#platform())
-    options=options.concat(this.#toolchain())
-    options=options.concat(this.#install_prefix())
-    options=options.concat(this.#configure_warnings())
-    options=options.concat(this.#configure_warnings_as_errors())
-    options=options.concat(this.#fresh())
-    options=options.concat(this.#list_cache_variables())
-    options=options.concat(this.#graphviz())
-    options=options.concat(this.#log_level())
-    options=options.concat(this.#log_context())
-*/
-    //console.log(options)
-    return options
   }
 
 
