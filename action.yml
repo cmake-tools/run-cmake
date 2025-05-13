@@ -50,6 +50,7 @@ inputs:
     description: 'Specify the installation directory, used by the CMAKE_INSTALL_PREFIX variable'
     required: false
     default: '../install'
+
   configure_warnings:
     description: 'Enable warnings. Choice is : none, deprecated, warning, developer'
     required: false

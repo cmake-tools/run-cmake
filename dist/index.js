@@ -31727,7 +31727,6 @@ const { json } = __nccwpck_require__(6465);
 const style = __nccwpck_require__(8746);
 (__nccwpck_require__(8603).config)();
 
-
 function os_is()
 {
   if(process.env.MSYSTEM !== undefined) return String(process.env.MSYSTEM).toLowerCase()
@@ -31744,12 +31743,13 @@ class CMake
   static #m_mode = ''
   static #m_platforms = Array()
   static #m_default_generator = ''
+
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
     this.#parseMode()
-    this.#parse_build_dir()
+    this.#parseBuildDir()
     return this;
   }
 
@@ -31765,13 +31765,6 @@ class CMake
   static mode() { return this.#m_mode}
 
   static default_generator() { return this.#m_default_generator }
-
-  static #parse_build_dir()
-  {
-    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir != '' ? process.env.binary_dir : './build' , disableable: false })
-    binary_dir=path.resolve(binary_dir)
-    core.exportVariable('binary_dir', binary_dir);
-  }
 
   static async #infos()
   {
@@ -31805,11 +31798,38 @@ class CMake
     await this.#parseGenerators()
   }
 
+    // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
+  static #working_directory()
+  {
+    if(this.is_greater_equal('3.13')) return path.resolve('./')
+    else return process.env.binary_dir
+  }
+
+  static #parseBuildDir()
+  {
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir !== undefined ? process.env.binary_dir : './build' , disableable: false })
+    binary_dir=path.resolve(binary_dir)
+    core.exportVariable('binary_dir', binary_dir);
+  }
+
   static #parseVersion(string)
   {
     if(this.#m_capacities!==null) this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0]
     else this.#m_version=string.match(/\d\.\d[\\.\d]+/)[0]
     core.exportVariable('cmake_version', this.#m_version);
+  }
+
+  /* Detect which mode the user wants :
+  - configure: CMake configure the project only.
+  - build: CMake build the project only.
+  - install: CMake install the project.
+  - all: CMake configure, build and install in a row.
+  By default CMake is in configure mode.
+  */
+  static #parseMode()
+  {
+    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
+    if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
   }
 
   static async #parseGenerators()
@@ -31904,26 +31924,18 @@ class CMake
     return 0;
   }
 
-  /* Detect which mode the user wants :
-  - configure: CMake configure the project only.
-  - build: CMake build the project only.
-  - install: CMake install the project.
-  - all: CMake configure, build and install in a row.
-  By default CMake is in configure mode.
-  */
-  static #parseMode()
+  // Generate a Project Buildsystem (https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem)
+
+  //-S <path-to-source> Path to root directory of the CMake project to build.
+  static #source_dir()
   {
-    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
-    if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
+    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE !== undefined ? process.env.GITHUB_WORKSPACE : './' , disableable: false })
+    source_dir=path.resolve(source_dir)
+    if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
+    else return Array(source_dir)
   }
 
-  // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
-  static #working_directory()
-  {
-    if(this.is_greater_equal('3.13')) return path.resolve('./')
-    else return process.env.binary_dir
-  }
-
+  //-B <path-to-build> Path to directory which CMake will use as the root of build directory.
   static #build_dir()
   {
     if(this.is_greater_equal('3.13')) return Array('-B',process.env.binary_dir)
@@ -31934,13 +31946,138 @@ class CMake
     }
   }
 
-  static #source_dir()
+  //-C <initial-cache> Pre-load a script to populate the cache.
+  static #initial_cache()
   {
-    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE ? process.env.GITHUB_WORKSPACE : './' , disableable: false });
-    source_dir=path.resolve(source_dir)
-    if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
-    else return Array(source_dir)
+    let initial_cache = parser.getInput({key: 'initial_cache', type: 'string', required: false, default: '' , disableable: false })
+    if(initial_cache!='')
+    {
+      initial_cache=path.posix.resolve(initial_cache)
+      return Array('-C',initial_cache)
+    }
+    else return Array()
   }
+
+  //-D <var>:<type>=<value>, -D <var>=<value
+  static #variables()
+  {
+    const value = parser.getInput({key: 'variables', type: 'array', required: false, default: [] , disableable: false })
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-D',value[i])
+    }
+    return ret;
+  }
+
+  //-U <globbing_expr>
+  static #remove_variables()
+  {
+    const value = parser.getInput({key: 'remove_variables', type: 'array', required: false, default: [] , disableable: false })
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-U',value[i])
+    }
+    return ret;
+  }
+
+  //-G <generator-name>
+  static #generator()
+  {
+    let generator = parser.getInput({key: 'generator', type: 'string', required: false, default: '', disableable: false })
+    if(generator!='')
+    {
+      this.#m_generator = generator
+      return Array('-G',this.#m_generator)
+    }
+    else
+    {
+      this.#m_generator = this.#m_default_generator
+      return Array()
+    }
+  }
+
+  //-T <toolset-spec>
+  static #toolset()
+  {
+    let has_toolset = true
+    if(this.#m_capacities !== null)
+    {
+      for(let index in this.#m_capacities.generators)
+      {
+        let gen = this.#m_capacities.generators[index]
+        if(gen.name == this.#m_generator)
+        {
+          has_toolset=gen.toolsetSupport
+        }
+      }
+    }
+    let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
+    if(toolset!='')
+    {
+      if(has_toolset==false) core.warning('toolset is not needed')
+      else return Array('-T',toolset)
+    }
+    return Array()
+  }
+
+  //-A <platform-name>
+  static #platform()
+  {
+    let has_platform = true
+    if(this.#m_capacities !== null)
+    {
+      for(let index in this.#m_capacities.generators)
+      {
+        let gen = this.#m_capacities.generators[index]
+        if(gen.name == this.#m_generator)
+        {
+          has_platform=gen.platformSupport
+          if(gen.supportedPlatforms!==null) this.#m_platforms=gen.supportedPlatforms
+        }
+      }
+    }
+    let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
+    if(this.is_greater_equal('3.1'))
+    {
+      if(platform!='' && has_platform== true) return Array('-A',platform)
+      else if(platform!='' && has_platform== false) core.warning('platform is not needed')
+      return Array()
+    }
+    else
+    {
+      if(platform!='' && has_platform== true) return String(' '+platform)
+      else if(platform!='' && has_platform== false )core.warning('platform is not needed')
+      return String('')
+    }
+  }
+
+  //--toolchain <path-to-file>
+  static #toolchain()
+  {
+    let toolchain = parser.getInput({key: 'toolchain', type: 'string', required: false, default: '', disableable: false })
+    if(toolchain!='')
+    {
+      if(this.is_greater_equal('3.21.0')) return Array('--toolchain',toolchain)
+      else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+toolchain)
+    }
+    return Array()
+  }
+
+  //--install-prefix <directory>
+  static #install_prefix()
+  {
+    let install_prefix = parser.getInput({key: 'install_prefix', type: 'string', required: false, default: '', disableable: false })
+    if(install_prefix!='')
+    {
+      install_prefix=path.resolve(install_prefix)
+      if(this.is_greater_equal('3.21') && os_is()!='cygwin') return Array('--install-prefix',install_prefix)
+      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+install_prefix)
+    }
+    return Array()
+  }
+
 
   /*static async #determineDefaultGenerator()
   {
@@ -32020,90 +32157,13 @@ class CMake
     }
   }*/
 
-  static #generator()
-  {
-    let generator = parser.getInput({key: 'generator', type: 'string', required: false, default: '', disableable: false })
-    if(generator!='')
-    {
-      this.#m_generator = generator
-      return Array('-G',this.#m_generator)
-    }
-    else
-    {
-      this.#m_generator = this.#m_default_generator
-      return Array()
-    }
-  }
-
-  static #toolset()
-  {
-    let has_toolset = true
-    if(this.#m_capacities !== null)
-    {
-      for(let index in this.#m_capacities.generators)
-      {
-        let gen = this.#m_capacities.generators[index]
-        if(gen.name == this.#m_generator)
-        {
-          has_toolset=gen.toolsetSupport
-        }
-      }
-    }
-    let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
-    if(toolset!='')
-    {
-      if(has_toolset==false) core.warning('toolset is not needed')
-      else return Array('-T',toolset)
-    }
-    return Array()
-  }
-
-  static #platform()
-  {
-    let has_platform = true
-    if(this.#m_capacities !== null)
-    {
-      for(let index in this.#m_capacities.generators)
-      {
-        let gen = this.#m_capacities.generators[index]
-        if(gen.name == this.#m_generator)
-        {
-          has_platform=gen.platformSupport
-          if(gen.supportedPlatforms!==null) this.#m_platforms=gen.supportedPlatforms
-        }
-      }
-    }
-    let platform = parser.getInput({key: 'platform', type: 'string', required: false, default: '', disableable: false })
-    if(this.is_greater_equal('3.1'))
-    {
-      if(platform!='' && has_platform== true) return Array('-A',platform)
-      else if(platform!='' && has_platform== false) core.warning('platform is not needed')
-      return Array()
-    }
-    else
-    {
-      if(platform!='' && has_platform== true) return String(' '+platform)
-      else if(platform!='' && has_platform== false )core.warning('platform is not needed')
-      return String('')
-    }
-  }
-
-  static #install_prefix()
-  {
-    let install_prefix = parser.getInput({key: 'install_prefix', type: 'string', required: false, default: '', disableable: false })
-    if(install_prefix!='')
-    {
-      install_prefix=path.resolve(install_prefix)
-      if(this.is_greater_equal('3.21') && os_is()!='cygwin') return Array('--install-prefix',install_prefix)
-      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+install_prefix)
-    }
-    return Array()
-  }
 
   static async configure()
   {
     let command = []
-    command=command.concat(this.#install_prefix())
+    command=command.concat(this.#initial_cache())
+    command=command.concat(this.#variables())
+    command=command.concat(this.#remove_variables())
     if(!this.is_greater_equal('3.1'))
     {
       let gen = this.#generator()
@@ -32116,6 +32176,8 @@ class CMake
     else command=command.concat(this.#generator())
     command=command.concat(this.#toolset())
     if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
+    command=command.concat(this.#toolchain())
+    command=command.concat(this.#install_prefix())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
@@ -32377,38 +32439,6 @@ class CommandLineMaker
     }
   }
 
-   #initial_cache()
-  {
-    let initial_cache = core.getInput('initial_cache', { required: false })
-    if(initial_cache!='')
-    {
-      initial_cache=path.posix.resolve(initial_cache)
-      return Array('-C',initial_cache)
-    }
-    else return Array()
-  }
-
-   #variables()
-  {
-    const value = parser.getInput('variables', {type: 'array',default:[]})
-    let ret=[]
-    for(const i in value)
-    {
-      ret=ret.concat('-D',value[i])
-    }
-    return ret;
-  }
-
-   #remove_variables()
-  {
-    const value = parser.getInput('remove_variables', {type: 'array',default:[]})
-    let ret=[]
-    for(const i in value)
-    {
-      ret=ret.concat('-U',value[i])
-    }
-    return ret;
-  }
   error()
   {
     return this.m_error;
@@ -32458,18 +32488,6 @@ class CommandLineMaker
     if(! CMakeVersionGreaterEqual('3.1.0')) return Array()
     if(this.platform!='') return Array('-A',this.platform)
     else return Array()
-  }
-
-  #toolchain()
-  {
-    delete process.env.CMAKE_TOOLCHAIN_FILE;
-    let toolchain = core.getInput('toolchain', { required: false })
-    if(toolchain!='')
-    {
-      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--toolchain',toolchain)
-      else return Array('-DCMAKE_TOOLCHAIN_FILE:PATH='+toolchain)
-    }
-    return []
   }
 
   #install_prefix()
