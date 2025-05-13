@@ -666,7 +666,7 @@ jobs:
           install_prefix: '../install'
           generator: ${{ matrix.generator }}
           toolset: ${{ matrix.generator == 'Visual Studio 17 2022' && 'ClangCL' || '' }}
-          platform: ${{ matrix.generator == 'Visual Studio 17 2022' && matrix.architecture || '' }}
+          #platform: ${{ matrix.generator == 'Visual Studio 17 2022' && matrix.architecture || '' }}
 
       - name: 🛠️ run-cmake (build)
         uses: ./
