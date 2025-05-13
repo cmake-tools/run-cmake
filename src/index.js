@@ -427,7 +427,6 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    options.cwd = this.#working_directory()
     console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
@@ -450,7 +449,6 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    options.cwd = this.#working_directory()
     console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
