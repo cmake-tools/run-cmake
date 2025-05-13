@@ -31956,6 +31956,7 @@ class CMake
 
   static #build_dir()
   {
+    console.log(`ssss ${process.env.binary_dir}`)
     let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir != '' ? process.env.binary_dir : './build' , disableable: false })
     binary_dir=path.resolve(binary_dir)
     core.exportVariable('binary_dir', binary_dir);
