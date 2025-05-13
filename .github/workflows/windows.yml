@@ -580,7 +580,8 @@ jobs:
         with:
           mode: install
           install_verbose: false
-  clang-cl-other:
+
+  clang-cl2:
     runs-on: windows-latest
     name: CMake v${{ matrix.cmake_version }} (clang-cl,${{ matrix.generator }})
     strategy:
