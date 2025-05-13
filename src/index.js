@@ -234,7 +234,7 @@ class CMake
       errline: (data) => {console.log(data) },
     }
     options.cwd = this.#working_directory()
-    console.log(`Running CMake v${this.version()} in ${this.mode()} mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
+    console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
@@ -412,8 +412,7 @@ class CMake
 
   static async build()
   {
-    let command = ['--build']
-    command=command.concat(process.env.binary_dir)
+    let command = ['--build',process.env.binary_dir]
     console.log(command)
     let cout = ''
     let cerr = ''
@@ -427,7 +426,7 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
+    console.log(`Running CMake v${this.version()} in build mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
@@ -435,20 +434,18 @@ class CMake
   static async install()
   {
     let command = []
-
-    if(CMakeVersionGreaterEqual('3.15.0'))
+    if(this.is_greater_equal('37.15.0'))
     {
-      command=['--install',process.env.binary_dir]
+      command=command.concat['--install',process.env.binary_dir]
     }
-    if(!CMakeVersionGreaterEqual('3.15.0'))
+    if(!this.is_greater_equal('37.15.0'))
     {
-      command=['-P',process.env.binary_dir+'/cmake_install.cmake']
-
+      command=['-P',path.resolve(process.env.binary_dir,'/cmake_install.cmake')]
     }
-    const options = {};
     console.log(command)
     let cout = ''
     let cerr = ''
+    const options = {};
     options.silent = false
     options.failOnStdErr = false
     options.ignoreReturnCode = true
@@ -458,7 +455,7 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
+    console.log(`Running CMake v${this.version()} in install mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
@@ -1219,24 +1216,24 @@ async function main()
     {
       case 'configure':
       {
-        cmake.configure()
+        await cmake.configure()
         break
       }
       case 'build':
       {
-        cmake.build()
+        await cmake.build()
         break
       }
       case 'install':
       {
-        cmake.install()
+        await cmake.install()
         break
       }
       case 'all':
       {
-        cmake.configure()
-        cmake.build()
-        cmake.install()
+        await cmake.configure()
+        await cmake.build()
+        await cmake.install()
         break
       }
     }
