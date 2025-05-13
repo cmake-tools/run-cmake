@@ -50,6 +50,11 @@ inputs:
     description: 'Specify the installation directory, used by the CMAKE_INSTALL_PREFIX variable'
     required: false
     default: '../install'
+  project_file:
+    description: 'Specify an alternate project file name.'
+    required: false
+    default: ''
+
 
   configure_warnings:
     description: 'Enable warnings. Choice is : none, deprecated, warning, developer'

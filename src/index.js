@@ -362,6 +362,19 @@ class CMake
     return Array()
   }
 
+  //--project-file <project-file-name>
+  static #project_file()
+  {
+    if(this.is_greater_equal('4.0'))
+    {
+      let project_file = parser.getInput({key: 'project_file', type: 'string', required: false, default: '', disableable: false })
+      if(project_file!='')
+      {
+        return Array('--project-file',project_file)
+      }
+    }
+    return Array()
+  }
 
   /*static async #determineDefaultGenerator()
   {
@@ -462,6 +475,7 @@ class CMake
     if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
     command=command.concat(this.#toolchain())
     command=command.concat(this.#install_prefix())
+    command=command.concat(this.#project_file())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
