@@ -440,7 +440,7 @@ class CMake
     }
     if(!this.is_greater_equal('37.15.0'))
     {
-      command=['-P',path.resolve(process.env.binary_dir,'/cmake_install.cmake')]
+      command=['-P',process.env.binary_dir+'/cmake_install.cmake']
     }
     console.log(command)
     let cout = ''
