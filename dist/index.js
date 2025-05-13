@@ -31934,6 +31934,7 @@ class CMake
     else command=command.concat(this.#generator())
     command=command.concat(this.#toolset())
     if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
+    command=command.concat(this.#install_prefix())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
@@ -32126,6 +32127,18 @@ class CMake
     }
   }
 
+  static #install_prefix()
+  {
+    let install_prefix = parser.getInput({key: 'install_prefix', type: 'string', required: false, default: '', disableable: false })
+    if(install_prefix!='')
+    {
+      install_prefix=path.resolve(install_prefix)
+      if(this.is_greater_equal('3.21') && os_is()!='cygwin') return Array('--install-prefix',install_prefix)
+      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+install_prefix)
+    }
+    return Array()
+  }
+
   static async build()
   {
     let command = ['--build',process.env.binary_dir]
@@ -32150,11 +32163,11 @@ class CMake
   static async install()
   {
     let command = []
-    if(this.is_greater_equal('37.15.0'))
+    if(this.is_greater_equal('3.15.0'))
     {
-      command=command.concat['--install',process.env.binary_dir]
+      command=['--install',process.env.binary_dir]
     }
-    if(!this.is_greater_equal('37.15.0'))
+    if(!this.is_greater_equal('3.15.0'))
     {
       command=['-P',process.env.binary_dir+'/cmake_install.cmake']
     }
