@@ -434,12 +434,21 @@ class CMake
 
   static async install()
   {
-    let command = ['--install']
-    command=command.concat(process.env.binary_dir)
+    let command = []
+
+    if(CMakeVersionGreaterEqual('3.15.0'))
+    {
+      command=['--install',process.env.binary_dir]
+    }
+    if(!CMakeVersionGreaterEqual('3.15.0'))
+    {
+      command=['-P',process.env.binary_dir+'/cmake_install.cmake']
+
+    }
+    const options = {};
     console.log(command)
     let cout = ''
     let cerr = ''
-    const options = {};
     options.silent = false
     options.failOnStdErr = false
     options.ignoreReturnCode = true
