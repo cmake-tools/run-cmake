@@ -32427,97 +32427,6 @@ class CommandLineMaker
   }
 
   /* Configure */
-   #source_dir()
-  {
-    let source_dir = core.getInput('source_dir', { required: false, default: '' });
-    if(source_dir=='')
-    {
-      source_dir = process.env.GITHUB_WORKSPACE;
-      if(source_dir === undefined) source_dir='./'
-    }
-    source_dir=path.resolve(source_dir)
-    if(!this.old_style) return Array('-S',source_dir)
-    else return Array(source_dir)
-  }
-
-   #binary_dir()
-  {
-    this.binary_dir = core.getInput('binary_dir', { required: false, default: '../build' });
-    this.binary_dir=path.resolve(this.binary_dir)
-    core.exportVariable('binary_dir', this.binary_dir);
-    if(!this.old_style) return Array('-B',this.binary_dir)
-    else
-    {
-      io.mkdirP(this.binary_dir);
-      return Array()
-    }
-  }
-
-  error()
-  {
-    return this.m_error;
-  }
-  #generator()
-  {
-    //console.log("Here11")
-    this.generator = core.getInput('generator', { required: false });
-    //if(this.generator=='')
-    //{
-     //   if(process.platform === "win32") this.generator="NMake Makefiles"
-        /*else*/
-    //}
-    /*this.#parseListGenerator().then((gens)=>{
-      console.log(gens)
-      console.log(this.generator)
-      let generator="Unix Makefiles"
-      if(gens.includes(generator))
-      {
-
-        let gen = '['+gens.toString()+']'
-        throw String('Generator '+generator+' is not supported by CMake '+global.cmake_version+'. Accepted ones are : '+gen)
-      }
-    }).catch((error)=>{console.log(error)})*/
-
-      if(!CMakeVersionGreaterEqual('3.1.0'))
-      {
-        this.#platform() /** TODO fix this mess dude */
-        if(this.platform!='')this.generator=this.generator+' '+this.platform
-      }
-      this.generator = Array('-G',this.generator)
-      return false;
-  }
-
-  #toolset()
-  {
-    this.toolset = core.getInput('toolset', { required: false })
-    if(this.toolset!='' && CMakeVersionGreaterEqual('3.1.0')) return Array('-T',this.toolset)
-    else return Array()
-  }
-
-  /* Must be called before generator to allow to add the toolset to the generator string !!!*/
-   #platform()
-  {
-    this.platform = core.getInput('platform', { required: false })
-    /* CMake 3.0 only allow platform to be addind to the generator string */
-    if(! CMakeVersionGreaterEqual('3.1.0')) return Array()
-    if(this.platform!='') return Array('-A',this.platform)
-    else return Array()
-  }
-
-  #install_prefix()
-  {
-    delete process.env.CMAKE_INSTALL_PREFIX;
-    this.install_prefix = core.getInput('install_prefix', { required: false, default:'' });
-    if(this.install_prefix!='')
-    {
-      //if(process.env.MSYS2_LOCATION)this.install_prefix=path.resolve('/usr/local/',this.install_prefix)
-      this.install_prefix=path.resolve(this.install_prefix)
-      if(CMakeVersionGreaterEqual('3.21.0')) return Array('--install-prefix',this.install_prefix)
-      else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+this.install_prefix)
-    }
-    return []
-  }
-
    #configure_warnings()
   {
     let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
@@ -32629,7 +32538,6 @@ class CommandLineMaker
     let ret = true
     let options=[]
 
-    options=options.concat(this.#binary_dir())
     // First check is initial_cache file exist
     /*const initial_cache = this.#initial_cache()
     if(Array.isArray(initial_cache) && initial_cache.length !== 0)
@@ -32639,7 +32547,6 @@ class CommandLineMaker
     options=options.concat(this.#remove_variables())
     options=options.concat(this.#variables())*/
     //console.log("Here1")
-    this.#generator()
     options=options.concat(this.generator)
     //console.log(this.m_error)
     //console.log("Here2")
@@ -32655,7 +32562,6 @@ class CommandLineMaker
     options=options.concat(this.#log_level())
     options=options.concat(this.#log_context())
 */
-    options=options.concat(this.#source_dir()) // Need to be the last
     //console.log(options)
     return options
   }
