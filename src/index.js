@@ -28,7 +28,6 @@ class CMake
   static #m_mode = ''
   static #m_platforms = Array()
   static #m_default_generator = ''
-  static #m_default_cc_cxx = []
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
@@ -200,44 +199,6 @@ class CMake
   {
     this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
     if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
-  }
-
-  static async configure()
-  {
-    let command = []
-    command=command.concat(this.#m_default_cc_cxx)
-    if(!this.is_greater_equal('3.1'))
-    {
-      let gen = this.#generator()
-      if(gen.length>0)
-      {
-        command=command.concat(this.#generator()[0])
-        command=command.concat(this.#generator()[1]+this.#platform())
-      }
-    }
-    else command=command.concat(this.#generator())
-    command=command.concat(this.#toolset())
-    if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
-    command=command.concat(this.#install_prefix())
-    command=command.concat(this.#build_dir())
-    command=command.concat(this.#source_dir()) // Must be the last one
-    console.log(command)
-    let cout = ''
-    let cerr = ''
-    const options = {};
-    options.silent = false
-    options.failOnStdErr = false
-    options.ignoreReturnCode = true
-    options.listeners =
-    {
-      stdout: (data) => { cout += data.toString() },
-      stderr: (data) => { cerr += data.toString() },
-      errline: (data) => {console.log(data) },
-    }
-    options.cwd = this.#working_directory()
-    console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
-    let ret = await run('cmake',command,options)
-    if(ret!=0) core.setFailed(cerr)
   }
 
   // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
@@ -423,6 +384,48 @@ class CMake
     return Array()
   }
 
+  static async configure()
+  {
+    let command = []
+    command=command.concat(this.#install_prefix())
+    if(!this.is_greater_equal('3.1'))
+    {
+      let gen = this.#generator()
+      if(gen.length>0)
+      {
+        command=command.concat(this.#generator()[0])
+        command=command.concat(this.#generator()[1]+this.#platform())
+      }
+    }
+    else command=command.concat(this.#generator())
+    command=command.concat(this.#toolset())
+    if(this.is_greater_equal('3.1'))command=command.concat(this.#platform())
+    command=command.concat(this.#build_dir())
+    command=command.concat(this.#source_dir()) // Must be the last one
+    console.log(command)
+    let cout = ''
+    let cerr = ''
+    const options = {};
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => {console.log(data) },
+    }
+    options.cwd = this.#working_directory()
+    console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
+    let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
+  }
+
+
+
+
+
+
   static #config_build()
   {
     let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config != '' ? process.env.config : '' , disableable: false })
@@ -431,12 +434,6 @@ class CMake
 
     }
     return Array()
-  }
-
-  static #config_install()
-  {
-    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
-    return Array('--config',config)
   }
 
   static async build()
@@ -458,6 +455,12 @@ class CMake
     console.log(`Running CMake v${this.version()} in build mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
+  }
+
+  static #config_install()
+  {
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
+    return Array('--config',config)
   }
 
   static async install()
