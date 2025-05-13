@@ -32139,6 +32139,22 @@ class CMake
     return Array()
   }
 
+  static #config_build()
+  {
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config != '' ? process.env.config : '' , disableable: false })
+    if(config!='')
+    {
+
+    }
+    return Array()
+  }
+
+  static #config_install()
+  {
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
+    return Array('--config',config)
+  }
+
   static async build()
   {
     let command = ['--build',process.env.binary_dir]
@@ -32167,6 +32183,7 @@ class CMake
     {
       command=['--install',process.env.binary_dir]
     }
+    command=command.concat(this.#config_install())
     if(!this.is_greater_equal('3.15.0'))
     {
       command=['-P',process.env.binary_dir+'/cmake_install.cmake']
