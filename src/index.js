@@ -34,6 +34,7 @@ class CMake
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
     this.#parseMode()
+    this.#parse_build_dir()
     return this;
   }
 
@@ -49,6 +50,13 @@ class CMake
   static mode() { return this.#m_mode}
 
   static default_generator() { return this.#m_default_generator }
+
+  static #parse_build_dir()
+  {
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir != '' ? process.env.binary_dir : './build' , disableable: false })
+    binary_dir=path.resolve(binary_dir)
+    core.exportVariable('binary_dir', binary_dir);
+  }
 
   static async #infos()
   {
@@ -240,14 +248,10 @@ class CMake
 
   static #build_dir()
   {
-    console.log(`ssss ${process.env.binary_dir}`)
-    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir != '' ? process.env.binary_dir : './build' , disableable: false })
-    binary_dir=path.resolve(binary_dir)
-    core.exportVariable('binary_dir', binary_dir);
-    if(this.is_greater_equal('3.13')) return Array('-B',binary_dir)
+    if(this.is_greater_equal('3.13')) return Array('-B',process.env.binary_dir)
     else
     {
-      io.mkdirP(binary_dir)
+      io.mkdirP(process.env.binary_dir)
       return Array()
     }
   }
@@ -409,7 +413,7 @@ class CMake
   static async build()
   {
     let command = ['--build']
-    command=command.concat(this.#build_dir())
+    command=command.concat(process.env.binary_dir)
     console.log(command)
     let cout = ''
     let cerr = ''
@@ -431,7 +435,25 @@ class CMake
 
   static async install()
   {
-
+    let command = ['--install']
+    command=command.concat(process.env.binary_dir)
+    console.log(command)
+    let cout = ''
+    let cerr = ''
+    const options = {};
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => {console.log(data) },
+    }
+    options.cwd = this.#working_directory()
+    console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
+    let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
   }
 
 }
