@@ -240,7 +240,7 @@ class CMake
 
   static #build_dir()
   {
-    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: '../build', disableable: false })
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir != '' ? process.env.binary_dir : './build' , disableable: false })
     binary_dir=path.resolve(binary_dir)
     core.exportVariable('binary_dir', binary_dir);
     if(this.is_greater_equal('3.13')) return Array('-B',binary_dir)
@@ -407,7 +407,25 @@ class CMake
 
   static async build()
   {
-
+    let command = ['--build']
+    command=command.concat(this.#build_dir())
+    console.log(command)
+    let cout = ''
+    let cerr = ''
+    const options = {};
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    options.listeners =
+    {
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => {console.log(data) },
+    }
+    options.cwd = this.#working_directory()
+    console.log(`Running CMake v${this.version()} in ${this.mode()} mode`)
+    let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
   }
 
   static async install()
