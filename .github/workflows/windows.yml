@@ -655,6 +655,7 @@ jobs:
         env:
           CC: clang-cl
           CXX: clang-cl
+          RC: llvm-rc
         with:
           mode: configure
           source_dir: './tests'
