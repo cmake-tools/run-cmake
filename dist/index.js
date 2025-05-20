@@ -33961,11 +33961,13 @@ class CMake
   static #m_mode = ''
   static #m_platforms = new Map()
   static #m_default_generator = ''
+  static #m_nbrCPU = '1'
 
   static async init()
   {
     if(!process.env.cmake_version) await this.#infos()
     else this.#m_version=process.env.cmake_version
+    this.#m_nbrCPU = String(os.availableParallelism())
     this.#parseMode()
     this.#parseBuildDir()
     return this;
@@ -34652,9 +34654,13 @@ class CMake
   static #parallel()
   {
     if(!this.is_greater_equal('3.12')) return Array()
-    let value = parser.getInput('parallel',{default:global.number_cpus})
+    let value = parser.getInput('parallel',{default:this.#m_nbrCPU})
     value = parseInt(value, 10)
-    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
+    if(isNaN(value)||value<=0)
+    {
+      core.warning('parallel should be a number >=1 ('+String(value)+')')
+      value=1
+    }
     return Array('--parallel',String(value))
   }
 
