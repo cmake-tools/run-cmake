@@ -34668,7 +34668,8 @@ class CMake
 
   static #config()
   {
-    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config != '' ? process.env.config : '' , disableable: false })
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : '' , disableable: false })
+    console.log(`eeeeeeeeeeeeeeee ${config}`)
     if(config!='')
     {
       return Array('--config',config)
