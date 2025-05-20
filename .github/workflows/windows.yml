@@ -290,9 +290,6 @@ jobs:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
@@ -551,9 +548,6 @@ jobs:
           ninjaVersion: ^1
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
@@ -676,9 +670,6 @@ jobs:
           ninjaVersion: ^1
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: configure
