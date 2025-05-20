@@ -44,7 +44,7 @@ class Graphviz
 
   if(process.platform === "win32")
   {
-    if(process.env.MSYSTEM !== undefined) this.#m_dot = which.sync('dot', { nothrow: true })
+    if(os == "msys" || os == "ucrt64" || os == "clang64" || os == "clangarm64" || os == "mingw64") this.#m_dot = which.sync('dot', { nothrow: true })
     else this.#m_dot = which.sync('dot.exe', { nothrow: true })
   }
   else
@@ -127,7 +127,7 @@ class CMake
   static #parseGraphviz()
   {
     this.#m_graphviz = core.getInput('graphviz', { required: false, default:'' });
-    this.#m_graphviz=path.resolve(this.#m_graphviz)
+    if(this.#m_graphviz!='')this.#m_graphviz=path.resolve(this.#m_graphviz)
   }
 
   static is_greater_equal(version)
