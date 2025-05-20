@@ -8,7 +8,6 @@ const parser = require('action-input-parser')
 const os = require("node:os");
 const artifact = require('@actions/artifact');
 const { json } = require('node:stream/consumers');
-const style = require('ansi-styles');
 require('dotenv').config();
 
 function os_is()

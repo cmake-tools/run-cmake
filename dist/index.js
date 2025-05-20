@@ -29303,14 +29303,6 @@ which.sync = whichSync
 
 /***/ }),
 
-/***/ 423:
-/***/ ((module) => {
-
-module.exports = eval("require")("ansi-styles");
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -31465,7 +31457,6 @@ const parser = __nccwpck_require__(3455)
 const os = __nccwpck_require__(612);
 const artifact = __nccwpck_require__(5253);
 const { json } = __nccwpck_require__(6465);
-const style = __nccwpck_require__(423);
 (__nccwpck_require__(8603).config)();
 
 function os_is()
