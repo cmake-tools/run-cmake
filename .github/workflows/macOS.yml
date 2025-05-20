@@ -209,7 +209,7 @@ jobs:
           ninjaVersion: ^1
 
       - name: ⬇️ Setup GCC v${{ matrix.compiler }}
-        run: brew install gcc@${{ matrix.compiler }}
+        run: brew reinstall gcc@${{ matrix.compiler }}
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
@@ -342,7 +342,7 @@ jobs:
           cmakeVersion: ~${{ matrix.cmake_version }}
           ninjaVersion: ^1
       - name: ⬇️ Setup LLVM v${{ matrix.compiler }}
-        run: brew install llvm@${{ matrix.compiler }}
+        run: brew reinstall llvm@${{ matrix.compiler }}
       - name: ⚙️ run-cmake (configure)
         uses: ./
         env:

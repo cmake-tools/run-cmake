@@ -33952,91 +33952,6 @@ function os_is()
   else return process.platform
 }
 
-class Graphviz
-{
-  static #m_dot = ''
-  static #m_name = ''
-  static async init(name)
-  {
-    await this.#installGraphivz()
-    this.#m_name=name
-    return this;
-  }
-
-  static async run()
-  {
-    let options;
-    const globber = await glob.create(`${this.#m_name}*`)
-    for await (const file of globber.globGenerator())
-    {
-      return await run(this.#m_dot,['-Tpng','-O',file], options)
-    }
-  }
-
-  static async #installGraphivz()
-  {
-
-  if(process.platform === "win32")
-  {
-    if(os == "msys" || os == "ucrt64" || os == "clang64" || os == "clangarm64" || os == "mingw64") this.#m_dot = which.sync('dot', { nothrow: true })
-    else this.#m_dot = which.sync('dot.exe', { nothrow: true })
-  }
-  else
-  {
-    this.#m_dot = which.sync('dot', { nothrow: true })
-  }
-  if(this.#m_dot==null)
-  {
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    let params = []
-    let command
-    let os = os_is()
-    /* cygwin doesn't have graphviz so install the windows one */
-    if( os == "win32" || os == "cygwin" )
-    {
-      params = ['install', 'graphviz']
-      command = 'choco'
-    }
-    else if( os == "msys" || os == "ucrt64" || os == "clang64" || os == "clangarm64" || os == "mingw64")
-    {
-      params = ['-S', 'graphviz:p']
-      command = 'pacboy'
-    }
-    else if( os == "darwin")
-    {
-      params = ['install', 'graphviz']
-      command = 'brew'
-    }
-    else
-    {
-      params = ['apt-get','install', 'graphviz']
-      command = 'sudo'
-    }
-    core.info('Installing Graphviz')
-    await run(command,params, options)
-    if(process.platform === "win32")
-    {
-      if(process.env.MSYSTEM !== undefined) this.#m_dot = which.sync('dot', { nothrow: true })
-      else this.#m_dot = which.sync('dot.exe', { nothrow: true })
-    }
-    else
-    {
-      this.#m_dot = which.sync('dot', { nothrow: true })
-    }
-  }
-  }
-}
-
 class CMake
 {
   static #m_version = '0';
@@ -34046,7 +33961,6 @@ class CMake
   static #m_mode = ''
   static #m_platforms = new Map()
   static #m_default_generator = ''
-  static #m_graphviz = ''
 
   static async init()
   {
@@ -34054,14 +33968,7 @@ class CMake
     else this.#m_version=process.env.cmake_version
     this.#parseMode()
     this.#parseBuildDir()
-    this.#parseGraphviz()
     return this;
-  }
-
-  static #parseGraphviz()
-  {
-    this.#m_graphviz = core.getInput('graphviz', { required: false, default:'' });
-    if(this.#m_graphviz!='')this.#m_graphviz=path.resolve(this.#m_graphviz)
   }
 
   static is_greater_equal(version)
@@ -34501,14 +34408,104 @@ class CMake
   static #graphviz()
   {
 
-    if(this.#m_graphviz=='')
+    let graphviz = core.getInput('graphviz', { required: false, default:'' });
+    if(graphviz=='')
     {
       return []
     }
     else
     {
-      return Array('--graphviz='+this.#m_graphviz)
+      graphviz=path.resolve(graphviz)
+      return Array('--graphviz='+graphviz)
     }
+  }
+
+  // TODO ? --system-information [file]
+  // TODO ? --print-config-dir
+
+  static #log_level()
+  {
+    let log_level = core.getInput('log_level', { required: false, default:'' });
+    if(log_level!='')
+    {
+      if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
+      if( this.is_greater_equal('3.15')) return ['--log-level='+log_level]
+    }
+    return []
+  }
+
+  static #log_context()
+  {
+    let log_level = core.getInput('log_context', { required: false, type: 'boolean',default:'' });
+    if(log_level)
+    {
+      if( this.is_greater_equal('3.17')) return ['--log-context']
+      else return []
+    }
+    return []
+  }
+
+  static #sarif_output()
+  {
+    let sarif_output = core.getInput('sarif_output', { required: false, type: 'string',default:'' });
+    if(sarif_output!='')
+    {
+      sarif_output=path.resolve(sarif_output)
+      if( this.is_greater_equal('4.0')) return ['--sarif-output='+sarif_output]
+    }
+    return []
+  }
+
+  // TODO --debug-trycompile ?
+
+  static #debug_output()
+  {
+    let debug_output = core.getInput('debug_output', { required: false, type: 'boolean',default:false });
+    if(debug_output)
+    {
+      return ['--debug-output']
+    }
+    return []
+  }
+
+  static #debug_find()
+  {
+    let debug_find = core.getInput('debug_find', { required: false, type: 'boolean',default:false });
+    if(debug_find)
+    {
+      if( this.is_greater_equal('3.17')) return ['--debug-find']
+    }
+    return []
+  }
+
+  static #debug_find_pkg()
+  {
+    let debug_find_pkg = core.getInput('debug_find_pkg', { required: false, type: 'string',default:'' });
+    if(debug_find_pkg!='')
+    {
+      if( this.is_greater_equal('3.23')) return ['--debug-find-pkg='+debug_find_pkg]
+    }
+    return []
+  }
+
+   static #debug_find_var()
+  {
+    let debug_find_var = core.getInput('debug_find_var', { required: false, type: 'string',default:'' });
+    if(debug_find_var!='')
+    {
+      if( this.is_greater_equal('3.23')) return ['--debug-find-var=='+debug_find_var]
+    }
+    return []
+  }
+
+    static #trace()
+  {
+    let trace = core.getInput('trace', { required: false, type: 'boolean',default:false });
+    if(trace)
+    {
+      return ['--trace']
+    }
+    return []
   }
 
   /*static async #determineDefaultGenerator()
@@ -34616,8 +34613,15 @@ class CMake
     command=command.concat(this.#project_file())
     command=command.concat(this.#list_cache_variables())
     command=command.concat(this.#graphviz())
-    if(this.#m_graphviz!='') graph = await Graphviz.init(this.#m_graphviz)
+    command=command.concat(this.#log_level())
+    command=command.concat(this.#log_context())
     command=command.concat(this.#build_dir())
+    command=command.concat(this.#sarif_output())
+    command=command.concat(this.#debug_output())
+    command=command.concat(this.#debug_find())
+    command=command.concat(this.#debug_find_pkg())
+    command=command.concat(this.#debug_find_var())
+    command=command.concat(this.#trace())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
     let cout = ''
@@ -34637,27 +34641,78 @@ class CMake
     if(this.#m_platforms.get(this.#m_generator) !== undefined && this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform known to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
-    if(this.#m_graphviz!='') ret = await graph.run()
   }
 
+  // BUILD PARAMETER
 
+  // TODO --build <dir> binary_dir ???
+  // TODO --preset <preset>, --preset=<preset>
+  // TODO --list-presets
 
+  static #parallel()
+  {
+    if(!this.is_greater_equal('3.12')) return Array()
+    let value = parser.getInput('parallel',{default:global.number_cpus})
+    value = parseInt(value, 10)
+    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
+    return Array('--parallel',String(value))
+  }
 
+  // TODO -t <tgt>..., --target <tgt>...
 
-
-  static #config_build()
+  static #config()
   {
     let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config != '' ? process.env.config : '' , disableable: false })
     if(config!='')
     {
-
+      return Array('--config',config)
     }
     return Array()
+  }
+
+  // TODO --clean-first
+  // TODO --resolve-package-references=<value>
+
+  static #build_verbose()
+  {
+    delete process.env.VERBOSE;
+    delete process.env.CMAKE_VERBOSE_MAKEFILE;
+    const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
+    if(build_verbose)
+    {
+      if( this.is_greater_equal('3.14'))
+      {
+        return Array('--verbose')
+      }
+      else
+      {
+        process.env.VERBOSE="TRUE"
+        process.env.CMAKE_VERBOSE_MAKEFILE="TRUE"
+        return []
+      }
+    }
+    return []
+  }
+
+  static #to_native_tool()
+  {
+    const to_native_tool = parser.getInput('to_native_tool', {type: 'array',default:[]})
+    if(to_native_tool.length == 0) return []
+    else
+    {
+      let ret = ['--']
+      ret=ret.concat(to_native_tool)
+      return ret
+    }
   }
 
   static async build()
   {
     let command = ['--build',process.env.binary_dir]
+    command=command.concat(this.#parallel())
+    command=command.concat(this.#config())
+    command=command.concat(this.#build_verbose())
+    command=command.concat(this.#to_native_tool())
     console.log(command)
     let cout = ''
     let cerr = ''
@@ -34676,11 +34731,33 @@ class CMake
     if(ret!=0) core.setFailed(cerr)
   }
 
+  // INSTALL PARAMETERS
+
   static #config_install()
   {
     let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
     return Array('--config',config)
   }
+
+  static #install_verbose()
+  {
+    delete process.env.VERBOSE;
+    const install_verbose = core.getInput('install_verbose', { required: false, type: 'boolean', default: false })
+    if(install_verbose)
+    {
+      if( this.is_greater_equal('3.15'))
+      {
+        return Array('--verbose')
+      }
+      else
+      {
+        process.env.VERBOSE="TRUE"
+        return Array()
+      }
+    }
+    return Array()
+  }
+
 
   static async install()
   {
@@ -34694,6 +34771,7 @@ class CMake
     {
       command=['-P',process.env.binary_dir+'/cmake_install.cmake']
     }
+    command=command.concat(this.#install_verbose())
     console.log(command)
     let cout = ''
     let cerr = ''
@@ -34713,6 +34791,29 @@ class CMake
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -34739,42 +34840,6 @@ async function run(cmd,args, opts)
   else return await exec.exec(cmd,args,opts)
 }
 
-async function runGraphviz()
-{
-  let command
-  if(process.platform === "win32") command = 'dot.exe'
-  else command= 'dot'
-  let graphviz = core.getInput('graphviz', { required: false, default:'' });
-  graphviz=path.resolve(graphviz)
-  let params = ['-Tpng','-o', './toto.png',graphviz]
-  let cout ='';
-  let cerr='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
-    }
-  }
-  await run(command,params, options)
-  const {id, size} = await artifact.create().uploadArtifact(
-    // name of the artifact
-    'CMake dependencies',
-    // files to include (supports absolute and relative paths)
-    ['/home/runner/work/run-cmake/run-cmake/dependencies.dot'],
-    {
-      // optional: how long to retain the artifact
-      // if unspecified, defaults to repository/org retention settings (the limit of this value)
-      retentionDays: 10
-    }
-  )
-  core.summary.addImage('toto.png', 'alt description of img', {width: '100', height: '100'})
-  core.summary.write()
-}
-
-
 class CommandLineMaker
 {
   constructor()
@@ -34783,45 +34848,7 @@ class CommandLineMaker
     if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
     else this.old_style=true
     this.actual_path=path.resolve('./')
-    //this.#binary_dir()
-    //this.need_to_install_graphviz=this.#graphviz()
   }
-
-
-
-
-
-   #fresh()
-  {
-    return []
-  }
-
-
-
-
-
-   #log_level()
-  {
-    let log_level = core.getInput('log_level', { required: false, default:'' });
-    if(log_level!='')
-    {
-      if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
-      if( CMakeVersionGreaterEqual('3.15')) return ['--log-level='+log_level]
-    }
-    return []
-  }
-
-   #log_context()
-  {
-    let log_level = core.getInput('log_level', { required: false, type: 'boolean',default:'' });
-    if(log_level)
-    {
-      if( CMakeVersionGreaterEqual('3.17')) return ['--log-context']
-      else return []
-    }
-    return []
-  }
-
 
    #binary_build_dir()
   {
@@ -34831,14 +34858,7 @@ class CommandLineMaker
     return Array(this.binary_dir)
   }
 
-   #parallel()
-  {
-    if(! CMakeVersionGreaterEqual('3.12.0')) return Array()
-    let value = parser.getInput('parallel',{default:global.number_cpus})
-    value = parseInt(value, 10)
-    if(isNaN(value)||value<=0) throw String('parallel should be a number >=1 ('+String(value)+')')
-    return Array('--parallel',String(value))
-  }
+
 
    #build_targets() /* FIXME for CMAKE<3.15 */
   {
@@ -34897,38 +34917,6 @@ class CommandLineMaker
     else return []
   }
 
-   #build_verbose()
-  {
-    delete process.env.VERBOSE;
-    delete process.env.CMAKE_VERBOSE_MAKEFILE;
-    const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
-    if(build_verbose)
-    {
-      if( CMakeVersionGreaterEqual('3.14'))
-      {
-        return Array('--verbose')
-      }
-      else
-      {
-        process.env.VERBOSE="TRUE"
-        process.env.CMAKE_VERBOSE_MAKEFILE="TRUE"
-        return []
-      }
-    }
-    return []
-  }
-
-   #to_native_tool()
-  {
-    const to_native_tool = parser.getInput('to_native_tool', {type: 'array',default:[]})
-    if(to_native_tool.length == 0) return []
-    else
-    {
-      let ret = ['--']
-      ret=ret.concat(to_native_tool)
-      return ret
-    }
-  }
 
    buildCommandParameters()
   {
@@ -34936,31 +34924,31 @@ class CommandLineMaker
     let commands = []
     if(targets.length ==0)
     {
-      let parameters=['--build']
-      parameters=parameters.concat(this.#binary_build_dir())
-      parameters=parameters.concat(this.#parallel())
-      parameters=parameters.concat(this.#build_targets())
-      parameters=parameters.concat(this.#config())
-      parameters=parameters.concat(this.#clean_first())
-      parameters=parameters.concat(this.#resolve_package_references())
-      parameters=parameters.concat(this.#build_verbose())
-      parameters=parameters.concat(this.#to_native_tool())
+      //let parameters=['--build']
+      //parameters=parameters.concat(this.#binary_build_dir())
+      //parameters=parameters.concat(this.#parallel())
+      //parameters=parameters.concat(this.#build_targets())
+      //parameters=parameters.concat(this.#config())
+      //parameters=parameters.concat(this.#clean_first())
+      //parameters=parameters.concat(this.#resolve_package_references())
+      //parameters=parameters.concat(this.#build_verbose())
+      //parameters=parameters.concat(this.#to_native_tool())
       commands.push(parameters)
     }
     else
     {
       for(const i in targets)
       {
-        let parameters=['--build']
-        parameters=parameters.concat(this.#binary_build_dir())
-        parameters=parameters.concat(this.#parallel())
-        parameters=parameters.concat(targets[i])
-        parameters=parameters.concat(this.#config())
-        if(i==1)parameters=parameters.concat(this.#clean_first())
-        parameters=parameters.concat(this.#resolve_package_references())
-        parameters=parameters.concat(this.#build_verbose())
-        parameters=parameters.concat(this.#to_native_tool())
-        commands.push(parameters)
+        //let parameters=['--build']
+        //parameters=parameters.concat(this.#binary_build_dir())
+        //parameters=parameters.concat(this.#parallel())
+        //parameters=parameters.concat(targets[i])
+        //parameters=parameters.concat(this.#config())
+        //if(i==1)parameters=parameters.concat(this.#clean_first())
+        //parameters=parameters.concat(this.#resolve_package_references())
+        //parameters=parameters.concat(this.#build_verbose())
+        //parameters=parameters.concat(this.#to_native_tool())
+        //commands.push(parameters)
       }
     }
     return commands
@@ -35026,91 +35014,8 @@ class CommandLineMaker
     else return []
   }
 
-   #install_verbose()
-  {
-    delete process.env.VERBOSE;
-    const install_verbose = core.getInput('install_verbose', { required: false, type: 'boolean', default: false })
-    if(install_verbose)
-    {
-      if( CMakeVersionGreaterEqual('3.15'))
-      {
-        return Array('--verbose')
-      }
-      else
-      {
-        process.env.VERBOSE="TRUE"
-        return []
-      }
-    }
-    return []
-  }
-
-   installCommandParameters()
-  {
-    let parameters=[]
-    if( CMakeVersionGreaterEqual('3.15.0'))
-    {
-      parameters=parameters.concat('--install')
-      parameters=parameters.concat(this.#binary_build_dir())
-      parameters=parameters.concat(this.#install_config())
-      parameters=parameters.concat(this.#component())
-      parameters=parameters.concat(this.#default_directory_permissions())
-      parameters=parameters.concat(this.#override_install_prefix())
-      parameters=parameters.concat(this.#strip())
-      parameters=parameters.concat(this.#install_verbose())
-    }
-    else
-    {
-      parameters=parameters.concat(this.#install_config())
-      parameters=parameters.concat(this.#component())
-      parameters=parameters.concat(this.#default_directory_permissions())
-      parameters=parameters.concat(this.#override_install_prefix())
-      parameters=parameters.concat(this.#strip())
-      parameters=parameters.concat(this.#install_verbose())
-      parameters=parameters.concat('-P')
-      parameters=parameters.concat(this.#binary_build_dir()+'/cmake_install.cmake')
-    }
-    return parameters
-  }
-
-   workingDirectory()
-  {
-    if(this.old_style==true)
-    {
-        return process.env.binary_dir
-    }
-    else
-    {
-      return this.actual_path
-    }
-  }
-
-   InstallGraphvizNeeded()
-  {
-    return this.need_to_install_graphviz
-  }
 }
 
-async function configure(command_line_maker)
-{
-  let params=command_line_maker.configureCommandParameters()
-  let cout ='';
-  let cerr='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
-    }
-  }
-  options.silent = false
-  options.cwd = command_line_maker.workingDirectory();
-  await run('cmake',params, options)
-  //if(command_line_maker.InstallGraphvizNeeded()) await runGraphviz()
-  return true;
-}
 
 async function build(command_line_maker)
 {
@@ -35131,23 +35036,6 @@ async function build(command_line_maker)
   {
     await run('cmake',commands[i], options)
   }
-}
-
-async function install(command_line_maker)
-{
-  let cout ='';
-  let cerr='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
-    }
-  }
-  options.silent = false
-  await run('cmake',command_line_maker.installCommandParameters(), options)
 }
 
 async function main()
