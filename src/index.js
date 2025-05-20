@@ -24,7 +24,7 @@ class CMake
   static #m_generators = Array()
   static #m_generator = ''
   static #m_mode = ''
-  static #m_platforms = Array()
+  static #m_platforms = new Map()
   static #m_default_generator = ''
 
   static async init()
@@ -79,9 +79,35 @@ class CMake
     }
     this.#parseVersion(cerr)
     await this.#parseGenerators()
+    await this.#parsePlatforms()
   }
 
-    // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
+  static async #parsePlatforms()
+  {
+    if(this.#m_capacities!==null)
+    {
+      for(var i= 0 ; i!= this.#m_capacities.generators.length; ++i)
+      {
+        let gen = this.#m_capacities.generators[i].name
+        if(this.#m_capacities.generators[i].supportedPlatforms !== undefined)
+        {
+          let pl = Array()
+          for(var j =0; j!=this.#m_capacities.generators[i].supportedPlatforms.length; ++j)
+          {
+            pl.concat(this.#m_capacities.generators[i].supportedPlatforms[j])
+            console.log(this.#m_capacities.generators[i].supportedPlatforms[j])
+          }
+          this.#m_platforms.set(gen,pl)
+        }
+        else
+        {
+          this.#m_platforms.set(gen, Array())
+        }
+      }
+    }
+  }
+
+  // Before CMake 3.13 -B -S is not available so we need to run cmake in the binary folder in config mode
   static #working_directory()
   {
     if(this.is_greater_equal('3.13')) return path.resolve('./')
@@ -317,12 +343,10 @@ class CMake
         if(gen.name == this.#m_generator)
         {
           has_platform=gen.platformSupport
-          if(gen.supportedPlatforms!==null) this.#m_platforms=gen.supportedPlatforms
         }
       }
     }
     let platform = core.getInput('platform', { required: false }) // don't use parser.getInput here !!!
-    console.log(`toto  kk ${platform}`)
     if(this.is_greater_equal('3.1'))
     {
       if(platform!='' && has_platform== true) return Array('-A',platform)
@@ -493,6 +517,7 @@ class CMake
     }
     options.cwd = this.#working_directory()
     console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
+    if(this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform know to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
