@@ -31758,7 +31758,7 @@ class CMake
   static #platform()
   {
     let has_platform = true
-    /*if(this.#m_capacities !== null)
+    if(this.#m_capacities !== null)
     {
       for(let index in this.#m_capacities.generators)
       {
@@ -31769,8 +31769,8 @@ class CMake
           if(gen.supportedPlatforms!==null) this.#m_platforms=gen.supportedPlatforms
         }
       }
-    }*/
-    let platform = parser.getInput({key: 'platforml', type: 'string', required: false, default: '', disableable: false })
+    }
+    let platform = core.getInput('platform', { required: false }) // don't use parser.getInput here !!!
     console.log(`toto  kk ${platform}`)
     if(this.is_greater_equal('3.1'))
     {
