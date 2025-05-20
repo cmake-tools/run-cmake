@@ -118,7 +118,7 @@ jobs:
           release: true
           update: true
           cache: true
-          pacboy: ninja:p cmake:p clang:p gcc:p
+          pacboy: ninja:p cmake:p clang:p gcc:p graphviz:p
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
@@ -189,7 +189,7 @@ jobs:
           release: true
           update: true
           cache: true
-          pacboy: ninja:p cmake:p clang:p gcc:p
+          pacboy: ninja:p cmake:p clang:p gcc:p graphviz:p
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
@@ -261,7 +261,7 @@ jobs:
           release: true
           update: true
           cache: true
-          pacboy: ninja:p cmake:p clang:p gcc:p
+          pacboy: ninja:p cmake:p clang:p gcc:p graphviz:p
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'

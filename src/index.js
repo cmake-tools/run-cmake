@@ -66,7 +66,7 @@ class Graphviz
     }
     let params = []
     let command
-    let os = await os_is()
+    let os = os_is()
     /* cygwin doesn't have graphviz so install the windows one */
     if( os == "win32" || os == "cygwin" )
     {
