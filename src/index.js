@@ -9,12 +9,98 @@ const os = require("node:os");
 const artifact = require('@actions/artifact');
 const { json } = require('node:stream/consumers');
 require('dotenv').config();
+const glob = require('@actions/glob');
 
 function os_is()
 {
   if(process.env.MSYSTEM !== undefined) return String(process.env.MSYSTEM).toLowerCase()
   if(process.env.CYGWIN) return 'cygwin'
   else return process.platform
+}
+
+class Graphviz
+{
+  static #m_dot = ''
+  static #m_name = ''
+  static async init(name)
+  {
+    await this.#installGraphivz()
+    this.#m_name=name
+    return this;
+  }
+
+  static async run()
+  {
+    let options;
+    const globber = await glob.create(`${this.#m_name}*`)
+    for await (const file of globber.globGenerator())
+    {
+      return await run(this.#m_dot,['-Tpng','-O',file], options)
+    }
+  }
+
+  static async #installGraphivz()
+  {
+
+  if(process.platform === "win32")
+  {
+    if(process.env.MSYSTEM !== undefined) this.#m_dot = which.sync('dot', { nothrow: true })
+    else this.#m_dot = which.sync('dot.exe', { nothrow: true })
+  }
+  else
+  {
+    this.#m_dot = which.sync('dot', { nothrow: true })
+  }
+  if(this.#m_dot==null)
+  {
+    let cout ='';
+    let cerr='';
+    const options = {};
+    options.listeners = {
+      stdout: (data) => {
+        cout = data.toString();
+      },
+      stderr: (data) => {
+        cerr = data.toString();
+      }
+    }
+    let params = []
+    let command
+    let os = await os_is()
+    /* cygwin doesn't have graphviz so install the windows one */
+    if( os == "win32" || os == "cygwin" )
+    {
+      params = ['install', 'graphviz']
+      command = 'choco'
+    }
+    else if( os == "msys2")
+    {
+      params = ['-S', 'graphviz:p']
+      command = 'pacboy'
+    }
+    else if( os == "darwin")
+    {
+      params = ['install', 'graphviz']
+      command = 'brew'
+    }
+    else
+    {
+      params = ['apt-get','install', 'graphviz']
+      command = 'sudo'
+    }
+    core.info('Installing Graphviz')
+    await run(command,params, options)
+    if(process.platform === "win32")
+    {
+      if(process.env.MSYSTEM !== undefined) this.#m_dot = which.sync('dot', { nothrow: true })
+      else this.#m_dot = which.sync('dot.exe', { nothrow: true })
+    }
+    else
+    {
+      this.#m_dot = which.sync('dot', { nothrow: true })
+    }
+  }
+  }
 }
 
 class CMake
@@ -26,6 +112,7 @@ class CMake
   static #m_mode = ''
   static #m_platforms = new Map()
   static #m_default_generator = ''
+  static #m_graphviz = ''
 
   static async init()
   {
@@ -33,7 +120,14 @@ class CMake
     else this.#m_version=process.env.cmake_version
     this.#parseMode()
     this.#parseBuildDir()
+    this.#parseGraphviz()
     return this;
+  }
+
+  static #parseGraphviz()
+  {
+    this.#m_graphviz = core.getInput('graphviz', { required: false, default:'' });
+    this.#m_graphviz=path.resolve(this.#m_graphviz)
   }
 
   static is_greater_equal(version)
@@ -399,6 +493,90 @@ class CMake
     return Array()
   }
 
+  // -Wno-dev -Wdev -Wdeprecated -Wno-deprecated
+  static #configure_warnings()
+  {
+    let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
+    if(configure_warnings=='') return []
+    if(configure_warnings=='none')
+    {
+      return Array('-Wno-dev')
+    }
+    else if(configure_warnings=='deprecated')
+    {
+      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      else return Array('-Wno-dev','-Wdeprecated')
+    }
+    else if(configure_warnings=='warning')
+    {
+      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      else return Array('-Wdev','-Wno-deprecated')
+    }
+    else if(configure_warnings=='developer')
+    {
+      return Array('-Wdev')
+    }
+    else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings)
+  }
+
+  // -Wno-dev -Wdev -Wdeprecated -Wno-deprecated
+  static #configure_warnings_as_errors()
+  {
+    let configure_warnings_as_errors = core.getInput('configure_warnings_as_errors', { required: false, default:'none' });
+    if(configure_warnings_as_errors=='') return []
+    if(configure_warnings_as_errors=='none')
+    {
+      if(! CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Wno-error=dev')
+    }
+    else if(configure_warnings_as_errors=='deprecated')
+    {
+      if(! CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Wno-error=dev','-Werror=deprecated')
+    }
+    else if(configure_warnings_as_errors=='warning')
+    {
+      if(! CMakeVersionGreaterEqual('3.5')) return []
+      else return Array('-Werror=dev','-Wno-error=deprecated')
+    }
+    else if(configure_warnings_as_errors=='developer')
+    {
+      return Array('-Werror=dev')
+    }
+    else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
+  }
+
+  // TODO --fresh
+
+  // -L[A][H] List non-advanced cached variables.
+  static #list_cache_variables()
+  {
+    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'' });
+    if(list_cache_variables=='') return []
+    else if(list_cache_variables=='cache') return Array('-L')
+    else if(list_cache_variables=='cache_help') return Array('-LH')
+    else if(list_cache_variables=='advanced') return Array('-LA')
+    else if(list_cache_variables=='advanced_help') return Array('-LAH')
+    else if(list_cache_variables=='off') return []
+    else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables)
+  }
+
+  // NO NEED -LR[A][H] <regex>
+  // NO NEED -N
+
+  static #graphviz()
+  {
+
+    if(this.#m_graphviz=='')
+    {
+      return []
+    }
+    else
+    {
+      return Array('--graphviz='+this.#m_graphviz)
+    }
+  }
+
   /*static async #determineDefaultGenerator()
   {
     console.log(os_is())
@@ -481,6 +659,9 @@ class CMake
   static async configure()
   {
     let command = []
+    let graph = ''
+    command=command.concat(this.#configure_warnings())
+    command=command.concat(this.#configure_warnings_as_errors())
     command=command.concat(this.#initial_cache())
     command=command.concat(this.#variables())
     command=command.concat(this.#remove_variables())
@@ -499,6 +680,9 @@ class CMake
     command=command.concat(this.#toolchain())
     command=command.concat(this.#install_prefix())
     command=command.concat(this.#project_file())
+    command=command.concat(this.#list_cache_variables())
+    command=command.concat(this.#graphviz())
+    if(this.#m_graphviz!='') graph = await Graphviz.init(this.#m_graphviz)
     command=command.concat(this.#build_dir())
     command=command.concat(this.#source_dir()) // Must be the last one
     console.log(command)
@@ -519,6 +703,7 @@ class CMake
     if(this.#m_platforms.get(this.#m_generator) !== undefined && this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform known to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
+    if(this.#m_graphviz!='') ret = await graph.run()
   }
 
 
@@ -655,60 +840,6 @@ async function runGraphviz()
   core.summary.write()
 }
 
-async function installGraphviz()
-{
-  let found_graphviz = false
-  if(process.platform === "win32")
-  {
-    if(process.env.MSYSTEM !== undefined) found_graphviz = which.sync('dot', { nothrow: true })
-    else found_graphviz = which.sync('dot.exe', { nothrow: true })
-  }
-  else
-  {
-    found_graphviz = which.sync('dot', { nothrow: true })
-  }
-  if(!found_graphviz)
-  {
-    let cout ='';
-    let cerr='';
-    const options = {};
-    options.listeners = {
-      stdout: (data) => {
-        cout = data.toString();
-      },
-      stderr: (data) => {
-        cerr = data.toString();
-      }
-    }
-    let params = []
-    let command
-    let os = await os_is()
-    /* cygwin doesn't have graphviz so install the windows one */
-    if( os == "win32" || os == "cygwin" )
-    {
-      params = ['install', 'graphviz']
-      command = 'choco'
-    }
-    else if( os == "msys2")
-    {
-      params = ['-S', 'graphviz:p']
-      command = 'pacboy'
-    }
-    else if( os == "darwin")
-    {
-      params = ['install', 'graphviz']
-      command = 'brew'
-    }
-    else
-    {
-      params = ['apt-get','install', 'graphviz']
-      command = 'sudo'
-    }
-    core.info('Installing Graphviz')
-    await run(command,params, options)
-  }
-  return true
-}
 
 class CommandLineMaker
 {
@@ -722,90 +853,18 @@ class CommandLineMaker
     //this.need_to_install_graphviz=this.#graphviz()
   }
 
-  /* Configure */
-   #configure_warnings()
-  {
-    let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
-    if(configure_warnings=='') return []
-    if(configure_warnings=='none')
-    {
-      return Array('-Wno-dev')
-    }
-    else if(configure_warnings=='deprecated')
-    {
-      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
-      else return Array('-Wno-dev','-Wdeprecated')
-    }
-    else if(configure_warnings=='warning')
-    {
-      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
-      else return Array('-Wdev','-Wno-deprecated')
-    }
-    else if(configure_warnings=='developer')
-    {
-      return Array('-Wdev')
-    }
-    else throw String('configure_warnings should be : none, deprecated, warning or developer. Received : '+configure_warnings)
-  }
 
-   #configure_warnings_as_errors()
-  {
-    let configure_warnings_as_errors = core.getInput('configure_warnings_as_errors', { required: false, default:'none' });
-    if(configure_warnings_as_errors=='') return []
-    if(configure_warnings_as_errors=='none')
-    {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
-      else return Array('-Wno-error=dev')
-    }
-    else if(configure_warnings_as_errors=='deprecated')
-    {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
-      else return Array('-Wno-error=dev','-Werror=deprecated')
-    }
-    else if(configure_warnings_as_errors=='warning')
-    {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
-      else return Array('-Werror=dev','-Wno-error=deprecated')
-    }
-    else if(configure_warnings_as_errors=='developer')
-    {
-      return Array('-Werror=dev')
-    }
-    else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
-  }
+
+
 
    #fresh()
   {
     return []
   }
 
-   #list_cache_variables()
-  {
-    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'' });
-    if(list_cache_variables=='') return []
-    else if(list_cache_variables=='cache') return Array('-L')
-    else if(list_cache_variables=='cache_help') return Array('-LH')
-    else if(list_cache_variables=='advanced') return Array('-LA')
-    else if(list_cache_variables=='advanced_help') return Array('-LAH')
-    else if(list_cache_variables=='off') return []
-    else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables)
-  }
 
-   #graphviz()
-  {
-    let graphviz = core.getInput('graphviz', { required: false, default:'' });
-    if(graphviz=='')
-    {
-      this.install_graphviz=false;
-      return []
-    }
-    else
-    {
-      this.install_graphviz=true;
-      graphviz=path.resolve(graphviz)
-      return Array('--graphviz='+graphviz)
-    }
-  }
+
+
 
    #log_level()
   {
