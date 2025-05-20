@@ -34007,7 +34007,7 @@ class Graphviz
       params = ['install', 'graphviz']
       command = 'choco'
     }
-    else if( os == "msys2")
+    else if( os == "msys" || os == "ucrt64" || os == "clang64" || os == "clangarm64" || os == "mingw64")
     {
       params = ['-S', 'graphviz:p']
       command = 'pacboy'
