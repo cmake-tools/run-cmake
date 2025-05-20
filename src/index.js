@@ -91,11 +91,10 @@ class CMake
         let gen = this.#m_capacities.generators[i].name
         if(this.#m_capacities.generators[i].supportedPlatforms !== undefined)
         {
-          let pl = Array()
+          let pl = new Array()
           for(var j =0; j!=this.#m_capacities.generators[i].supportedPlatforms.length; ++j)
           {
             pl.concat(this.#m_capacities.generators[i].supportedPlatforms[j])
-            console.log(this.#m_capacities.generators[i].supportedPlatforms[j])
           }
           this.#m_platforms.set(gen,pl)
         }
@@ -517,7 +516,7 @@ class CMake
     }
     options.cwd = this.#working_directory()
     console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
-    if(this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform know to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
+    if(this.#m_platforms.get(this.#m_generator) !== undefined && this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform know to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
