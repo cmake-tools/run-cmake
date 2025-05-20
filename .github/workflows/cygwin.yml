@@ -67,7 +67,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: 📤 Upload dot files
         with:
-          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}
           path: ./dots/*
           if-no-files-found: warn
           retention-days: 90
@@ -132,7 +132,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: 📤 Upload dot files
         with:
-          name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
+          name: dot_${{ github.workflow }}_${{ matrix.generator }}
           path: ./dots/*
           if-no-files-found: warn
           retention-days: 90

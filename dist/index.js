@@ -31965,7 +31965,7 @@ class CMake
     }
     options.cwd = this.#working_directory()
     console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
-    if(this.#m_platforms.get(this.#m_generator) !== undefined && this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform know to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
+    if(this.#m_platforms.get(this.#m_generator) !== undefined && this.#m_platforms.get(this.#m_generator).length !=0) console.log(`Platform known to be available ${this.#m_platforms.get(this.#m_generator).toString()}`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
