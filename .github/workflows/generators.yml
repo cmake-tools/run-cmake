@@ -71,8 +71,8 @@ jobs:
           }
         - {
             name: 'Clang',
-            cc: 'clang',
-            cxx: 'clang++',
+            cc: 'clang-20',
+            cxx: 'clang++-20',
             generator: 'Unix Makefiles'
           }
 
@@ -84,6 +84,9 @@ jobs:
         with:
           cmakeVersion: ~${{ matrix.cmake_version }}
           ninjaVersion: ^1
+      - name: ⬇️ Setup LLVM v20
+        if: startsWith(matrix.config.name, 'Clang')
+        run: brew reinstall llvm@20
       - name: ⚙️ run-cmake (configure)
         uses: ./
         env:
@@ -158,8 +161,9 @@ jobs:
         - {
             name: 'Clang-cl',
             cc: 'clang-cl',
-            cxx: 'clang++-cl',
-            generator: 'Unix Makefiles'
+            cxx: 'clang-cl',
+            generator: 'Unix Makefiles',
+            toolset: ''
           }
     steps:
       - name: Checkout
