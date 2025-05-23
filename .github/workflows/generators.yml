@@ -144,26 +144,29 @@ jobs:
             name: 'MSVC',
             cc: '',
             cxx: '',
-            generator: ''
+            generator: '',
+            toolset: ''
           }
         - {
             name: 'GCC',
             cc: 'gcc',
             cxx: 'g++',
-            generator: 'Unix Makefiles'
+            generator: 'Unix Makefiles',
+            toolset: ''
           }
         - {
             name: 'Clang',
             cc: 'clang',
             cxx: 'clang++',
-            generator: 'Unix Makefiles'
+            generator: 'Unix Makefiles',
+            toolset: ''
           }
         - {
             name: 'Clang-cl',
             cc: 'clang-cl',
             cxx: 'clang-cl',
             generator: 'Unix Makefiles',
-            toolset: ''
+            toolset: 'ClangCL'
           }
     steps:
       - name: Checkout
@@ -186,6 +189,7 @@ jobs:
           source_dir: './tests'
           install_prefix: './install'
           generator: ${{ matrix.config.generator }}
+          toolset: ${{ matrix.config.toolset }}
 
   ubuntu:
     runs-on: ubuntu-latest
