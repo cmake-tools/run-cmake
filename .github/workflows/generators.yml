@@ -61,16 +61,19 @@ jobs:
             name: 'XCode',
             cc: '',
             cxx: '',
+            generator: ''
           }
         - {
             name: 'GCC',
             cc: 'gcc',
             cxx: 'g++',
+            generator: 'Unix Makefiles'
           }
         - {
             name: 'Clang',
             cc: 'clang',
             cxx: 'clang++',
+            generator: 'Unix Makefiles'
           }
 
     steps:
@@ -91,6 +94,7 @@ jobs:
           mode: configure
           source_dir: './tests'
           install_prefix: './install'
+          generator: ${{ matrix.config.generator }}
 
   windows:
     runs-on: windows-latest
@@ -137,21 +141,25 @@ jobs:
             name: 'MSVC',
             cc: '',
             cxx: '',
+            generator: ''
           }
         - {
             name: 'GCC',
             cc: 'gcc',
             cxx: 'g++',
+            generator: 'Unix Makefiles'
           }
         - {
             name: 'Clang',
             cc: 'clang',
             cxx: 'clang++',
+            generator: 'Unix Makefiles'
           }
         - {
             name: 'Clang-cl',
             cc: '',
-            cxx: ''
+            cxx: '',
+            generator: 'Unix Makefiles'
           }
     steps:
       - name: Checkout
