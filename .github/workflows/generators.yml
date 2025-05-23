@@ -165,7 +165,7 @@ jobs:
             name: 'Clang-cl',
             cc: 'clang-cl',
             cxx: 'clang-cl',
-            generator: 'Unix Makefiles',
+            generator: '',
             toolset: 'ClangCL'
           }
     steps:
