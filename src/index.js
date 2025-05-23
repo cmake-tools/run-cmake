@@ -413,12 +413,12 @@ class CMake
     }
     else if(configure_warnings=='deprecated')
     {
-      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      if(! this.is_greater_equal('3.5')) return Array('-Wdev')
       else return Array('-Wno-dev','-Wdeprecated')
     }
     else if(configure_warnings=='warning')
     {
-      if(! CMakeVersionGreaterEqual('3.5')) return Array('-Wdev')
+      if(! this.is_greater_equal('3.5')) return Array('-Wdev')
       else return Array('-Wdev','-Wno-deprecated')
     }
     else if(configure_warnings=='developer')
@@ -435,17 +435,17 @@ class CMake
     if(configure_warnings_as_errors=='') return []
     if(configure_warnings_as_errors=='none')
     {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
+      if(! this.is_greater_equal('3.5')) return []
       else return Array('-Wno-error=dev')
     }
     else if(configure_warnings_as_errors=='deprecated')
     {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
+      if(! this.is_greater_equal('3.5')) return []
       else return Array('-Wno-error=dev','-Werror=deprecated')
     }
     else if(configure_warnings_as_errors=='warning')
     {
-      if(! CMakeVersionGreaterEqual('3.5')) return []
+      if(! this.is_greater_equal('3.5')) return []
       else return Array('-Werror=dev','-Wno-error=deprecated')
     }
     else if(configure_warnings_as_errors=='developer')
@@ -658,7 +658,6 @@ class CMake
   static async configure()
   {
     let command = []
-    let graph = ''
     command=command.concat(this.#configure_warnings())
     command=command.concat(this.#configure_warnings_as_errors())
     command=command.concat(this.#initial_cache())
@@ -914,23 +913,6 @@ async function run(cmd,args, opts)
 
 class CommandLineMaker
 {
-  constructor()
-  {
-    this.m_error=false;
-    if(CMakeVersionGreaterEqual('3.13.0')) this.old_style=false
-    else this.old_style=true
-    this.actual_path=path.resolve('./')
-  }
-
-   #binary_build_dir()
-  {
-    this.binary_dir = process.env.binary_dir;
-    if(this.binary_dir=='') this.binary_dir = core.getInput('binary_dir', { required: false, default: '../toto' });
-    this.binary_dir=path.resolve(this.binary_dir)
-    return Array(this.binary_dir)
-  }
-
-
 
    #build_targets() /* FIXME for CMAKE<3.15 */
   {
@@ -959,16 +941,6 @@ class CommandLineMaker
     }
   }
 
-   #config()
-  {
-    const config = core.getInput('config', { required: false, default: '' })
-    if(config!='')
-    {
-      core.exportVariable('config',config)
-      return Array('--config',config)
-    }
-    else return []
-  }
 
    #clean_first()
   {
@@ -1024,22 +996,6 @@ class CommandLineMaker
       }
     }
     return commands
-  }
-
-  /** install step */
-   #install_config()
-  {
-    let config
-    // Find the config from build first
-    if(process.env.config) config = process.env.config
-    else config = core.getInput('config', { required: false, default: '' })
-    if(config!='')
-    {
-      core.exportVariable('config',config)
-      if( CMakeVersionGreaterEqual('3.15.0')) return Array('--config',config)
-      else return Array('-DBUILD_TYPE:STRING='+config)
-    }
-    else return []
   }
 
    #component()
@@ -1140,56 +1096,10 @@ async function main()
         break
       }
     }
-    //console.log(cmake.version())
-    //console.log(cmake.generators())
-    //let ret;
-    //global.cmake_version = await getCMakeVersion()
-    /*console.log(`Running CMake v${global.cmake_version}`)
-    getCapabilities()
 
-    let toto = await os_is()
-    console.log(`OS ${toto}!`)
-    if(process.env.MSYSTEM !== undefined)
-    {
-      global.msys2 = String('msys2')
-      global.is_msys2 = true
-    }
-    else
-    {
-      global.msys2 = String('cmake')
-      global.is_msys2 = false
-    }
-    const cmake_matcher = path.join(__dirname, "cmake.json");
-    core.info('::add-matcher::' + cmake_matcher);
-    if(os.availableParallelism === "function") global.number_cpus = String(os.availableParallelism())
-    else global.number_cpus = 1;
-    //let found = which.sync(global.msys2, { nothrow: true })
-    //if(!found) throw String('not found: CMake')
-    //global.capabilities = await getCapabilities()
-    const command_line_maker = new CommandLineMaker()
-    let mode = getMode()
-    if(mode==='configure')
-    {
-      command_line_maker.configureCommandParameters()
-      //console.log(`error ${command_line_maker.error()}`)
-      //if(!command_line_maker.error()) await configure(command_line_maker)
-      //if(command_line_maker.InstallGraphvizNeeded()) await installGraphviz()
+    //const cmake_matcher = path.join(__dirname, "cmake.json");
+    //core.info('::add-matcher::' + cmake_matcher);
 
-    }
-    else if(mode==='build')
-    {
-      await build(command_line_maker)
-    }
-    else if(mode==='install')
-    {
-      await install(command_line_maker)
-    }
-    else if(mode==='all')
-    {
-      await configure(command_line_maker)
-      await build(command_line_maker)
-      await install(command_line_maker)
-    }*/
   }
   catch (error)
   {
