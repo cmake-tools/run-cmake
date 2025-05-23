@@ -18,7 +18,7 @@ concurrency:
 jobs:
   macos:
     runs-on: macos-latest
-    name: macOS CMake v${{ matrix.cmake_version }} ()
+    name: macOS CMake v${{ matrix.cmake_version }} (${{ matrix.config.name }})
     strategy:
       fail-fast: false
       matrix:
@@ -94,7 +94,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    name: windows CMake v${{ matrix.cmake_version }} ()
+    name: windows CMake v${{ matrix.cmake_version }} (${{ matrix.config.name }})
     strategy:
       fail-fast: false
       matrix:
@@ -174,7 +174,7 @@ jobs:
 
   ubuntu:
     runs-on: ubuntu-latest
-    name: ubuntu CMake v${{ matrix.cmake_version }} ()
+    name: ubuntu CMake v${{ matrix.cmake_version }} (${{ matrix.config.name }})
     strategy:
       fail-fast: false
       matrix:
