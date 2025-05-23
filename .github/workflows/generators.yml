@@ -56,6 +56,23 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+        config:
+        - {
+            name: 'XCode',
+            cc: '',
+            cxx: '',
+          }
+        - {
+            name: 'GCC',
+            cc: 'gcc',
+            cxx: 'g++',
+          }
+        - {
+            name: 'Clang',
+            cc: 'clang',
+            cxx: 'clang++',
+          }
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,6 +83,9 @@ jobs:
           ninjaVersion: ^1
       - name: ⚙️ run-cmake (configure)
         uses: ./
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
         id: configure
         with:
           mode: configure
@@ -112,6 +132,27 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+        config:
+        - {
+            name: 'MSVC',
+            cc: '',
+            cxx: '',
+          }
+        - {
+            name: 'GCC',
+            cc: 'gcc',
+            cxx: 'g++',
+          }
+        - {
+            name: 'Clang',
+            cc: 'clang',
+            cxx: 'clang++',
+          }
+        - {
+            name: 'Clang-cl',
+            cc: '',
+            cxx: ''
+          }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -122,6 +163,9 @@ jobs:
           ninjaVersion: ^1
       - name: ⚙️ run-cmake (configure)
         uses: ./
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
         id: configure
         with:
           mode: configure
@@ -168,6 +212,17 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+        config:
+        - {
+            name: 'GCC',
+            cc: 'gcc',
+            cxx: 'g++',
+          }
+        - {
+            name: 'Clang',
+            cc: 'clang',
+            cxx: 'clang++',
+          }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -178,6 +233,9 @@ jobs:
           ninjaVersion: ^1
       - name: ⚙️ run-cmake (configure)
         uses: ./
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
         id: configure
         with:
           mode: configure
