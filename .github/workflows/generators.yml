@@ -18,7 +18,7 @@ concurrency:
 jobs:
   macos:
     runs-on: macos-latest
-    name: CMake v${{ matrix.cmake_version }} ()
+    name: macOS CMake v${{ matrix.cmake_version }} ()
     strategy:
       fail-fast: false
       matrix:
@@ -59,10 +59,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ~${{ matrix.cmake_version }}
+          ninjaVersion: ^1
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: configure
+        with:
+          mode: configure
+          source_dir: './tests'
+          install_prefix: './install'
 
   windows:
     runs-on: windows-latest
-    name: CMake v${{ matrix.cmake_version }} ()
+    name: windows CMake v${{ matrix.cmake_version }} ()
     strategy:
       fail-fast: false
       matrix:
@@ -103,10 +115,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ~${{ matrix.cmake_version }}
+          ninjaVersion: ^1
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: configure
+        with:
+          mode: configure
+          source_dir: './tests'
+          install_prefix: './install'
 
   ubuntu:
     runs-on: ubuntu-latest
-    name: CMake v${{ matrix.cmake_version }} ()
+    name: ubuntu CMake v${{ matrix.cmake_version }} ()
     strategy:
       fail-fast: false
       matrix:
@@ -147,3 +171,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ~${{ matrix.cmake_version }}
+          ninjaVersion: ^1
+      - name: ⚙️ run-cmake (configure)
+        uses: ./
+        id: configure
+        with:
+          mode: configure
+          source_dir: './tests'
+          install_prefix: './install'
