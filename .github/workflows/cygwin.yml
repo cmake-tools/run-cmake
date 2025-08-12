@@ -41,10 +41,10 @@ jobs:
           - mingw64-x86_64-gcc-g++=14.2.0-1
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout tests repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: cmake-tools/runs.test
           path: ./tests
@@ -106,10 +106,10 @@ jobs:
         compiler_type: ['clang', 'mingw64-x86_64-clang']
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout tests repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: cmake-tools/runs.test
           path: ./tests

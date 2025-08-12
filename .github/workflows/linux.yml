@@ -94,10 +94,10 @@ jobs:
             generator: 'Ninja Multi-Config'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout tests repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: cmake-tools/runs.test
           path: tests
