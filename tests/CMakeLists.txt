@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0...${CMAKE_VERSION} FATAL_ERROR)
 
 project(run-cmake LANGUAGES CXX)
 
+message(STATUS "${TOTO} ${TITI} ${TATA}")
+
 file(WRITE "${PROJECT_BINARY_DIR}/main.cpp" [[int main(){}]])
 
 include(GNUInstallDirs)

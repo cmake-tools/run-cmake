@@ -21,5 +21,17 @@
     "os": "^0.1.2",
     "path": "^0.12.7",
     "which": "^5.0.0"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmake-tools/run-cmake.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/cmake-tools/run-cmake/issues"
+  },
+  "homepage": "https://github.com/cmake-tools/run-cmake#readme"
 }

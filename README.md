@@ -8,12 +8,12 @@ CMake command options and corresponding action parameters :
 
 |  CMake option                                             |  Action parameter      |  Description                                                            |  Type    |  Default       | Available  |
 |:---------------------------------------------------------:|:----------------------:|:-----------------------------------------------------------------------:|:--------:|:--------------:|:----------:|
-|  -S                                                       |  source_dir            |  Path to root directory of the CMake project to build                   |  path    |  "./"          |  ✔️         |
-|  -B                                                       |  binary_dir            |  Path to directory which CMake will use as the root of build directory  |  path    |  "../build"    |  ✔️         |
+|  -S                                                       |  source_dir            |  Path to root directory of the CMake project to build                   |  path    |  (1)           |  ✔️         |
+|  -B                                                       |  binary_dir            |  Path to directory which CMake will use as the root of build directory  |  path    |  "./build"     |  ✔️         |
 |  -C                                                       |  initial_cache         |  Pre-load a script to populate the cache                                |  file    |  ""            |  ✔️         |
 |  -D                                                       |  variables             |  Create or update a CMake CACHE entry                                   |  array   |  []            |  ✔️         |
 |  -U                                                       |  remove_variables      |  Remove matching entries from CMake CACHE                               |  array   |  []            |  ✔️         |
-|  -G                                                       |  generator             |  Specify a build system generator                                       |  string  |   *            |  ✔️         |
+|  -G                                                       |  generator             |  Specify a build system generator                                       |  string  |  (2)           |  ✔️         |
 |  -T                                                       |  toolset               |  Toolset specification for the generator, if supported                  |  string  |  ""            |  ✔️         |
 |  -A                                                       |  platform              |  Specify platform name if supported by generator                        |  string  |  ""            |  ✔️         |
 |  --toolchain                                              |  toolchain             |  Specify the cross compiling toolchain file                             |  file    |  ""            |  ✔️         |
@@ -27,6 +27,8 @@ CMake command options and corresponding action parameters :
 |  --system-information                                     |                        |  Dump information about this system                                     |          |                |  ❌         |
 |  --log-level                                              |  log_level             |  Set the log level                                                      |  string  |  ""            |  ✔️         |
 |  --log-context                                            |  log_context           |  Enable the outputting context attached to each message                 |  bool    |                |  ✔️         |
+
+(1) : environment variable `GITHUB_WORKSPACE` if available, otherwise "./"
 
 ## Build a Build a Project
 
@@ -56,3 +58,6 @@ CMake command options and corresponding action parameters :
 |  --prefix                         |  override_install_prefix        |  Override the installation prefix                                                                                  |  string  |  ""          | 3.15+      |
 |  --strip                          |  strip                          |  Strip before installing                                                                                           |  bool    |  false       | 3.15+      |
 |  -v, --verbose                    |  install_verbose                |  Enable verbose output                                                                                             |  bool    |  false       |  ✔️         |
+
+ncc build ./src/index.js -o dist
+node dist/index.js
