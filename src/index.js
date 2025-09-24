@@ -219,7 +219,7 @@ class CMake
       }
     }
     // We need to fill this.#m_default_generator by ourself
-    if(!this.is_greater_equal('3.14')) await this.#determineDefaultGenerator()
+    await this.#determineDefaultGenerator()
   }
 
   static async #determineDefaultGenerator()
@@ -228,12 +228,12 @@ class CMake
     {
       case "linux":
       {
-        this.#m_default_generator = 'Unix Makefiles'
+        if(this.#m_default_generator=='') this.#m_default_generator = 'Unix Makefiles'
         break
       }
       case "darwin":
       {
-        this.#m_default_generator = 'Xcode'
+        if(this.#m_default_generator=='') this.#m_default_generator = 'Xcode'
         //if(!this.is_greater_equal('3.3')) this.#m_default_generator = 'Unix Makefiles'
         //else
         //{
@@ -267,9 +267,6 @@ class CMake
       }
       case "win32":
       {
-        if(this.#m_generators.get('Visual Studio 17 2022')!= undefined) this.#m_default_generator = 'Visual Studio 17 2022'
-        else if (this.#m_generators.get('Visual Studio 16 2019')!= undefined) this.#m_default_generator = 'Visual Studio 16 2019'
-        else this.#m_default_generator = 'NMake Makefiles'
         // Read CC CXX
         if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
         {
@@ -278,6 +275,12 @@ class CMake
         if(process.env.CXX !== undefined && (process.env.CXX.includes('g++')||process.env.CXX.includes('clang++')))
         {
           this.#m_default_generator = 'Unix Makefiles'
+        }
+        if(this.#m_default_generator=='')
+        {
+          if(this.#m_generators.get('Visual Studio 17 2022')!= undefined) this.#m_default_generator = 'Visual Studio 17 2022'
+          else if (this.#m_generators.get('Visual Studio 16 2019')!= undefined) this.#m_default_generator = 'Visual Studio 16 2019'
+          else this.#m_default_generator = 'NMake Makefiles'
         }
         break
       }
