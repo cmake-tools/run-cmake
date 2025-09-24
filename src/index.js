@@ -143,7 +143,8 @@ class CMake
     }
     else
     {
-      this.#m_version=string.match(/\d\.\d[\\.\d]+/)[0]
+      const match = string.match(/\d+\.\d+(?:\.\d+)?/);
+      this.#m_version = match ? match[0] : "0.0.0";
       [this.#m_version_major, this.#m_version_minor, this.#m_version_patch] = this.#m_version.split('.').map(Number);
     }
     core.exportVariable('cmake_version', this.#m_version);
