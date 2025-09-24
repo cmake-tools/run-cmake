@@ -34440,7 +34440,6 @@ class CMake
       if(this.is_greater_equal('3.24')) return Array('--fresh')
       else
       {
-        console.log(process.env.binary_dir+"/CMakeCache.txt")
         await io.rmRF(process.env.binary_dir+"/CMakeCache.txt");
         await io.rmRF(process.env.binary_dir+"/CMakeFiles");
       }
@@ -34850,7 +34849,6 @@ class CMake
     command=command.concat(this.#debugger_pipe())
     command=command.concat(this.#debugger_dap_log())
     if(!this.is_greater_equal('3.13')) command=command.concat(this.#source_dir()) // Must be the last one in this case
-    //console.log(command)
     let cout = ''
     let cerr = ''
     const options = {};
@@ -35146,39 +35144,12 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    console.log(command)
     console.log(`Running CMake v${this.version()} in install mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @param {string[]} args
@@ -35200,161 +35171,6 @@ async function run(cmd,args, opts)
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
   else return await exec.exec(cmd,args,opts)
-}
-
-class CommandLineMaker
-{
-
-   #build_targets() /* FIXME for CMAKE<3.15 */
-  {
-    const build_targets = parser.getInput('build_targets', {type: 'array',default:[]})
-    let targets= []
-    if (build_targets.length == 0) return targets;
-    else if( CMakeVersionGreaterEqual('3.15'))
-    {
-      let ret=['--target']
-      for(const i in build_targets)
-      {
-        ret=ret.concat(build_targets[i])
-      }
-      targets.push(ret)
-      return targets;
-    }
-    else
-    {
-      for(const i in build_targets)
-      {
-        let ret=[]
-        ret=ret.concat('--target',build_targets[i])
-        targets.push(ret)
-      }
-      return targets;
-    }
-  }
-
-
-   #clean_first()
-  {
-    const clean_first = core.getInput('clean_first', { required: false, type: 'boolean', default: '' })
-    if(clean_first) return ['--clean-first']
-    else return []
-  }
-
-   #resolve_package_references()
-  {
-    const resolve_package_references = core.getInput('resolve_package_references', { required: false, default: '' })
-    if(resolve_package_references=='') return []
-    else if(resolve_package_references!='on' && resolve_package_references=='off' && resolve_package_references=='only')
-    {
-      throw String('resolve_package_references should be on,off,only. Received: '+resolve_package_references)
-    }
-    else if( CMakeVersionGreaterEqual('3.23')) return ['--resolve-package-references='+resolve_package_references]
-    else return []
-  }
-
-
-   buildCommandParameters()
-  {
-    let targets = this.#build_targets()
-    let commands = []
-    if(targets.length ==0)
-    {
-      //let parameters=['--build']
-      //parameters=parameters.concat(this.#binary_build_dir())
-      //parameters=parameters.concat(this.#parallel())
-      //parameters=parameters.concat(this.#build_targets())
-      //parameters=parameters.concat(this.#config())
-      //parameters=parameters.concat(this.#clean_first())
-      //parameters=parameters.concat(this.#resolve_package_references())
-      //parameters=parameters.concat(this.#build_verbose())
-      //parameters=parameters.concat(this.#to_native_tool())
-      commands.push(parameters)
-    }
-    else
-    {
-      for(const i in targets)
-      {
-        //let parameters=['--build']
-        //parameters=parameters.concat(this.#binary_build_dir())
-        //parameters=parameters.concat(this.#parallel())
-        //parameters=parameters.concat(targets[i])
-        //parameters=parameters.concat(this.#config())
-        //if(i==1)parameters=parameters.concat(this.#clean_first())
-        //parameters=parameters.concat(this.#resolve_package_references())
-        //parameters=parameters.concat(this.#build_verbose())
-        //parameters=parameters.concat(this.#to_native_tool())
-        //commands.push(parameters)
-      }
-    }
-    return commands
-  }
-
-   #component()
-  {
-    const component = core.getInput('component', { required: false, default: '' })
-    if(component!='')
-    {
-      if( CMakeVersionGreaterEqual('3.15.0')) return Array('--component',component)
-      else return Array('-DCOMPONENT',component)
-    }
-    else return []
-  }
-
-   #default_directory_permissions()
-  {
-    const default_directory_permissions = core.getInput('default_directory_permissions', { required: false, default: '' })
-    if(default_directory_permissions!='')
-    {
-      if( CMakeVersionGreaterEqual('3.19')) return Array('--default-directory-permissions',default_directory_permissions)
-      else return []
-    }
-    else return []
-  }
-
-   #override_install_prefix()
-  {
-    const override_install_prefix = core.getInput('override_install_prefix', { required: false, default: '' })
-    if(override_install_prefix!='')
-    {
-      if( CMakeVersionGreaterEqual('3.15')) return Array('--prefix',override_install_prefix)
-      else return []
-    }
-    else return []
-  }
-
-   #strip()
-  {
-    const strip = core.getInput('strip', { required: false, type: 'boolean', default: false })
-    if( CMakeVersionGreaterEqual('3.15'))
-    {
-      if(strip) return Array('--strip')
-      else return []
-    }
-    else return []
-  }
-
-}
-
-
-async function build(command_line_maker)
-{
-  let cout ='';
-  let cerr='';
-  const options = {};
-  options.listeners = {
-    stdout: (data) => {
-      cout = data.toString();
-    },
-    stderr: (data) => {
-      cerr = data.toString();
-    }
-  }
-  options.silent = false
-  let commands = command_line_maker.buildCommandParameters()
-  for(const i in commands)
-  {
-    await run('cmake',commands[i], options)
-  }
 }
 
 async function main()
