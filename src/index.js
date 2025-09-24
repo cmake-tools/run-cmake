@@ -183,7 +183,7 @@ class CMake
     cout=cout.split("\n");
     if(this.#m_capacities!==null)
     {
-      for(const element of cout)
+      for(element of cout)
       {
         if(element.includes('*') && element.includes('='))
         {
@@ -196,7 +196,7 @@ class CMake
     }
     else
     {
-      for(const line of cout)
+      for(line of cout)
       {
         if(line.includes('='))
         {
