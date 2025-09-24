@@ -346,6 +346,9 @@ jobs:
       - name: Install Xcode Command Line Tools
         run: |
           xcode-select --install || true
+          xcode-select -s /Applications/Xcode.app/Contents/Developer
+          which install_name_tool || (echo "install_name_tool not found" && exit 1)
+
       - name: ⬇️ Setup LLVM v${{ matrix.compiler }}
         run: brew reinstall llvm@${{ matrix.compiler }} proctools
       - name: ⚙️ run-cmake (configure)
