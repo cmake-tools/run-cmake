@@ -858,7 +858,7 @@ class CMake
     command=command.concat(this.#debugger_pipe())
     command=command.concat(this.#debugger_dap_log())
     if(!this.is_greater_equal('3.13')) command=command.concat(this.#source_dir()) // Must be the last one in this case
-    console.log(command)
+    //console.log(command)
     let cout = ''
     let cerr = ''
     const options = {};
@@ -879,14 +879,12 @@ class CMake
 
   // BUILD PARAMETER
 
-  // TODO --build <dir> binary_dir ???
-  // TODO --preset <preset>, --preset=<preset>
-  // TODO --list-presets
+  // --build <dir>
 
-  /*static #parallel()
+  static #parallel()
   {
-    if(!this.is_greater_equal('3.12')) return Array()
-    let value = parser.getInput('parallel',{default:this.#m_nbrCPU})
+    if(!this.is_greater_equal('3.12')) return []
+    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false })
     value = parseInt(value, 10)
     if(isNaN(value)||value<=0)
     {
@@ -894,28 +892,64 @@ class CMake
       value=1
     }
     return Array('--parallel',String(value))
-  }*/
+  }
 
-  // TODO -t <tgt>..., --target <tgt>...
-
-  /*static #config()
+  static #preset_build()
   {
-    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : '' , disableable: false })
+    let trace = parser.getInput({ key:'preset_build', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.19')&& trace!='') return Array('--preset '+trace)
+    return []
+  }
+
+  // NO --list-presets
+
+  static #targets()
+  {
+    let targets = parser.getInput({key: 'targets', type: 'string', required: false, default: '' , disableable: false })
+    if(targets!='')
+    {
+      if(this.is_greater_equal('3.15')) return Array('--target').concat(targets.split(' '))
+      else
+      {
+        return targets.split(' ')
+      }
+    }
+    return []
+  }
+
+  static #config()
+  {
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
     if(config!='')
     {
+      core.exportVariable('config', config);
       return Array('--config',config)
     }
     return Array()
-  }*/
+  }
 
-  // TODO --clean-first
-  // TODO --resolve-package-references=<value>
+  static #clean_first()
+  {
+    let value = parser.getInput({ key:'clean_first', type: 'boolean', required: false, default:false, disableable: false });
+    if(value) return ['--clean-first']
+    return []
+  }
 
-  /*static #build_verbose()
+  static #resolve_package_references()
+  {
+    let value = parser.getInput({key: 'resolve_package_references', type: 'string', required: false, default: '' , disableable: false })
+    if(this.is_greater_equal('3.23'))
+    {
+      if(value=='on' || value=='off' || value=='only') return ['--resolve-package-references='+value]
+    }
+    return []
+  }
+
+  static #build_verbose()
   {
     delete process.env.VERBOSE;
     delete process.env.CMAKE_VERBOSE_MAKEFILE;
-    const build_verbose = core.getInput('build_verbose', { required: false, type: 'boolean', default: false })
+    const build_verbose = parser.getInput({ key:'build_verbose', type: 'boolean', required: false, default: false, disableable: false})
     if(build_verbose)
     {
       if( this.is_greater_equal('3.14'))
@@ -930,11 +964,11 @@ class CMake
       }
     }
     return []
-  }*/
+  }
 
-  /*static #to_native_tool()
+  static #to_native_tool()
   {
-    const to_native_tool = parser.getInput('to_native_tool', {type: 'array',default:[]})
+    const to_native_tool = parser.getInput({ key:'to_native_tool', type: 'array',required: false, default:[], disableable: false})
     if(to_native_tool.length == 0) return []
     else
     {
@@ -942,16 +976,10 @@ class CMake
       ret=ret.concat(to_native_tool)
       return ret
     }
-  }*/
+  }
 
   static async build()
   {
-    let command = ['--build',process.env.binary_dir]
-    /*command=command.concat(this.#parallel())
-    command=command.concat(this.#config())
-    command=command.concat(this.#build_verbose())
-    command=command.concat(this.#to_native_tool())*/
-    console.log(command)
     let cout = ''
     let cerr = ''
     const options = {};
@@ -964,23 +992,105 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
-    console.log(`Running CMake v${this.version()} in build mode`)
-    let ret = await run('cmake',command,options)
-    if(ret!=0) core.setFailed(cerr)
+    this.#parseBuildDir()
+    if(this.is_greater_equal('3.15'))
+    {
+      let command = ['--build',process.env.binary_dir]
+      command=command.concat(this.#parallel())
+      command=command.concat(this.#preset_build())
+      command=command.concat(this.#targets())
+      command=command.concat(this.#config())
+      command=command.concat(this.#clean_first())
+      command=command.concat(this.#resolve_package_references())
+      command=command.concat(this.#build_verbose())
+      command=command.concat(this.#to_native_tool())
+      console.log(`Running CMake v${this.version()} in build mode`)
+      let ret = await run('cmake',command,options)
+      if(ret!=0) core.setFailed(cerr)
+    }
+    else
+    {
+      const arr = this.#targets()
+      if(arr.length == 0)
+      {
+        let command = ['--build',process.env.binary_dir]
+        command=command.concat(this.#parallel())
+        command=command.concat(this.#config())
+        command=command.concat(this.#clean_first())
+        command=command.concat(this.#build_verbose())
+        command=command.concat(this.#to_native_tool())
+        console.log(`Running CMake v${this.version()} in build mode`)
+        let ret = await run('cmake',command,options)
+        if(ret!=0) core.setFailed(cerr)
+      }
+      else
+      {
+        for(const target in arr)
+        {
+          let command = ['--build',process.env.binary_dir]
+          command=command.concat(this.#parallel())
+          command=command.concat('--target', arr[target])
+          command=command.concat(this.#config())
+          if(target==0)command=command.concat(this.#clean_first())
+          command=command.concat(this.#build_verbose())
+          command=command.concat(this.#to_native_tool())
+          console.log(`Running CMake v${this.version()} in build mode`)
+          let ret = await run('cmake',command,options)
+          if(ret!=0) core.setFailed(cerr)
+        }
+      }
+    }
   }
 
   // INSTALL PARAMETERS
 
-  /*static #config_install()
+  static #config_install()
   {
-    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
-    return Array('--config',config)
-  }*/
+    let value = parser.getInput({key: 'install_config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
+    if(this.is_greater_equal('3.15')) return Array('--config',value)
+    else return ['-DBUILD_TYPE='+value]
+  }
 
-  /*static #install_verbose()
+  static #component()
+  {
+    let value = parser.getInput({key: 'component', type: 'string', required: false, default: '' , disableable: false })
+    if(value!='')
+    {
+      if(this.is_greater_equal('3.15')) return ['--component',value]
+      else return ['-DCOMPONENT='+value]
+    }
+    return []
+  }
+
+  static #default_directory_permissions()
+  {
+    let value = parser.getInput({key: 'default_directory_permissions', type: 'string', required: false, default: '' , disableable: false })
+    if(value!='' && this.is_greater_equal('3.19')) return ['--default_directory_permissions',value]
+    return []
+  }
+
+  static #prefix()
+  {
+    let value = parser.getInput({key: 'prefix', type: 'string', required: false, default: '' , disableable: false })
+    if(value!='')
+    {
+      if(this.is_greater_equal('3.15')) return ['--prefix',value]
+      else return ['-DCMAKE_INSTALL_PREFIX='+value]
+    }
+    return []
+  }
+
+  static #strip()
+  {
+    let value = parser.getInput({key: 'strip', type: 'boolean', required: false, default: false , disableable: false })
+    if(value=='true') return ['--strip']
+    return []
+  }
+
+  static #install_verbose()
   {
     delete process.env.VERBOSE;
-    const install_verbose = core.getInput('install_verbose', { required: false, type: 'boolean', default: false })
+    const install_verbose = parser.getInput({ key:'install_verbose', type: 'boolean', required: false,  default: process.env.VERBOSE !== undefined ? process.env.VERBOSE : false , disableable: false })
     if(install_verbose)
     {
       if( this.is_greater_equal('3.15'))
@@ -994,21 +1104,44 @@ class CMake
       }
     }
     return Array()
-  }*/
+  }
+
+  static #install_parallel()
+  {
+    if(!this.is_greater_equal('3.31')) return []
+    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false })
+    value = parseInt(value, 10)
+    if(isNaN(value)||value<=0)
+    {
+      core.warning('parallel should be a number >=1 ('+String(value)+')')
+      value=1
+    }
+    return Array('--parallel',String(value))
+  }
 
   static async install()
   {
+    this.#parseBuildDir()
     let command = []
     if(this.is_greater_equal('3.15.0'))
     {
       command=['--install',process.env.binary_dir]
+      command=command.concat(this.#config_install())
+      command=command.concat(this.#component())
+      command=command.concat(this.#default_directory_permissions())
+      command=command.concat(this.#prefix())
+      command=command.concat(this.#strip())
+      command=command.concat(this.#install_verbose())
+      command=command.concat(this.#install_parallel())
     }
-    /*command=command.concat(this.#config_install())*/
     if(!this.is_greater_equal('3.15.0'))
     {
-      command=['-P',process.env.binary_dir+'/cmake_install.cmake']
+      command = []
+      command=command.concat(this.#config_install())
+      command=command.concat(this.#component())
+      command=command.concat(this.#prefix())
+      command=command.concat('-P',process.env.binary_dir+'/cmake_install.cmake')
     }
-    //command=command.concat(this.#install_verbose())
     let cout = ''
     let cerr = ''
     const options = {};
@@ -1021,6 +1154,7 @@ class CMake
       stderr: (data) => { cerr += data.toString() },
       errline: (data) => {console.log(data) },
     }
+    console.log(command)
     console.log(`Running CMake v${this.version()} in install mode`)
     let ret = await run('cmake',command,options)
     if(ret!=0) core.setFailed(cerr)
