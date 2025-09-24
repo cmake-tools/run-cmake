@@ -34306,7 +34306,7 @@ class CMake
   static #generator()
   {
     this.#m_generator = parser.getInput({key: 'generator', type: 'string', required: false, default: this.#m_default_generator, disableable: false })
-    return Array('-G',this.#m_generator)
+    if(this.#m_generator!='') return Array('-G',this.#m_generator)
   }
 
   //-T <toolset-spec>
