@@ -34364,7 +34364,6 @@ class CMake
     return Array()
   }
 
-  /*
   //--project-file <project-file-name>
   static #project_file()
   {
@@ -34382,7 +34381,7 @@ class CMake
   // -Wno-dev -Wdev -Wdeprecated -Wno-deprecated
   static #configure_warnings()
   {
-    let configure_warnings = core.getInput('configure_warnings', { required: false, default:'none' });
+    let configure_warnings = parser.getInput({key:'configure_warnings', type: 'string', required: false, default:'none', disableable: false });
     if(configure_warnings=='') return []
     if(configure_warnings=='none')
     {
@@ -34408,7 +34407,7 @@ class CMake
   // -Wno-dev -Wdev -Wdeprecated -Wno-deprecated
   static #configure_warnings_as_errors()
   {
-    let configure_warnings_as_errors = core.getInput('configure_warnings_as_errors', { required: false, default:'none' });
+    let configure_warnings_as_errors = parser.getInput({ key:'configure_warnings_as_errors', type:'string', required: false, default:'none', disableable: false  });
     if(configure_warnings_as_errors=='') return []
     if(configure_warnings_as_errors=='none')
     {
@@ -34432,12 +34431,27 @@ class CMake
     else throw String('configure_warnings_as_errors should be : none, deprecated, warning or developer. Received : '+configure_warnings_as_errors)
   }
 
-  // TODO --fresh
+  static async #fresh()
+  {
+    let fresh = parser.getInput({key:'fresh', type: 'boolean', required: false, default:false, disableable: false });
+    if(fresh)
+    {
+      if(this.is_greater_equal('3.24')) return Array('--fresh')
+      else
+      {
+        console.log(process.env.binary_dir+"/CMakeCache.txt")
+        await io.rmRF(process.env.binary_dir+"/CMakeCache.txt");
+        await io.rmRF(process.env.binary_dir+"/CMakeFiles");
+        exit(1)
+      }
+    }
+    return Array()
+  }
 
   // -L[A][H] List non-advanced cached variables.
   static #list_cache_variables()
   {
-    let list_cache_variables = core.getInput('list_cache_variables', { required: false, default:'' });
+    let list_cache_variables = parser.getInput({ key:'list_cache_variables', type:'string', required: false, default:'', disableable: false });
     if(list_cache_variables=='') return []
     else if(list_cache_variables=='cache') return Array('-L')
     else if(list_cache_variables=='cache_help') return Array('-LH')
@@ -34447,13 +34461,56 @@ class CMake
     else throw String('list_cache_variables should be : cache, cache_help, advanced or advanced_help. Received : '+list_cache_variables)
   }
 
-  // NO NEED -LR[A][H] <regex>
+  // -LR[A][H] <regex>
+  static #list_cache_variables_regex()
+  {
+    let value = parser.getInput({ key:'list_cache_variables_regex', type:'array', required: false, default:[], disableable: false });
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-LR',value[i])
+    }
+    return ret;
+  }
+
+    static #list_cache_help_variables_regex()
+  {
+    let value = parser.getInput({ key:'list_cache_help_variables_regex', type:'array', required: false, default:[], disableable: false });
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-LRH',value[i])
+    }
+    return ret;
+  }
+
+    static #list_cache_advanced_variables_regex()
+  {
+    let value = parser.getInput({ key:'list_cache_advanced_variables_regex', type:'array', required: false, default:[], disableable: false });
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-LRA',value[i])
+    }
+    return ret;
+  }
+
+  static #list_cache_advanced_help_variables_regex()
+  {
+    let value = parser.getInput({ key:'list_cache_advanced_help_variables_regex', type:'array', required: false, default:[], disableable: false });
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('-LRAH',value[i])
+    }
+    return ret;
+  }
+
   // NO NEED -N
 
   static #graphviz()
   {
-
-    let graphviz = core.getInput('graphviz', { required: false, default:'' });
+    let graphviz = parser.getInput({ key:'graphviz', type: 'string', required: false, default:'', disableable: false});
     if(graphviz=='')
     {
       return []
@@ -34465,34 +34522,31 @@ class CMake
     }
   }
 
-  // TODO ? --system-information [file]
-  // TODO ? --print-config-dir
+  // NO --system-information [file]
+  // NO --print-config-dir
 
   static #log_level()
   {
-    let log_level = core.getInput('log_level', { required: false, default:'' });
+    let log_level = parser.getInput({ key:'log_level', type:'string', required: false, default:'', disableable: false });
     if(log_level!='')
     {
       if(log_level!='ERROR' && log_level!='WARNING' && log_level!='NOTICE' && log_level!='STATUS' && log_level!='VERBOSE' && log_level!='DEBUG' && log_level!='TRACE') throw String('log_level should be : ERROR, WARNING, NOTICE, STATUS, VERBOSE, DEBUG, TRACE. Received : '+log_level)
-      if( this.is_greater_equal('3.15')) return ['--log-level='+log_level]
+      if( this.is_greater_equal('3.15') && !this.is_greater_equal('3.16')) return ['--loglevel='+log_level]
+      else if ( this.is_greater_equal('3.15') ) return ['--log-level='+log_level]
     }
     return []
   }
 
   static #log_context()
   {
-    let log_level = core.getInput('log_context', { required: false, type: 'boolean',default:'' });
-    if(log_level)
-    {
-      if( this.is_greater_equal('3.17')) return ['--log-context']
-      else return []
-    }
+    let log_level = parser.getInput({ key:'log_context', type:'boolean', required: false, default:'false', disableable: false });
+    if( this.is_greater_equal('3.17') && log_level==true) return ['--log-context']
     return []
   }
 
   static #sarif_output()
   {
-    let sarif_output = core.getInput('sarif_output', { required: false, type: 'string',default:'' });
+    let sarif_output = parser.getInput({ key:'sarif_output', type: 'string', required: false, default:'', disableable: false });
     if(sarif_output!='')
     {
       sarif_output=path.resolve(sarif_output)
@@ -34501,11 +34555,16 @@ class CMake
     return []
   }
 
-  // TODO --debug-trycompile ?
+  static #debug_trycompile()
+  {
+    let value = parser.getInput({key:'debug_trycompile', type: 'boolean', required: false, default:false, disableable: false });
+    if(value) return Array('--debug-trycompile')
+    return Array()
+  }
 
   static #debug_output()
   {
-    let debug_output = core.getInput('debug_output', { required: false, type: 'boolean',default:false });
+    let debug_output = parser.getInput({key:'debug_output', type: 'boolean', required: false, default:false, disableable: false });
     if(debug_output)
     {
       return ['--debug-output']
@@ -34515,7 +34574,7 @@ class CMake
 
   static #debug_find()
   {
-    let debug_find = core.getInput('debug_find', { required: false, type: 'boolean',default:false });
+    let debug_find = parser.getInput({ key:'debug_find', type: 'boolean', required: false, default:false, disableable: false });
     if(debug_find)
     {
       if( this.is_greater_equal('3.17')) return ['--debug-find']
@@ -34525,7 +34584,7 @@ class CMake
 
   static #debug_find_pkg()
   {
-    let debug_find_pkg = core.getInput('debug_find_pkg', { required: false, type: 'string',default:'' });
+    let debug_find_pkg = parser.getInput({ key:'debug_find_pkg', type: 'string', required: false, default:'', disableable: false });
     if(debug_find_pkg!='')
     {
       if( this.is_greater_equal('3.23')) return ['--debug-find-pkg='+debug_find_pkg]
@@ -34533,25 +34592,130 @@ class CMake
     return []
   }
 
-   static #debug_find_var()
+  static #debug_find_var()
   {
-    let debug_find_var = core.getInput('debug_find_var', { required: false, type: 'string',default:'' });
+    let debug_find_var = parser.getInput({ key:'debug_find_var', type: 'string', required: false, default:'', disableable: false });
     if(debug_find_var!='')
     {
-      if( this.is_greater_equal('3.23')) return ['--debug-find-var=='+debug_find_var]
+      if( this.is_greater_equal('3.23')) return ['--debug-find-var='+debug_find_var]
     }
     return []
   }
 
-    static #trace()
+  static #trace()
   {
-    let trace = core.getInput('trace', { required: false, type: 'boolean',default:false });
-    if(trace)
+    let trace = parser.getInput({ key:'trace', type: 'string', required: false, default:'', disableable: false });
+    if(trace!='' && trace!='trace' && trace!='expand' ) throw String('trace should be : "", trace or expand. Received : '+trace)
+    else if (trace=='trace') return Array('--trace')
+    else if (trace=='expand') return Array('--trace-expand')
+    return []
+  }
+
+  static #trace_format()
+  {
+    let trace = parser.getInput({ key:'trace_format', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.17'))
     {
-      return ['--trace']
+      if(trace!=''&& trace!='human' && trace!='json-v1' ) throw String('trace_format should be : "", human or json-v1. Received : '+trace)
+      if(trace!='') return Array('--trace-format='+trace)
     }
     return []
-  }*/
+  }
+
+  static #trace_source()
+  {
+    let value = parser.getInput({ key:'trace_source', type:'array', required: false, default:[], disableable: false });
+    let ret=[]
+    for(const i in value)
+    {
+      ret=ret.concat('--trace-source='+value[i])
+    }
+    return ret;
+  }
+
+  static #trace_redirect()
+  {
+    let trace = parser.getInput({ key:'trace_redirect', type: 'string', required: false, default:'', disableable: false });
+    if(trace!='') return Array('--trace-redirect='+trace)
+    return []
+  }
+
+  static #warn_uninitialized()
+  {
+    let debug_find = parser.getInput({ key:'warn_uninitialized', type: 'boolean', required: false, default:false, disableable: false });
+    if(debug_find) return ['--warn-uninitialized']
+    return []
+  }
+
+  static #no_warn_unused_cli()
+  {
+    let debug_find = parser.getInput({ key:'no_warn_unused_cli', type: 'boolean', required: false, default:false, disableable: false });
+    if(debug_find) return ['--no-warn-unused-cli']
+    return []
+  }
+
+  static #check_system_vars()
+  {
+    let value = parser.getInput({ key:'check_system_vars', type: 'boolean', required: false, default:false, disableable: false });
+    if(value) return ['--check-system-vars']
+    return []
+  }
+
+  static #compile_no_warning_as_error()
+  {
+    let value = parser.getInput({ key:'compile_no_warning_as_error', type: 'boolean', required: false, default:false, disableable: false });
+    if( this.is_greater_equal('3.24')) if(value) return ['--compile-no-warning-as-error']
+    return []
+  }
+
+  static #link_no_warning_as_error()
+  {
+    let value = parser.getInput({ key:'link_no_warning_as_error', type: 'boolean', required: false, default:false, disableable: false });
+    if( this.is_greater_equal('4.0')) if(value) return ['--link-no-warning-as-error']
+    return []
+  }
+
+  static #profiling_output()
+  {
+    let trace = parser.getInput({ key:'profiling_output', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.18') && trace!='') return Array('--profiling-output='+trace)
+    return []
+  }
+
+  static #profiling_format()
+  {
+    let trace = parser.getInput({ key:'profiling_format', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.18')&& trace!='') return Array('--profiling-format='+trace)
+    return []
+  }
+
+  static #preset()
+  {
+    let trace = parser.getInput({ key:'preset', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.19')&& trace!='') return Array('--preset '+trace)
+    return []
+  }
+
+  static #debugger()
+  {
+    let value = parser.getInput({ key:'debugger', type: 'boolean', required: false, default:false, disableable: false });
+    if( this.is_greater_equal('3.27')) if(value) return ['--debugger']
+    return []
+  }
+
+  static #debugger_pipe()
+  {
+    let trace = parser.getInput({ key:'debugger_pipe', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.27')&& trace!='') return Array('--debugger-pipe '+trace)
+    return []
+  }
+
+  static #debugger_dap_log()
+  {
+    let trace = parser.getInput({ key:'debugger_dap_log', type: 'string', required: false, default:'', disableable: false });
+    if( this.is_greater_equal('3.27')&& trace!='') return Array('--debugger-dap-log '+trace)
+    return []
+  }
 
   /*static async #determineDefaultGenerator()
   {
@@ -34653,21 +34817,39 @@ class CMake
     if(this.is_greater_equal('3.1')) command=command.concat(this.#platform())
     command=command.concat(this.#toolchain())
     command=command.concat(this.#install_prefix())
-    /*command=command.concat(this.#configure_warnings())*/
-    /*command=command.concat(this.#configure_warnings_as_errors())
-
-
     command=command.concat(this.#project_file())
+    command=command.concat(this.#configure_warnings())
+    command=command.concat(this.#configure_warnings_as_errors())
+    command=command.concat(await this.#fresh())
     command=command.concat(this.#list_cache_variables())
+    command=command.concat(this.#list_cache_variables_regex())
+    command=command.concat(this.#list_cache_help_variables_regex())
+    command=command.concat(this.#list_cache_advanced_variables_regex())
+    command=command.concat(this.#list_cache_advanced_help_variables_regex())
     command=command.concat(this.#graphviz())
     command=command.concat(this.#log_level())
     command=command.concat(this.#log_context())
     command=command.concat(this.#sarif_output())
+    command=command.concat(this.#debug_trycompile())
     command=command.concat(this.#debug_output())
     command=command.concat(this.#debug_find())
     command=command.concat(this.#debug_find_pkg())
     command=command.concat(this.#debug_find_var())
-    command=command.concat(this.#trace())*/
+    command=command.concat(this.#trace())
+    command=command.concat(this.#trace_format())
+    command=command.concat(this.#trace_source())
+    command=command.concat(this.#trace_redirect())
+    command=command.concat(this.#warn_uninitialized())
+    command=command.concat(this.#no_warn_unused_cli())
+    command=command.concat(this.#check_system_vars())
+    command=command.concat(this.#compile_no_warning_as_error())
+    command=command.concat(this.#link_no_warning_as_error())
+    command=command.concat(this.#profiling_output())
+    command=command.concat(this.#profiling_format())
+    command=command.concat(this.#preset())
+    command=command.concat(this.#debugger())
+    command=command.concat(this.#debugger_pipe())
+    command=command.concat(this.#debugger_dap_log())
     if(!this.is_greater_equal('3.13')) command=command.concat(this.#source_dir()) // Must be the last one in this case
     console.log(command)
     let cout = ''
