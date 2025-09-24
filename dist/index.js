@@ -34442,7 +34442,6 @@ class CMake
         console.log(process.env.binary_dir+"/CMakeCache.txt")
         await io.rmRF(process.env.binary_dir+"/CMakeCache.txt");
         await io.rmRF(process.env.binary_dir+"/CMakeFiles");
-        exit(1)
       }
     }
     return Array()
