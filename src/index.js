@@ -178,12 +178,12 @@ class CMake
     options.silent = true
     options.failOnStdErr = false
     options.ignoreReturnCode = true
-    await run('cmake',['--help'], options)
-    cout = cout.substring(cout.indexOf("Generators") + 10);
-    cout=cout.replace("\r", "");
-    cout=cout.split("\n");
-    if(this.#m_capacities!==null)
+    if(this.#m_capacities!==null && this.is_greater_equal('3.14')) // we can deduce default generator with * with CMake 3.14
     {
+      await run('cmake',['--help'], options)
+      cout = cout.substring(cout.indexOf("Generators") + 10);
+      cout=cout.replace("\r", "");
+      cout=cout.split("\n");
       for(const element of cout)
       {
         if(element.includes('*') && element.includes('='))
@@ -195,8 +195,12 @@ class CMake
         }
       }
     }
-    else
+    else if(this.#m_capacities==null) // we need to parse all to have the generators
     {
+      await run('cmake',['--help'], options)
+      cout = cout.substring(cout.indexOf("Generators") + 10);
+      cout=cout.replace("\r", "");
+      cout=cout.split("\n");
       for(const line of cout)
       {
         if(line.includes('='))
@@ -213,6 +217,87 @@ class CMake
           this.#m_generators.set(element,new Generator(element,false,false,[]))
         }
       }
+    }
+    // We need to fill this.#m_default_generator by ourself
+    if(!this.is_greater_equal('3.14')) await this.#determineDefaultGenerator()
+  }
+
+  static async #determineDefaultGenerator()
+  {
+    switch(os_is())
+    {
+      case "linux":
+      {
+        this.#m_default_generator = 'Unix Makefiles'
+        break
+      }
+      case "darwin":
+      {
+        this.#m_default_generator = 'Xcode'
+        //if(!this.is_greater_equal('3.3')) this.#m_default_generator = 'Unix Makefiles'
+        //else
+        //{
+
+          /*if(!this.is_greater_equal('3.22') && process.env.SDKROOT===undefined)
+          {
+            let cout = ''
+            let cerr = ''
+            const options = {};
+            options.failOnStdErr = false
+            options.ignoreReturnCode = true
+            options.listeners =
+            {
+              stdout: (data) => { cout += data.toString() },
+              stderr: (data) => { cerr += data.toString() },
+            }
+            options.silent = true
+            await exec.exec('xcrun', ['--show-sdk-path'],options)
+            process.env.SDKROOT=cout.replace('\n','').trim()
+            cout = ''
+            cerr = ''
+            await exec.exec('xcrun', ['--find','clang'],options)
+            cout=cout.replace('\n','').trim()
+            let CC = cout
+            let CXX = String(cout + '++')
+            this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`]
+            console.log(process.env.SDKROOT)
+          }*/
+        //}
+        break
+      }
+      case "win32":
+      {
+        if(this.#m_generators.get('Visual Studio 17 2022')!= undefined) this.#m_default_generator = 'Visual Studio 17 2022'
+        else if (this.#m_generators.get('Visual Studio 16 2019')!= undefined) this.#m_default_generator = 'Visual Studio 16 2019'
+        else this.#m_default_generator = 'NMake Makefiles'
+        // Read CC CXX
+        if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
+        {
+          this.#m_default_generator = 'Unix Makefiles'
+        }
+        if(process.env.CXX !== undefined && (process.env.CXX.includes('g++')||process.env.CXX.includes('clang++')))
+        {
+          this.#m_default_generator = 'Unix Makefiles'
+        }
+        break
+      }
+      case "msys":
+      case "ucrt64":
+      case "clang64":
+      case "clangarm64":
+      case "mingw64":
+      case "clang32":
+      case "mingw32":
+      {
+        //this.#m_default_generator = "Unix Makefiles"
+        break
+      }
+      case "cygwin":
+      {
+        //this.#m_default_generator = "Unix Makefiles"
+        break
+      }
+
     }
   }
 
@@ -723,84 +808,6 @@ class CMake
     if( this.is_greater_equal('3.27')&& trace!='') return Array('--debugger-dap-log '+trace)
     return []
   }
-
-  /*static async #determineDefaultGenerator()
-  {
-    console.log(os_is())
-    switch(os_is())
-    {
-      case "linux":
-      {
-        this.#m_default_generator = 'Unix Makefiles'
-        break
-      }
-      case "darwin":
-      {
-        if(!this.is_greater_equal('3.3')) this.#m_default_generator = 'Unix Makefiles'
-        else
-        {
-          this.#m_default_generator = 'Xcode'
-          if(!this.is_greater_equal('3.22') && process.env.SDKROOT===undefined)
-          {
-            let cout = ''
-            let cerr = ''
-            const options = {};
-            options.failOnStdErr = false
-            options.ignoreReturnCode = true
-            options.listeners =
-            {
-              stdout: (data) => { cout += data.toString() },
-              stderr: (data) => { cerr += data.toString() },
-            }
-            options.silent = true
-            await exec.exec('xcrun', ['--show-sdk-path'],options)
-            process.env.SDKROOT=cout.replace('\n','').trim()
-            cout = ''
-            cerr = ''
-            await exec.exec('xcrun', ['--find','clang'],options)
-            cout=cout.replace('\n','').trim()
-            let CC = cout
-            let CXX = String(cout + '++')
-            this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`]
-            console.log(process.env.SDKROOT)
-          }
-        }
-        break
-      }
-      case "win32":
-      {
-        if(this.#m_generators.includes('Visual Studio 17 2022')) this.#m_default_generator = 'Visual Studio 17 2022'
-        else this.#m_default_generator = 'NMake Makefiles'
-        // Read CC CXX
-        if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
-        {
-          this.#m_default_generator = 'Unix Makefiles'
-        }
-        if(process.env.CXX !== undefined && (process.env.CXX.includes('g++')||process.env.CXX.includes('clang++')))
-        {
-          this.#m_default_generator = 'Unix Makefiles'
-        }
-        break
-      }
-      case "msys":
-      case "ucrt64":
-      case "clang64":
-      case "clangarm64":
-      case "mingw64":
-      case "clang32":
-      case "mingw32":
-      {
-        this.#m_default_generator = "Unix Makefiles"
-        break
-      }
-      case "cygwin":
-      {
-        this.#m_default_generator = "Unix Makefiles"
-        break
-      }
-
-    }
-  }*/
 
   static async configure()
   {
