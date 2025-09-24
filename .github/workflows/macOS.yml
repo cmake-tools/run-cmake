@@ -210,7 +210,7 @@ jobs:
           ninjaVersion: ^1
 
       - name: ⬇️ Setup GCC v${{ matrix.compiler }}
-        run: brew reinstall gcc@${{ matrix.compiler }}
+        run: brew reinstall gcc@${{ matrix.compiler }} proctools make
 
       - name: ⚙️ run-cmake (configure)
         uses: ./
@@ -350,7 +350,7 @@ jobs:
           which install_name_tool || (echo "install_name_tool not found" && exit 1)
 
       - name: ⬇️ Setup LLVM v${{ matrix.compiler }}
-        run: brew reinstall llvm@${{ matrix.compiler }} proctools
+        run: brew reinstall llvm@${{ matrix.compiler }} proctools make
       - name: ⚙️ run-cmake (configure)
         uses: ./
         env:
