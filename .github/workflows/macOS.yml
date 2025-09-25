@@ -356,7 +356,7 @@ jobs:
         env:
           PATH: "/opt/homebrew/opt/llvm@${{ matrix.compiler }}/bin:$PATH"
           CC: clang-${{ matrix.compiler }}
-          CXX: clang++-${{ matrix.compiler }}
+          CXX: clang-${{ matrix.compiler }}
         id: configure
         with:
           mode: configure
