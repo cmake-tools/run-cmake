@@ -56,7 +56,9 @@ CMake command options and corresponding action parameters :
 |  --debugger-dap-log                                       |  debugger_dap_log                          |  Enables interactive debugging of the CMake language                    |  bool    |  ''       |  ✔️ |
 
 (1) : environment variable `GITHUB_WORKSPACE` if available, otherwise "./"
+
 (2) : default generator selected by CMake
+
 (3) : "", "trace", "expand"
 
 ## Build a Build a Project

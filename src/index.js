@@ -234,35 +234,28 @@ class CMake
       case "darwin":
       {
         if(this.#m_default_generator=='') this.#m_default_generator = 'Xcode'
-        //if(!this.is_greater_equal('3.3')) this.#m_default_generator = 'Unix Makefiles'
-        //else
-        //{
-
-          /*if(!this.is_greater_equal('3.22') && process.env.SDKROOT===undefined)
+        if(process.env.SDKROOT===undefined)
+        {
+          let cout = ''
+          let cerr = ''
+          const options = {};
+          options.failOnStdErr = false
+          options.ignoreReturnCode = true
+          options.listeners =
           {
-            let cout = ''
-            let cerr = ''
-            const options = {};
-            options.failOnStdErr = false
-            options.ignoreReturnCode = true
-            options.listeners =
-            {
-              stdout: (data) => { cout += data.toString() },
-              stderr: (data) => { cerr += data.toString() },
-            }
-            options.silent = true
-            await exec.exec('xcrun', ['--show-sdk-path'],options)
-            process.env.SDKROOT=cout.replace('\n','').trim()
-            cout = ''
-            cerr = ''
-            await exec.exec('xcrun', ['--find','clang'],options)
-            cout=cout.replace('\n','').trim()
-            let CC = cout
-            let CXX = String(cout + '++')
-            this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`]
-            console.log(process.env.SDKROOT)
-          }*/
-        //}
+            stdout: (data) => { cout += data.toString() },
+            stderr: (data) => { cerr += data.toString() },
+          }
+          options.silent = true
+          await exec.exec('xcrun', ['--show-sdk-path'],options)
+          process.env.SDKROOT=cout.replace('\n','').trim()
+          cout = ''
+          cerr = ''
+          await exec.exec('xcrun', ['--find','clang'],options)
+          cout=cout.replace('\n','').trim()
+          process.env.CC = cout
+          process.env.CXX = String(cout + '++')
+        }
         break
       }
       case "win32":
