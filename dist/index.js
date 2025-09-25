@@ -34245,8 +34245,8 @@ class CMake
           cerr = ''
           await exec.exec('xcrun', ['--find','clang'],options)
           cout=cout.replace('\n','').trim()
-          process.env.CC = cout
-          process.env.CXX = String(cout + '++')
+          if(process.env.CC == '' || process.env.CC === undefined) process.env.CC = cout
+          if(process.env.CXX == '' || process.env.CXX === undefined) process.env.CXX = String(cout + '++')
         }
         break
       }
