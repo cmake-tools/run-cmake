@@ -256,7 +256,7 @@ class CMake
           cout=cout.replace('\n','').trim()
           if(process.env.CC == '' || process.env.CC === undefined) process.env.CC = cout
           if(process.env.CXX == '' || process.env.CXX === undefined) process.env.CXX = String(cout + '++')
-          if(!this.is_greater_equal('3.14')) this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`];
+          if(!this.is_greater_equal('3.14')) this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${process.env.CC}`,`-DCMAKE_CXX_COMPILER:PATH=${process.env.CXX}`];
         }
         break
       }
@@ -295,7 +295,6 @@ class CMake
         //this.#m_default_generator = "Unix Makefiles"
         break
       }
-
     }
   }
 
