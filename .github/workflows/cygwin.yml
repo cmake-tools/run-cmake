@@ -53,6 +53,7 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler }} cmake ninja
+          add-to-path: false
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
@@ -118,6 +119,7 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         with:
           packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }} cmake ninja
+          add-to-path: false
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
