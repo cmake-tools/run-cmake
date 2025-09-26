@@ -354,7 +354,6 @@ jobs:
       - name: ⚙️ run-cmake (configure)
         uses: ./
         env:
-          PATH: "/opt/homebrew/opt/llvm@${{ matrix.compiler }}/bin:/opt/homebrew/opt/make/libexec/gnubin:$PATH"
           CC: clang-${{ matrix.compiler }}
           CXX: clang-${{ matrix.compiler }}
         id: configure

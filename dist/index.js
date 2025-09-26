@@ -34227,6 +34227,7 @@ class CMake
       case "darwin":
       {
         if(this.#m_default_generator=='') this.#m_default_generator = 'Xcode'
+        if(!this.is_greater_equal('3.14')) this.#m_default_generator = 'Unix Makefiles'
         if(process.env.SDKROOT===undefined)
         {
           let cout = ''
