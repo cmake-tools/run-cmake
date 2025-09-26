@@ -103,7 +103,7 @@ jobs:
       matrix:
         generator: ['MinGW Makefiles', 'Unix Makefiles','Ninja', 'Ninja Multi-Config']
         compiler_version: ['5.0.1-2','8.0.1-1']
-        compiler_type: ['clang', 'mingw64-x86_64-clang']
+        compiler_type: ['mingw64-x86_64-clang'] #not mingw64 ones are buggy
     steps:
       - name: Checkout
         uses: actions/checkout@v5
