@@ -44,6 +44,7 @@ class CMake
   static #m_capacities = null
   static #m_tls = -1
   static #m_debugger = -1
+  static #m_default_cc_cxx= ''
 
 
 
@@ -255,6 +256,7 @@ class CMake
           cout=cout.replace('\n','').trim()
           if(process.env.CC == '' || process.env.CC === undefined) process.env.CC = cout
           if(process.env.CXX == '' || process.env.CXX === undefined) process.env.CXX = String(cout + '++')
+          if(!this.is_greater_equal('3.14')) this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${CC}`,`-DCMAKE_CXX_COMPILER:PATH=${CXX}`];
         }
         break
       }
@@ -808,6 +810,7 @@ class CMake
   static async configure()
   {
     let command = []
+    if(this.#m_default_cc_cxx!='') command=command.concat(this.#m_default_cc_cxx);
     if(this.is_greater_equal('3.13')) command=command.concat(this.#source_dir())
     command=command.concat(this.#build_dir())
     command=command.concat(this.#initial_cache())
