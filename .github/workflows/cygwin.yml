@@ -18,7 +18,7 @@ concurrency:
 jobs:
   cygwin-gcc:
     runs-on: windows-latest
-    name: cygwin (${{ matrix.compiler}},${{ matrix.generator }})
+    name: ${{ matrix.compiler}},${{ matrix.generator }}
     env:
       CYGWIN: true
       CC: gcc
@@ -52,8 +52,7 @@ jobs:
       - name: ⬇️ Setup Cygwin
         uses: cygwin/cygwin-install-action@master
         with:
-          packages: ${{ matrix.compiler }} cmake ninja
-          add-to-path: false
+          packages: ${{ matrix.compiler }}
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
@@ -94,7 +93,7 @@ jobs:
 
   cygwin-clang:
     runs-on: windows-latest
-    name: cygwin (${{ matrix.compiler_type}}${{ matrix.compiler_version }},${{ matrix.generator }})
+    name: ${{ matrix.compiler_type}}${{ matrix.compiler_version }},${{ matrix.generator }}
     env:
       CYGWIN: true
       CC: clang
@@ -118,8 +117,7 @@ jobs:
       - name: ⬇️ Setup Cygwin
         uses: cygwin/cygwin-install-action@master
         with:
-          packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }} cmake ninja
-          add-to-path: false
+          packages: ${{ matrix.compiler_type }}=${{ matrix.compiler_version }}
       - name: ⚙️ run-cmake (configure)
         uses: ./
         id: 'configure'
