@@ -34240,6 +34240,7 @@ class CMake
             stderr: (data) => { cerr += data.toString() },
           }
           options.silent = true
+          await exec.exec('xcode-select', ['--install'],options)
           await exec.exec('xcrun', ['--show-sdk-path'],options)
           process.env.SDKROOT=cout.replace('\n','').trim()
           cout = ''
