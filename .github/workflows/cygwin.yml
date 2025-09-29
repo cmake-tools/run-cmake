@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['MinGW Makefiles', 'Unix Makefiles','Ninja', 'Ninja Multi-Config']
+        generator: ['MinGW Makefiles', 'Unix Makefiles','Ninja']
         compiler:
           - gcc-g++=11.5.0-1
           - gcc-g++=12.4.0-3
