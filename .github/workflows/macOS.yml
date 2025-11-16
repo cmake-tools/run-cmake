@@ -91,7 +91,7 @@ jobs:
           install_prefix: './MyInstallPrefix'
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
@@ -225,7 +225,7 @@ jobs:
           install_prefix: './MyInstallPrefix'
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
@@ -365,7 +365,7 @@ jobs:
           install_prefix: './MyInstallPrefix'
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
