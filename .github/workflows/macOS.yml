@@ -60,10 +60,10 @@ jobs:
         xcode_version: ['16.0.0', '16.1.0', '16.2.0', '16.3.0', '16.4.0', '26.0.0']
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -195,10 +195,10 @@ jobs:
             generator: 'Ninja Multi-Config'
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -330,10 +330,10 @@ jobs:
             generator: 'Ninja Multi-Config'
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests

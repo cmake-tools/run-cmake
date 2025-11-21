@@ -96,10 +96,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -274,10 +274,10 @@ jobs:
             generator: 'Visual Studio 17 2022'
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -464,10 +464,10 @@ jobs:
       - uses: ammaraskar/gcc-problem-matcher@master
 
       - name: 📥 Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -534,10 +534,10 @@ jobs:
       - uses: ammaraskar/msvc-problem-matcher@master
 
       - name: 📥 Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
@@ -656,10 +656,10 @@ jobs:
       - uses: ammaraskar/msvc-problem-matcher@master
 
       - name: 📥 Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Checkout tests repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: cmake-tools/runs.test
           path: tests
