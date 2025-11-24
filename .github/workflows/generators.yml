@@ -79,7 +79,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -171,7 +171,7 @@ jobs:
           }
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
@@ -245,7 +245,7 @@ jobs:
           }
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: ⬇️ Setup CMake v${{ matrix.cmake_version }}
         uses: lukka/get-cmake@latest
         with:
