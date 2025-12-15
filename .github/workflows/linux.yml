@@ -118,7 +118,7 @@ jobs:
           source_dir: './tests'
           install_prefix: './MyInstallPrefix'
           graphviz: ./dots/dependencies.dot
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_${{ matrix.generator }}_${{ matrix.cmake_version }}
