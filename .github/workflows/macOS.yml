@@ -156,6 +156,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+          - '4.1'
         generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
         compiler: ['14']
         exclude:
@@ -291,6 +292,7 @@ jobs:
           - '3.30'
           - '3.31'
           - '4.0'
+          - '4.1'
         generator: ['Unix Makefiles', 'Ninja', 'Ninja Multi-Config']
         compiler: ['20']
         exclude:
