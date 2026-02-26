@@ -1,15 +1,153 @@
-const core = require('@actions/core');
-const exec = require('@actions/exec');
-require('which');
-const compare_version = require('compare-versions');
-const io = require('@actions/io');
-const path = require('path');
-const parser = require('action-input-parser');
-const os = require("node:os");
-require('@actions/artifact');
-require('node:stream/consumers');
-require('dotenv').config();
-require('@actions/glob');
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ 410:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/artifact");
+
+
+/***/ }),
+
+/***/ 625:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/core");
+
+
+/***/ }),
+
+/***/ 415:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/exec");
+
+
+/***/ }),
+
+/***/ 562:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/glob");
+
+
+/***/ }),
+
+/***/ 720:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/io");
+
+
+/***/ }),
+
+/***/ 831:
+/***/ ((module) => {
+
+module.exports = eval("require")("action-input-parser");
+
+
+/***/ }),
+
+/***/ 521:
+/***/ ((module) => {
+
+module.exports = eval("require")("compare-versions");
+
+
+/***/ }),
+
+/***/ 310:
+/***/ ((module) => {
+
+module.exports = eval("require")("dotenv");
+
+
+/***/ }),
+
+/***/ 707:
+/***/ ((module) => {
+
+module.exports = eval("require")("which");
+
+
+/***/ }),
+
+/***/ 161:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:os");
+
+/***/ }),
+
+/***/ 321:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:stream/consumers");
+
+/***/ }),
+
+/***/ 928:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("path");
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __nccwpck_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			__webpack_modules__[moduleId](module, module.exports, __nccwpck_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
+/******/ 		}
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat */
+/******/ 	
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+const core = __nccwpck_require__(625);
+const exec = __nccwpck_require__(415);
+const which = __nccwpck_require__(707)
+const compare_version = __nccwpck_require__(521)
+const io = __nccwpck_require__(720);
+const path = __nccwpck_require__(928)
+const parser = __nccwpck_require__(831)
+const os = __nccwpck_require__(161);
+const artifact = __nccwpck_require__(410);
+const json = __nccwpck_require__(321);
+(__nccwpck_require__(310).config)();
+const glob = __nccwpck_require__(562);
 
 function os_is()
 {
@@ -56,11 +194,11 @@ class CMake
 
   static async init()
   {
-    if(!process.env.cmake_version) await this.#infos();
-    else this.#m_version=process.env.cmake_version;
-    this.#m_nbrCPU = String(os.availableParallelism());
-    this.#parseMode();
-    this.#parseBuildDir();
+    if(!process.env.cmake_version) await this.#infos()
+    else this.#m_version=process.env.cmake_version
+    this.#m_nbrCPU = String(os.availableParallelism())
+    this.#parseMode()
+    this.#parseBuildDir()
     return this;
   }
 
@@ -79,35 +217,35 @@ class CMake
 
   static async #infos()
   {
-    let cout ='';
-    let cerr ='';
+    let cout =''
+    let cerr =''
     const options = {};
     options.listeners =
     {
-      stdout: (data) => { cout += data.toString(); },
-      stderr: (data) => { cerr += data.toString(); }
-    };
-    options.silent = true;
-    options.failOnStdErr = false;
-    options.ignoreReturnCode = true;
-    await run('cmake',['-E','capabilities'], options);
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() }
+    }
+    options.silent = true
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
+    await run('cmake',['-E','capabilities'], options)
     if(cout!='')
     {
-      this.#m_capacities=JSON.parse(cout);
-      cout ='';
-      cerr ='';
+      this.#m_capacities=JSON.parse(cout)
+      cout =''
+      cerr =''
     }
     // if we are here and we don't have a CMake Error so CMake has lib problems ! Fix this fucking shitty Ubuntu
     else if(!cerr.includes('CMake Error'))
     {
-      await this.#fixCMake();
-      cout ='';
-      cerr ='';
-      await run('cmake',['-E','capabilities'], options);
+      await this.#fixCMake()
+      cout =''
+      cerr =''
+      await run('cmake',['-E','capabilities'], options)
     }
-    this.#parseVersion(cerr); // pass cerr to handle the case this.#m_capacities=JSON.parse(cout) fails because of very old CMake
-    await this.#parseGenerators();
-    await this.#parseOtherInfos();
+    this.#parseVersion(cerr) // pass cerr to handle the case this.#m_capacities=JSON.parse(cout) fails because of very old CMake
+    await this.#parseGenerators()
+    await this.#parseOtherInfos()
   }
 
   static async #fixCMake()
@@ -116,14 +254,14 @@ class CMake
     {
       let ret;
       const options = {};
-      options.silent = true;
+      options.silent = true
       if( await os_is() === "linux")
       {
-        ret = await exec.exec('sudo apt-get update', [], options);
+        ret = await exec.exec('sudo apt-get update', [], options)
         if(ret!=0) return ret;
-        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options);
+        ret = await exec.exec('sudo apt-get install --no-install-recommends -y libidn12', [], options)
         if(ret!=0) return ret;
-        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options);
+        ret = await exec.exec('sudo ln -sf /usr/lib/x86_64-linux-gnu/libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11', [], options)
         if(ret!=0) return ret;
         global.fix_done = true;
       }
@@ -135,7 +273,7 @@ class CMake
   {
     if(this.#m_capacities!==null)
     {
-      this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0];
+      this.#m_version=this.#m_capacities.version.string.match(/\d\.\d[\\.\d]+/)[0]
       this.#m_version_major=this.#m_capacities.version.major;
       this.#m_version_minor=this.#m_capacities.version.minor;
       this.#m_version_patch=this.#m_capacities.version.patch;
@@ -163,9 +301,9 @@ class CMake
         let platforms = Array();
         if(this.#m_capacities.generators[i].supportedPlatforms!== undefined)
         {
-          platforms= this.#m_capacities.generators[i].supportedPlatforms;
+          platforms= this.#m_capacities.generators[i].supportedPlatforms
         }
-        this.#m_generators.set(name,new Generator(name,toolsetSupport,platformSupport,platforms));
+        this.#m_generators.set(name,new Generator(name,toolsetSupport,platformSupport,platforms))
       }
     }
     // Read the default generator or parse the generators if CMake is old
@@ -173,15 +311,15 @@ class CMake
     const options = {};
     options.listeners =
     {
-      stdout: (data) => { cout += data.toString(); },
-      stderr: (data) => { cout += data.toString(); }
-    };
-    options.silent = true;
-    options.failOnStdErr = false;
-    options.ignoreReturnCode = true;
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cout += data.toString() }
+    }
+    options.silent = true
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
     if(this.#m_capacities!==null && this.is_greater_equal('3.14')) // we can deduce default generator with * with CMake 3.14
     {
-      await run('cmake',['--help'], options);
+      await run('cmake',['--help'], options)
       cout = cout.substring(cout.indexOf("Generators") + 10);
       cout=cout.replace("\r", "");
       cout=cout.split("\n");
@@ -189,16 +327,16 @@ class CMake
       {
         if(element.includes('*') && element.includes('='))
         {
-          let gen=element.split("=");
-          gen=gen[0].replace("*", "");
-          gen=gen.trim();
-          this.#m_default_generator=gen;
+          let gen=element.split("=")
+          gen=gen[0].replace("*", "")
+          gen=gen.trim()
+          this.#m_default_generator=gen
         }
       }
     }
     else if(this.#m_capacities==null) // we need to parse all to have the generators
     {
-      await run('cmake',['--help'], options);
+      await run('cmake',['--help'], options)
       cout = cout.substring(cout.indexOf("Generators") + 10);
       cout=cout.replace("\r", "");
       cout=cout.split("\n");
@@ -211,16 +349,16 @@ class CMake
           if(element[0].includes("*"))
           {
             element=element[0].replace("*", " ");
-            element=element.trim();
-            this.#m_default_generator=element;
+            element=element.trim()
+            this.#m_default_generator=element
           }
-          else element=element[0].trim();
-          this.#m_generators.set(element,new Generator(element,false,false,[]));
+          else element=element[0].trim()
+          this.#m_generators.set(element,new Generator(element,false,false,[]))
         }
       }
     }
     // We need to fill this.#m_default_generator by ourself
-    await this.#determineDefaultGenerator();
+    await this.#determineDefaultGenerator()
   }
 
   static async #determineDefaultGenerator()
@@ -229,35 +367,35 @@ class CMake
     {
       case "linux":
       {
-        if(this.#m_default_generator=='') this.#m_default_generator = 'Unix Makefiles';
+        if(this.#m_default_generator=='') this.#m_default_generator = 'Unix Makefiles'
         break
       }
       case "darwin":
       {
-        if(this.#m_default_generator=='') this.#m_default_generator = 'Xcode';
-        if(!this.is_greater_equal('3.14')) this.#m_default_generator = 'Unix Makefiles';
+        if(this.#m_default_generator=='') this.#m_default_generator = 'Xcode'
+        if(!this.is_greater_equal('3.14')) this.#m_default_generator = 'Unix Makefiles'
         if(process.env.SDKROOT===undefined)
         {
-          let cout = '';
-          let cerr = '';
+          let cout = ''
+          let cerr = ''
           const options = {};
-          options.failOnStdErr = false;
-          options.ignoreReturnCode = true;
+          options.failOnStdErr = false
+          options.ignoreReturnCode = true
           options.listeners =
           {
-            stdout: (data) => { cout += data.toString(); },
-            stderr: (data) => { cerr += data.toString(); },
-          };
-          options.silent = true;
-          await exec.exec('xcode-select', ['--install'],options);
-          await exec.exec('xcrun', ['--show-sdk-path'],options);
-          process.env.SDKROOT=cout.replace('\n','').trim();
-          cout = '';
-          cerr = '';
-          await exec.exec('xcrun', ['--find','clang'],options);
-          cout=cout.replace('\n','').trim();
-          if(process.env.CC == '' || process.env.CC === undefined) process.env.CC = cout;
-          if(process.env.CXX == '' || process.env.CXX === undefined) process.env.CXX = String(cout + '++');
+            stdout: (data) => { cout += data.toString() },
+            stderr: (data) => { cerr += data.toString() },
+          }
+          options.silent = true
+          await exec.exec('xcode-select', ['--install'],options)
+          await exec.exec('xcrun', ['--show-sdk-path'],options)
+          process.env.SDKROOT=cout.replace('\n','').trim()
+          cout = ''
+          cerr = ''
+          await exec.exec('xcrun', ['--find','clang'],options)
+          cout=cout.replace('\n','').trim()
+          if(process.env.CC == '' || process.env.CC === undefined) process.env.CC = cout
+          if(process.env.CXX == '' || process.env.CXX === undefined) process.env.CXX = String(cout + '++')
           if(!this.is_greater_equal('3.14')) this.#m_default_cc_cxx=[`-DCMAKE_C_COMPILER:PATH=${process.env.CC}`,`-DCMAKE_CXX_COMPILER:PATH=${process.env.CXX}`];
         }
         break
@@ -267,18 +405,34 @@ class CMake
         // Read CC CXX
         if(process.env.CC !== undefined && (process.env.CC.includes('gcc')||process.env.CC.includes('clang')))
         {
-          this.#m_default_generator = 'Unix Makefiles';
+          this.#m_default_generator = 'Unix Makefiles'
         }
         if(process.env.CXX !== undefined && (process.env.CXX.includes('g++')||process.env.CXX.includes('clang++')))
         {
-          this.#m_default_generator = 'Unix Makefiles';
+          this.#m_default_generator = 'Unix Makefiles'
         }
         if(this.#m_default_generator=='')
         {
-          if(this.#m_generators.get('Visual Studio 17 2022')!= undefined) this.#m_default_generator = 'Visual Studio 17 2022';
-          else if (this.#m_generators.get('Visual Studio 16 2019')!= undefined) this.#m_default_generator = 'Visual Studio 16 2019';
-          else this.#m_default_generator = 'NMake Makefiles';
+          if(this.#m_generators.get('Visual Studio 17 2022')!= undefined) this.#m_default_generator = 'Visual Studio 17 2022'
+          else if (this.#m_generators.get('Visual Studio 16 2019')!= undefined) this.#m_default_generator = 'Visual Studio 16 2019'
+          else this.#m_default_generator = 'NMake Makefiles'
         }
+        break
+      }
+      case "msys":
+      case "ucrt64":
+      case "clang64":
+      case "clangarm64":
+      case "mingw64":
+      case "clang32":
+      case "mingw32":
+      {
+        //this.#m_default_generator = "Unix Makefiles"
+        break
+      }
+      case "cygwin":
+      {
+        //this.#m_default_generator = "Unix Makefiles"
         break
       }
     }
@@ -288,8 +442,8 @@ class CMake
   {
     if(this.#m_capacities!==null)
     {
-      this.#m_tls = this.#m_capacities.tls;
-      this.#m_debugger = this.#m_capacities.debugger;
+      this.#m_tls = this.#m_capacities.tls
+      this.#m_debugger = this.#m_capacities.debugger
     }
   }
 
@@ -302,7 +456,7 @@ class CMake
   */
   static #parseMode()
   {
-    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false });
+    this.#m_mode = parser.getInput({key: 'mode', type: 'string', required: false, default: 'configure', disableable: false })
     if(this.#m_mode!='configure' && this.#m_mode!='build' && this.#m_mode!='install' && this.#m_mode!='all') throw String('mode should be configure, build, install or all')
   }
 
@@ -315,8 +469,8 @@ class CMake
 
   static #parseBuildDir()
   {
-    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir !== undefined ? process.env.binary_dir : './build' , disableable: false });
-    binary_dir=path.resolve(binary_dir);
+    let binary_dir = parser.getInput({key: 'binary_dir', type: 'string', required: false, default: process.env.binary_dir !== undefined ? process.env.binary_dir : './build' , disableable: false })
+    binary_dir=path.resolve(binary_dir)
     core.exportVariable('binary_dir', binary_dir);
   }
 
@@ -325,8 +479,8 @@ class CMake
   //-S <path-to-source> Path to root directory of the CMake project to build.
   static #source_dir()
   {
-    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE !== undefined ? process.env.GITHUB_WORKSPACE : './' , disableable: false });
-    source_dir=path.resolve(source_dir);
+    let source_dir = parser.getInput({key: 'source_dir', type: 'string', required: false, default: process.env.GITHUB_WORKSPACE !== undefined ? process.env.GITHUB_WORKSPACE : './' , disableable: false })
+    source_dir=path.resolve(source_dir)
     if(this.is_greater_equal('3.13')) return Array('-S',source_dir)
     else return Array(source_dir)
   }
@@ -337,7 +491,7 @@ class CMake
     if(this.is_greater_equal('3.13')) return Array('-B',process.env.binary_dir)
     else
     {
-      io.mkdirP(process.env.binary_dir);
+      io.mkdirP(process.env.binary_dir)
       return Array()
     }
   }
@@ -345,10 +499,10 @@ class CMake
   //-C <initial-cache> Pre-load a script to populate the cache.
   static #initial_cache()
   {
-    let initial_cache = parser.getInput({key: 'initial_cache', type: 'string', required: false, default: '' , disableable: false });
+    let initial_cache = parser.getInput({key: 'initial_cache', type: 'string', required: false, default: '' , disableable: false })
     if(initial_cache!='')
     {
-      initial_cache=path.posix.resolve(initial_cache);
+      initial_cache=path.posix.resolve(initial_cache)
       return Array('-C',initial_cache)
     }
     else return Array()
@@ -357,11 +511,11 @@ class CMake
   //-D <var>:<type>=<value>, -D <var>=<value
   static #variables()
   {
-    const value = parser.getInput({key: 'variables', type: 'array', required: false, default: [] , disableable: false });
-    let ret=[];
+    const value = parser.getInput({key: 'variables', type: 'array', required: false, default: [] , disableable: false })
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-D',value[i]);
+      ret=ret.concat('-D',value[i])
     }
     return ret;
   }
@@ -369,11 +523,11 @@ class CMake
   //-U <globbing_expr>
   static #remove_variables()
   {
-    const value = parser.getInput({key: 'remove_variables', type: 'array', required: false, default: [] , disableable: false });
-    let ret=[];
+    const value = parser.getInput({key: 'remove_variables', type: 'array', required: false, default: [] , disableable: false })
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-U',value[i]);
+      ret=ret.concat('-U',value[i])
     }
     return ret;
   }
@@ -381,19 +535,19 @@ class CMake
   //-G <generator-name>
   static #generator()
   {
-    this.#m_generator = parser.getInput({key: 'generator', type: 'string', required: false, default: this.#m_default_generator, disableable: false });
+    this.#m_generator = parser.getInput({key: 'generator', type: 'string', required: false, default: this.#m_default_generator, disableable: false })
     if(this.#m_generator!='') return Array('-G',this.#m_generator)
   }
 
   //-T <toolset-spec>
   static #toolset()
   {
-    let generator_infos = this.#m_generators.get(this.#m_generator);
-    let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false });
+    let generator_infos = this.#m_generators.get(this.#m_generator)
+    let toolset = parser.getInput({key: 'toolset', type: 'string', required: false, default: '', disableable: false })
     let has_toolset_info = false;
-    if(generator_infos != undefined) has_toolset_info=true;
+    if(generator_infos != undefined) has_toolset_info=true
     if(toolset!='' && has_toolset_info==true && generator_infos.support_toolset == true) return Array('-T',toolset)
-    else if (toolset!='' && has_toolset_info==true && generator_infos.support_toolset == false ) core.warning('toolset is not needed');
+    else if (toolset!='' && has_toolset_info==true && generator_infos.support_toolset == false ) core.warning('toolset is not needed')
     else if (toolset!='' && has_toolset_info==false ) return Array('-T',toolset)
     return Array()
   }
@@ -401,14 +555,14 @@ class CMake
   //-A <platform-name>
   static #platform()
   {
-    let generator_infos = this.#m_generators.get(this.#m_generator);
-    let platform = core.getInput('platform', { required: false }); // don't use parser.getInput here !!!
+    let generator_infos = this.#m_generators.get(this.#m_generator)
+    let platform = core.getInput('platform', { required: false }) // don't use parser.getInput here !!!
     let has_platform_info = false;
-    if(generator_infos != undefined) has_platform_info=true;
+    if(generator_infos != undefined) has_platform_info=true
     if(this.is_greater_equal('3.1'))
     {
       if(platform!='' && has_platform_info== true && generator_infos.support_platform == true) return Array('-A',platform)
-      else if(platform!='' && has_platform_info== true && generator_infos.support_platform==false) core.warning('platform is not needed');
+      else if(platform!='' && has_platform_info== true && generator_infos.support_platform==false) core.warning('platform is not needed')
       else if(platform!='' && has_platform_info== false) return Array('-A',platform)
       return Array()
     }
@@ -419,7 +573,7 @@ class CMake
   //--toolchain <path-to-file>
   static #toolchain()
   {
-    let toolchain = parser.getInput({key: 'toolchain', type: 'string', required: false, default: '', disableable: false });
+    let toolchain = parser.getInput({key: 'toolchain', type: 'string', required: false, default: '', disableable: false })
     if(toolchain!='')
     {
       if(this.is_greater_equal('3.21.0')) return Array('--toolchain',toolchain)
@@ -431,10 +585,10 @@ class CMake
   //--install-prefix <directory>
   static #install_prefix()
   {
-    let install_prefix = parser.getInput({key: 'install_prefix', type: 'string', required: false, default: '', disableable: false });
+    let install_prefix = parser.getInput({key: 'install_prefix', type: 'string', required: false, default: '', disableable: false })
     if(install_prefix!='')
     {
-      install_prefix=path.resolve(install_prefix);
+      install_prefix=path.resolve(install_prefix)
       if(this.is_greater_equal('3.21') && os_is()!='cygwin') return Array('--install-prefix',install_prefix)
       else return Array('-DCMAKE_INSTALL_PREFIX:PATH='+install_prefix)
     }
@@ -446,7 +600,7 @@ class CMake
   {
     if(this.is_greater_equal('4.0'))
     {
-      let project_file = parser.getInput({key: 'project_file', type: 'string', required: false, default: '', disableable: false });
+      let project_file = parser.getInput({key: 'project_file', type: 'string', required: false, default: '', disableable: false })
       if(project_file!='')
       {
         return Array('--project-file',project_file)
@@ -540,10 +694,10 @@ class CMake
   static #list_cache_variables_regex()
   {
     let value = parser.getInput({ key:'list_cache_variables_regex', type:'array', required: false, default:[], disableable: false });
-    let ret=[];
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-LR',value[i]);
+      ret=ret.concat('-LR',value[i])
     }
     return ret;
   }
@@ -551,10 +705,10 @@ class CMake
     static #list_cache_help_variables_regex()
   {
     let value = parser.getInput({ key:'list_cache_help_variables_regex', type:'array', required: false, default:[], disableable: false });
-    let ret=[];
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-LRH',value[i]);
+      ret=ret.concat('-LRH',value[i])
     }
     return ret;
   }
@@ -562,10 +716,10 @@ class CMake
     static #list_cache_advanced_variables_regex()
   {
     let value = parser.getInput({ key:'list_cache_advanced_variables_regex', type:'array', required: false, default:[], disableable: false });
-    let ret=[];
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-LRA',value[i]);
+      ret=ret.concat('-LRA',value[i])
     }
     return ret;
   }
@@ -573,10 +727,10 @@ class CMake
   static #list_cache_advanced_help_variables_regex()
   {
     let value = parser.getInput({ key:'list_cache_advanced_help_variables_regex', type:'array', required: false, default:[], disableable: false });
-    let ret=[];
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('-LRAH',value[i]);
+      ret=ret.concat('-LRAH',value[i])
     }
     return ret;
   }
@@ -592,7 +746,7 @@ class CMake
     }
     else
     {
-      graphviz=path.resolve(graphviz);
+      graphviz=path.resolve(graphviz)
       return Array('--graphviz='+graphviz)
     }
   }
@@ -624,7 +778,7 @@ class CMake
     let sarif_output = parser.getInput({ key:'sarif_output', type: 'string', required: false, default:'', disableable: false });
     if(sarif_output!='')
     {
-      sarif_output=path.resolve(sarif_output);
+      sarif_output=path.resolve(sarif_output)
       if( this.is_greater_equal('4.0')) return ['--sarif-output='+sarif_output]
     }
     return []
@@ -700,10 +854,10 @@ class CMake
   static #trace_source()
   {
     let value = parser.getInput({ key:'trace_source', type:'array', required: false, default:[], disableable: false });
-    let ret=[];
+    let ret=[]
     for(const i in value)
     {
-      ret=ret.concat('--trace-source='+value[i]);
+      ret=ret.concat('--trace-source='+value[i])
     }
     return ret;
   }
@@ -794,76 +948,76 @@ class CMake
 
   static async configure()
   {
-    let command = [];
+    let command = []
     if(this.#m_default_cc_cxx!='') command=command.concat(this.#m_default_cc_cxx);
-    if(this.is_greater_equal('3.13')) command=command.concat(this.#source_dir());
-    command=command.concat(this.#build_dir());
-    command=command.concat(this.#initial_cache());
-    command=command.concat(this.#variables());
-    command=command.concat(this.#remove_variables());
+    if(this.is_greater_equal('3.13')) command=command.concat(this.#source_dir())
+    command=command.concat(this.#build_dir())
+    command=command.concat(this.#initial_cache())
+    command=command.concat(this.#variables())
+    command=command.concat(this.#remove_variables())
     if(!this.is_greater_equal('3.1'))
     {
-      command=command.concat(this.#generator()[0]);
-      command=command.concat(this.#generator()[1]+this.#platform());
+      command=command.concat(this.#generator()[0])
+      command=command.concat(this.#generator()[1]+this.#platform())
     }
     else
     {
-      command=command.concat(this.#generator());
+      command=command.concat(this.#generator())
     }
-    command=command.concat(this.#toolset());
-    if(this.is_greater_equal('3.1')) command=command.concat(this.#platform());
-    command=command.concat(this.#toolchain());
-    command=command.concat(this.#install_prefix());
-    command=command.concat(this.#project_file());
-    command=command.concat(this.#configure_warnings());
-    command=command.concat(this.#configure_warnings_as_errors());
-    command=command.concat(await this.#fresh());
-    command=command.concat(this.#list_cache_variables());
-    command=command.concat(this.#list_cache_variables_regex());
-    command=command.concat(this.#list_cache_help_variables_regex());
-    command=command.concat(this.#list_cache_advanced_variables_regex());
-    command=command.concat(this.#list_cache_advanced_help_variables_regex());
-    command=command.concat(this.#graphviz());
-    command=command.concat(this.#log_level());
-    command=command.concat(this.#log_context());
-    command=command.concat(this.#sarif_output());
-    command=command.concat(this.#debug_trycompile());
-    command=command.concat(this.#debug_output());
-    command=command.concat(this.#debug_find());
-    command=command.concat(this.#debug_find_pkg());
-    command=command.concat(this.#debug_find_var());
-    command=command.concat(this.#trace());
-    command=command.concat(this.#trace_format());
-    command=command.concat(this.#trace_source());
-    command=command.concat(this.#trace_redirect());
-    command=command.concat(this.#warn_uninitialized());
-    command=command.concat(this.#no_warn_unused_cli());
-    command=command.concat(this.#check_system_vars());
-    command=command.concat(this.#compile_no_warning_as_error());
-    command=command.concat(this.#link_no_warning_as_error());
-    command=command.concat(this.#profiling_output());
-    command=command.concat(this.#profiling_format());
-    command=command.concat(this.#preset());
-    command=command.concat(this.#debugger());
-    command=command.concat(this.#debugger_pipe());
-    command=command.concat(this.#debugger_dap_log());
-    if(!this.is_greater_equal('3.13')) command=command.concat(this.#source_dir()); // Must be the last one in this case
-    let cout = '';
-    let cerr = '';
+    command=command.concat(this.#toolset())
+    if(this.is_greater_equal('3.1')) command=command.concat(this.#platform())
+    command=command.concat(this.#toolchain())
+    command=command.concat(this.#install_prefix())
+    command=command.concat(this.#project_file())
+    command=command.concat(this.#configure_warnings())
+    command=command.concat(this.#configure_warnings_as_errors())
+    command=command.concat(await this.#fresh())
+    command=command.concat(this.#list_cache_variables())
+    command=command.concat(this.#list_cache_variables_regex())
+    command=command.concat(this.#list_cache_help_variables_regex())
+    command=command.concat(this.#list_cache_advanced_variables_regex())
+    command=command.concat(this.#list_cache_advanced_help_variables_regex())
+    command=command.concat(this.#graphviz())
+    command=command.concat(this.#log_level())
+    command=command.concat(this.#log_context())
+    command=command.concat(this.#sarif_output())
+    command=command.concat(this.#debug_trycompile())
+    command=command.concat(this.#debug_output())
+    command=command.concat(this.#debug_find())
+    command=command.concat(this.#debug_find_pkg())
+    command=command.concat(this.#debug_find_var())
+    command=command.concat(this.#trace())
+    command=command.concat(this.#trace_format())
+    command=command.concat(this.#trace_source())
+    command=command.concat(this.#trace_redirect())
+    command=command.concat(this.#warn_uninitialized())
+    command=command.concat(this.#no_warn_unused_cli())
+    command=command.concat(this.#check_system_vars())
+    command=command.concat(this.#compile_no_warning_as_error())
+    command=command.concat(this.#link_no_warning_as_error())
+    command=command.concat(this.#profiling_output())
+    command=command.concat(this.#profiling_format())
+    command=command.concat(this.#preset())
+    command=command.concat(this.#debugger())
+    command=command.concat(this.#debugger_pipe())
+    command=command.concat(this.#debugger_dap_log())
+    if(!this.is_greater_equal('3.13')) command=command.concat(this.#source_dir()) // Must be the last one in this case
+    let cout = ''
+    let cerr = ''
     const options = {};
-    options.silent = false;
-    options.failOnStdErr = false;
-    options.ignoreReturnCode = true;
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
     options.listeners =
     {
-      stdout: (data) => { cout += data.toString(); },
-      stderr: (data) => { cerr += data.toString(); },
-      errline: (data) => { console.log(data); },
-    };
-    options.cwd = this.#working_directory();
-    console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`);
-    let ret = await run('cmake',command,options);
-    if(ret!=0) core.setFailed(cerr);
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => { console.log(data) },
+    }
+    options.cwd = this.#working_directory()
+    console.log(`Running CMake v${this.version()} in configure mode with generator ${this.#m_generator} (Default generator : ${this.default_generator()})`)
+    let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
   }
 
   // BUILD PARAMETER
@@ -873,12 +1027,12 @@ class CMake
   static #parallel()
   {
     if(!this.is_greater_equal('3.12')) return []
-    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false });
-    value = parseInt(value, 10);
+    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false })
+    value = parseInt(value, 10)
     if(isNaN(value)||value<=0)
     {
-      core.warning('parallel should be a number >=1 ('+String(value)+')');
-      value=1;
+      core.warning('parallel should be a number >=1 ('+String(value)+')')
+      value=1
     }
     return Array('--parallel',String(value))
   }
@@ -894,7 +1048,7 @@ class CMake
 
   static #targets()
   {
-    let targets = parser.getInput({key: 'targets', type: 'string', required: false, default: '' , disableable: false });
+    let targets = parser.getInput({key: 'targets', type: 'string', required: false, default: '' , disableable: false })
     if(targets!='')
     {
       if(this.is_greater_equal('3.15')) return Array('--target').concat(targets.split(' '))
@@ -908,7 +1062,7 @@ class CMake
 
   static #config()
   {
-    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false });
+    let config = parser.getInput({key: 'config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
     if(config!='')
     {
       core.exportVariable('config', config);
@@ -926,7 +1080,7 @@ class CMake
 
   static #resolve_package_references()
   {
-    let value = parser.getInput({key: 'resolve_package_references', type: 'string', required: false, default: '' , disableable: false });
+    let value = parser.getInput({key: 'resolve_package_references', type: 'string', required: false, default: '' , disableable: false })
     if(this.is_greater_equal('3.23'))
     {
       if(value=='on' || value=='off' || value=='only') return ['--resolve-package-references='+value]
@@ -938,7 +1092,7 @@ class CMake
   {
     delete process.env.VERBOSE;
     delete process.env.CMAKE_VERBOSE_MAKEFILE;
-    const build_verbose = parser.getInput({ key:'build_verbose', type: 'boolean', required: false, default: false, disableable: false});
+    const build_verbose = parser.getInput({ key:'build_verbose', type: 'boolean', required: false, default: false, disableable: false})
     if(build_verbose)
     {
       if( this.is_greater_equal('3.14'))
@@ -947,8 +1101,8 @@ class CMake
       }
       else
       {
-        process.env.VERBOSE="TRUE";
-        process.env.CMAKE_VERBOSE_MAKEFILE="TRUE";
+        process.env.VERBOSE="TRUE"
+        process.env.CMAKE_VERBOSE_MAKEFILE="TRUE"
         return []
       }
     }
@@ -957,75 +1111,75 @@ class CMake
 
   static #to_native_tool()
   {
-    const to_native_tool = parser.getInput({ key:'to_native_tool', type: 'array',required: false, default:[], disableable: false});
+    const to_native_tool = parser.getInput({ key:'to_native_tool', type: 'array',required: false, default:[], disableable: false})
     if(to_native_tool.length == 0) return []
     else
     {
-      let ret = ['--'];
-      ret=ret.concat(to_native_tool);
+      let ret = ['--']
+      ret=ret.concat(to_native_tool)
       return ret
     }
   }
 
   static async build()
   {
-    let cout = '';
-    let cerr = '';
+    let cout = ''
+    let cerr = ''
     const options = {};
-    options.silent = false;
-    options.failOnStdErr = false;
-    options.ignoreReturnCode = true;
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
     options.listeners =
     {
-      stdout: (data) => { cout += data.toString(); },
-      stderr: (data) => { cerr += data.toString(); },
-      errline: (data) => {console.log(data); },
-    };
-    this.#parseBuildDir();
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => {console.log(data) },
+    }
+    this.#parseBuildDir()
     if(this.is_greater_equal('3.15'))
     {
-      let command = ['--build',process.env.binary_dir];
-      command=command.concat(this.#parallel());
-      command=command.concat(this.#preset_build());
-      command=command.concat(this.#targets());
-      command=command.concat(this.#config());
-      command=command.concat(this.#clean_first());
-      command=command.concat(this.#resolve_package_references());
-      command=command.concat(this.#build_verbose());
-      command=command.concat(this.#to_native_tool());
-      console.log(`Running CMake v${this.version()} in build mode`);
-      let ret = await run('cmake',command,options);
-      if(ret!=0) core.setFailed(cerr);
+      let command = ['--build',process.env.binary_dir]
+      command=command.concat(this.#parallel())
+      command=command.concat(this.#preset_build())
+      command=command.concat(this.#targets())
+      command=command.concat(this.#config())
+      command=command.concat(this.#clean_first())
+      command=command.concat(this.#resolve_package_references())
+      command=command.concat(this.#build_verbose())
+      command=command.concat(this.#to_native_tool())
+      console.log(`Running CMake v${this.version()} in build mode`)
+      let ret = await run('cmake',command,options)
+      if(ret!=0) core.setFailed(cerr)
     }
     else
     {
-      const arr = this.#targets();
+      const arr = this.#targets()
       if(arr.length == 0)
       {
-        let command = ['--build',process.env.binary_dir];
-        command=command.concat(this.#parallel());
-        command=command.concat(this.#config());
-        command=command.concat(this.#clean_first());
-        command=command.concat(this.#build_verbose());
-        command=command.concat(this.#to_native_tool());
-        console.log(`Running CMake v${this.version()} in build mode`);
-        let ret = await run('cmake',command,options);
-        if(ret!=0) core.setFailed(cerr);
+        let command = ['--build',process.env.binary_dir]
+        command=command.concat(this.#parallel())
+        command=command.concat(this.#config())
+        command=command.concat(this.#clean_first())
+        command=command.concat(this.#build_verbose())
+        command=command.concat(this.#to_native_tool())
+        console.log(`Running CMake v${this.version()} in build mode`)
+        let ret = await run('cmake',command,options)
+        if(ret!=0) core.setFailed(cerr)
       }
       else
       {
         for(const target in arr)
         {
-          let command = ['--build',process.env.binary_dir];
-          command=command.concat(this.#parallel());
-          command=command.concat('--target', arr[target]);
-          command=command.concat(this.#config());
-          if(target==0)command=command.concat(this.#clean_first());
-          command=command.concat(this.#build_verbose());
-          command=command.concat(this.#to_native_tool());
-          console.log(`Running CMake v${this.version()} in build mode`);
-          let ret = await run('cmake',command,options);
-          if(ret!=0) core.setFailed(cerr);
+          let command = ['--build',process.env.binary_dir]
+          command=command.concat(this.#parallel())
+          command=command.concat('--target', arr[target])
+          command=command.concat(this.#config())
+          if(target==0)command=command.concat(this.#clean_first())
+          command=command.concat(this.#build_verbose())
+          command=command.concat(this.#to_native_tool())
+          console.log(`Running CMake v${this.version()} in build mode`)
+          let ret = await run('cmake',command,options)
+          if(ret!=0) core.setFailed(cerr)
         }
       }
     }
@@ -1035,14 +1189,14 @@ class CMake
 
   static #config_install()
   {
-    let value = parser.getInput({key: 'install_config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false });
+    let value = parser.getInput({key: 'install_config', type: 'string', required: false, default: process.env.config !== undefined ? process.env.config : 'Debug' , disableable: false })
     if(this.is_greater_equal('3.15')) return Array('--config',value)
     else return ['-DBUILD_TYPE='+value]
   }
 
   static #component()
   {
-    let value = parser.getInput({key: 'component', type: 'string', required: false, default: '' , disableable: false });
+    let value = parser.getInput({key: 'component', type: 'string', required: false, default: '' , disableable: false })
     if(value!='')
     {
       if(this.is_greater_equal('3.15')) return ['--component',value]
@@ -1053,14 +1207,14 @@ class CMake
 
   static #default_directory_permissions()
   {
-    let value = parser.getInput({key: 'default_directory_permissions', type: 'string', required: false, default: '' , disableable: false });
+    let value = parser.getInput({key: 'default_directory_permissions', type: 'string', required: false, default: '' , disableable: false })
     if(value!='' && this.is_greater_equal('3.19')) return ['--default_directory_permissions',value]
     return []
   }
 
   static #prefix()
   {
-    let value = parser.getInput({key: 'prefix', type: 'string', required: false, default: '' , disableable: false });
+    let value = parser.getInput({key: 'prefix', type: 'string', required: false, default: '' , disableable: false })
     if(value!='')
     {
       if(this.is_greater_equal('3.15')) return ['--prefix',value]
@@ -1071,7 +1225,7 @@ class CMake
 
   static #strip()
   {
-    let value = parser.getInput({key: 'strip', type: 'boolean', required: false, default: false , disableable: false });
+    let value = parser.getInput({key: 'strip', type: 'boolean', required: false, default: false , disableable: false })
     if(value=='true') return ['--strip']
     return []
   }
@@ -1079,7 +1233,7 @@ class CMake
   static #install_verbose()
   {
     delete process.env.VERBOSE;
-    const install_verbose = parser.getInput({ key:'install_verbose', type: 'boolean', required: false,  default: process.env.VERBOSE !== undefined ? process.env.VERBOSE : false , disableable: false });
+    const install_verbose = parser.getInput({ key:'install_verbose', type: 'boolean', required: false,  default: process.env.VERBOSE !== undefined ? process.env.VERBOSE : false , disableable: false })
     if(install_verbose)
     {
       if( this.is_greater_equal('3.15'))
@@ -1088,7 +1242,7 @@ class CMake
       }
       else
       {
-        process.env.VERBOSE="TRUE";
+        process.env.VERBOSE="TRUE"
         return Array()
       }
     }
@@ -1098,54 +1252,54 @@ class CMake
   static #install_parallel()
   {
     if(!this.is_greater_equal('3.31')) return []
-    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false });
-    value = parseInt(value, 10);
+    let value = parser.getInput({ key:'parallel', type: 'string', required: false, default:this.#m_nbrCPU, disableable: false })
+    value = parseInt(value, 10)
     if(isNaN(value)||value<=0)
     {
-      core.warning('parallel should be a number >=1 ('+String(value)+')');
-      value=1;
+      core.warning('parallel should be a number >=1 ('+String(value)+')')
+      value=1
     }
     return Array('--parallel',String(value))
   }
 
   static async install()
   {
-    this.#parseBuildDir();
-    let command = [];
+    this.#parseBuildDir()
+    let command = []
     if(this.is_greater_equal('3.15.0'))
     {
-      command=['--install',process.env.binary_dir];
-      command=command.concat(this.#config_install());
-      command=command.concat(this.#component());
-      command=command.concat(this.#default_directory_permissions());
-      command=command.concat(this.#prefix());
-      command=command.concat(this.#strip());
-      command=command.concat(this.#install_verbose());
-      command=command.concat(this.#install_parallel());
+      command=['--install',process.env.binary_dir]
+      command=command.concat(this.#config_install())
+      command=command.concat(this.#component())
+      command=command.concat(this.#default_directory_permissions())
+      command=command.concat(this.#prefix())
+      command=command.concat(this.#strip())
+      command=command.concat(this.#install_verbose())
+      command=command.concat(this.#install_parallel())
     }
     if(!this.is_greater_equal('3.15.0'))
     {
-      command = [];
-      command=command.concat(this.#config_install());
-      command=command.concat(this.#component());
-      command=command.concat(this.#prefix());
-      command=command.concat('-P',process.env.binary_dir+'/cmake_install.cmake');
+      command = []
+      command=command.concat(this.#config_install())
+      command=command.concat(this.#component())
+      command=command.concat(this.#prefix())
+      command=command.concat('-P',process.env.binary_dir+'/cmake_install.cmake')
     }
-    let cout = '';
-    let cerr = '';
+    let cout = ''
+    let cerr = ''
     const options = {};
-    options.silent = false;
-    options.failOnStdErr = false;
-    options.ignoreReturnCode = true;
+    options.silent = false
+    options.failOnStdErr = false
+    options.ignoreReturnCode = true
     options.listeners =
     {
-      stdout: (data) => { cout += data.toString(); },
-      stderr: (data) => { cerr += data.toString(); },
-      errline: (data) => {console.log(data); },
-    };
-    console.log(`Running CMake v${this.version()} in install mode`);
-    let ret = await run('cmake',command,options);
-    if(ret!=0) core.setFailed(cerr);
+      stdout: (data) => { cout += data.toString() },
+      stderr: (data) => { cerr += data.toString() },
+      errline: (data) => {console.log(data) },
+    }
+    console.log(`Running CMake v${this.version()} in install mode`)
+    let ret = await run('cmake',command,options)
+    if(ret!=0) core.setFailed(cerr)
   }
 
 }
@@ -1164,8 +1318,8 @@ async function run(cmd,args, opts)
       core.setFailed('environment variable RUNNER_TEMP is undefined');
       return;
     }
-    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd');
-    let quotedArgs = [cmd].concat(args);
+    const msys = path.join(tmp_dir, 'setup-msys2/msys2.cmd')
+    let quotedArgs = [cmd].concat(args)
     //quotedArgs =  quotedArgs.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}) // fix confused vim syntax highlighting with:
     return await exec.exec('cmd', ['/D', '/S', '/C', msys].concat(['-c', quotedArgs.join(' ')]), opts)
   }
@@ -1181,24 +1335,24 @@ async function main()
     {
       case 'configure':
       {
-        await cmake.configure();
+        await cmake.configure()
         break
       }
       case 'build':
       {
-        await cmake.build();
+        await cmake.build()
         break
       }
       case 'install':
       {
-        await cmake.install();
+        await cmake.install()
         break
       }
       case 'all':
       {
-        await cmake.configure();
-        await cmake.build();
-        await cmake.install();
+        await cmake.configure()
+        await cmake.build()
+        await cmake.install()
         break
       }
     }
@@ -1209,9 +1363,12 @@ async function main()
   }
   catch (error)
   {
-    core.setFailed(error);
+    core.setFailed(error)
   }
 }
 
-main();
-//# sourceMappingURL=index.js.map
+main()
+
+module.exports = __webpack_exports__;
+/******/ })()
+;
