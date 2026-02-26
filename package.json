@@ -4,8 +4,8 @@
   "description": "GitHub action to run CMake",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npx esbuild src/index.js --bundle --platform=node --target=node20 --outfile=dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx esbuild src/index.js --bundle --platform=node --target=node24 --outfile=dist/index.js",
+    "test": "node dist/index.js"
   },
   "keywords": [],
   "author": "flagarde",
