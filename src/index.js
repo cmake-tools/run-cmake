@@ -1,15 +1,16 @@
-const core = require('@actions/core');
-const exec = require('@actions/exec');
-const which = require('which')
-const compare_version = require('compare-versions')
-const io = require('@actions/io');
-const path = require('path')
-const parser = require('action-input-parser')
-const os = require("node:os");
-const artifact = require('@actions/artifact');
-const json = require('node:stream/consumers');
+import * as core from '@actions/core'
+import * as exec from '@actions/exec'
+import * as which from 'which'
+import * as compare_version from 'compare-versions'
+import * as io from '@actions/io'
+import * as path from 'path'
+import * as parser from 'action-input-parser'
+import * as os from 'node:os'
+import * as artifact from '@actions/artifact'
+import * as json from 'node:stream/consumers'
+import * as glob from '@actions/glob'
+
 require('dotenv').config();
-const glob = require('@actions/glob');
 
 function os_is()
 {

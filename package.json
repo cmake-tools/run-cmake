@@ -1,44 +1,38 @@
 {
   "name": "run-cmake",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "GitHub action to run CMake",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npx esbuild src/index.js --bundle --platform=node --target=node20 --outfile=dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "flagarde",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/artifact": "^6.2.0",
+    "@actions/core": "^3.0.0",
+    "@actions/exec": "^3.0.0",
+    "@actions/glob": "^0.6.1",
+    "@actions/io": "^3.0.2",
+    "action-input-parser": "^1.2.38",
+    "ansi-styles": "^6.2.3",
+    "compare-versions": "^6.1.1",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "which": "^6.0.1"
+  },
   "directories": {
     "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cmake-tools/run-cmake.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/cmake-tools/run-cmake/issues"
   },
-  "homepage": "https://github.com/cmake-tools/run-cmake#readme",
-  "dependencies": {
-    "@actions/artifact": "^6.2.0",
-    "@actions/github": "^9.0.0",
-    "@actions/glob": "^0.6.1",
-    "action-input-parser": "^1.2.38",
-    "compare-versions": "^6.1.1",
-    "dotenv": "^17.3.1",
-    "path": "^0.12.7",
-    "which": "^6.0.1"
-  },
-  "devDependencies": {
-    "@actions/core": "^3.0.0",
-    "@actions/exec": "^3.0.0",
-    "@actions/io": "^3.0.2",
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@vercel/ncc": "^0.38.4",
-    "jest": "^30.2.0",
-    "rollup": "^4.59.0"
-  }
+  "homepage": "https://github.com/cmake-tools/run-cmake#readme"
 }
