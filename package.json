@@ -22,11 +22,14 @@
   },
   "homepage": "https://github.com/cmake-tools/run-cmake#readme",
   "dependencies": {
+    "@actions/github": "^9.0.0"
+  },
+  "devDependencies": {
     "@actions/core": "^3.0.0",
     "@actions/exec": "^3.0.0",
-    "@actions/github": "^9.0.0",
     "@actions/io": "^3.0.2",
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3"
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "rollup": "^4.59.0"
   }
 }
