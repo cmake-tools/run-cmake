@@ -124,7 +124,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         name: 📤 Upload dot files
         with:
-          name: dot_${{ github.workflow }}_${{ matrix.generator }}
+          name: dot_${{ github.workflow }}_gcc_${{ matrix.generator }}
           path: ./dots/*
           if-no-files-found: warn
           retention-days: 90
@@ -185,7 +185,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         name: 📤 Upload dot files
         with:
-          name: dot_${{ github.workflow }}_${{ matrix.generator }}
+          name: dot_${{ github.workflow }}_clang_${{ matrix.generator }}
           path: ./dots/*
           if-no-files-found: warn
           retention-days: 90
