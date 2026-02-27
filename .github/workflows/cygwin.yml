@@ -59,7 +59,7 @@ jobs:
           source_dir: ./tests
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_${{ matrix.generator }}
@@ -121,7 +121,7 @@ jobs:
           source_dir: ./tests
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_gcc_${{ matrix.generator }}
@@ -182,7 +182,7 @@ jobs:
           source_dir: ./tests
           graphviz: ./dots/dependencies.dot
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         name: 📤 Upload dot files
         with:
           name: dot_${{ github.workflow }}_clang_${{ matrix.generator }}
